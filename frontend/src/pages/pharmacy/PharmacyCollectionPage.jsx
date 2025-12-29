@@ -140,6 +140,12 @@ const PharmacyCollectionPage = ({ subLabel }) => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [fetchError, setFetchError] = useState('');
+  // Selected filters: mapping from section label -> Set of selected option strings
+  const [selectedFilters, setSelectedFilters] = useState(() => {
+    const init = {};
+    (filterSections || []).forEach(s => { init[s.label] = new Set(); });
+    return init;
+  });
 
   const resolveImageUrl = (p) => {
     const candidate = p?.imageUrl || p?.image || p?.thumbnailUrl || p?.image_path;
@@ -243,10 +249,59 @@ const PharmacyCollectionPage = ({ subLabel }) => {
       console.log(`PharmacyCollectionPage: After subcategory filter (${activeSubcategory}): ${working.length} products`);
     }
     
+    // Step 3: Apply drawer filters (selectedFilters)
+    try {
+      Object.keys(selectedFilters || {}).forEach(sectionLabel => {
+        const selSet = selectedFilters[sectionLabel];
+        if (!selSet || selSet.size === 0) return;
+
+        const opts = Array.from(selSet);
+        working = working.filter(p => {
+          // helper: match price ranges
+          const matchPriceOption = (opt) => {
+            try {
+              const price = Number(p.price || 0);
+              const nums = opt.match(/(\d+)/g);
+              if (!nums || nums.length === 0) return false;
+              if (opt.includes('+')) {
+                const min = Number(nums[0]);
+                return price >= min;
+              }
+              if (nums.length >= 2) {
+                const min = Number(nums[0]);
+                const max = Number(nums[1]);
+                return price >= min && price <= max;
+              }
+              return false;
+            } catch (e) { return false; }
+          };
+
+          const matchGeneric = (opt) => {
+            const norm = (s) => String(s||'').toLowerCase();
+            const o = norm(opt);
+            if (norm(p.name).includes(o)) return true;
+            if (norm(p.category).includes(o)) return true;
+            if (norm(p.subcategory).includes(o)) return true;
+            if (norm(p.petType).includes(o)) return true;
+            if ((p.tags || []).some(t => norm(t).includes(o))) return true;
+            if ((p.badges || []).some(b => norm(b).includes(o))) return true;
+            if ((p.variants || []).some(v => norm(v).includes(o))) return true;
+            return false;
+          };
+
+          return opts.some(opt => {
+            if (/INR/i.test(opt)) return matchPriceOption(opt);
+            return matchGeneric(opt);
+          });
+        });
+      });
+    } catch (err) {
+      console.error('Filtering by selectedFilters failed', err);
+    }
+
     console.log(`PharmacyCollectionPage: Final filtered products: ${working.length}`);
-    
     setFilteredProducts(working);
-  }, [products, active, isDogPath, isCatPath, isMedicinesPath, isSupplementsPath, isPrescriptionPath]);
+  }, [products, active, isDogPath, isCatPath, isMedicinesPath, isSupplementsPath, isPrescriptionPath, selectedFilters]);
 
   // Top filters
   const topRef = useRef(null);
@@ -293,6 +348,28 @@ const PharmacyCollectionPage = ({ subLabel }) => {
       e.preventDefault();
       rightRef.current.scrollTop += e.deltaY;
     }
+  };
+
+  // Toggle a filter option for a given section label
+  const toggleFilter = (sectionLabel, option) => {
+    setSelectedFilters(prev => {
+      const next = { ...prev };
+      const setFor = new Set(next[sectionLabel] ? Array.from(next[sectionLabel]) : []);
+      if (setFor.has(option)) setFor.delete(option); else setFor.add(option);
+      next[sectionLabel] = setFor;
+      return next;
+    });
+  };
+
+  const clearAllFilters = () => {
+    const reset = {};
+    (filterSections || []).forEach(s => { reset[s.label] = new Set(); });
+    setSelectedFilters(reset);
+  };
+
+  const applyFilters = () => {
+    // Filtering is live; just close the drawer
+    setFilterOpen(false);
   };
 
   const ProductCard = ({ p }) => {
@@ -381,7 +458,8 @@ const PharmacyCollectionPage = ({ subLabel }) => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-12 gap-3 md:gap-6">
           {/* Sidebar - Categories */}
-          <aside className="col-span-3 lg:col-span-3 xl:col-span-2">
+          {/* Desktop/Tablet sidebar (hidden on small screens) */}
+          <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
             <div
               ref={leftRef}
               onWheel={handleLeftWheel}
@@ -410,12 +488,38 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           </aside>
 
           {/* Main Content */}
+          {/* Main Content */}
+          {/* On small screens the main column takes full width; sidebar is replaced by a horizontal scroller above */}
           <main
             ref={rightRef}
             onWheel={handleRightWheel}
-            className="col-span-9 lg:col-span-9 xl:col-span-10"
+            className="col-span-12 lg:col-span-9 xl:col-span-10"
             style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}
           >
+            {/* Mobile category scroller (horizontal) - shows on small screens */}
+            <div className="lg:hidden mb-4">
+              <div className="overflow-x-auto hide-scrollbar px-4">
+                <div className="inline-flex items-center gap-3 py-2">
+                  {categories.map((c) => {
+                    const isActive = active === c.label;
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => handleCategoryClick(c)}
+                        className={`flex-shrink-0 flex flex-col items-center gap-1 p-2 bg-white rounded-lg border transition-shadow ${isActive ? 'ring-2 ring-orange-400 shadow-sm' : 'border-border'}`}
+                        style={{ minWidth: 84 }}
+                      >
+                        <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${isActive ? '' : ''}`}>
+                          <img src={c.img} alt={c.label} className="w-full h-full object-cover pointer-events-none" />
+                        </div>
+                        <span className="text-xs text-center leading-tight mt-1">{c.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
             {/* Top filter bar */}
             <div className="mb-4 flex items-center justify-between">
               <div className="relative flex-1 overflow-hidden">
@@ -553,11 +657,18 @@ const PharmacyCollectionPage = ({ subLabel }) => {
                 <h4 className="text-sm font-medium mb-3">{section.label}</h4>
                 {section.options.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {section.options.map(option => (
-                      <button key={option} className="text-xs px-3 py-1 border border-border rounded bg-white">
-                        {option}
-                      </button>
-                    ))}
+                    {section.options.map(option => {
+                          const isActiveOpt = selectedFilters[section.label] && selectedFilters[section.label].has(option);
+                          return (
+                            <button
+                              key={option}
+                              onClick={() => toggleFilter(section.label, option)}
+                              className={`text-xs px-3 py-1 border rounded ${isActiveOpt ? 'bg-orange-500 text-white border-orange-500' : 'bg-white border-border'}`}
+                            >
+                              {option}
+                            </button>
+                          );
+                        })}
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">Add options for {section.label}</p>
@@ -567,8 +678,8 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           </div>
 
           <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
-            <button className="text-sm text-orange-500">Clear All</button>
-            <button className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
+            <button onClick={clearAllFilters} className="text-sm text-orange-500">Clear All</button>
+            <button onClick={applyFilters} className="bg-orange-500 text-white px-5 py-2 rounded">Apply Filters</button>
           </div>
         </aside>
       </div>

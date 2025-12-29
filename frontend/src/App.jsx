@@ -47,6 +47,7 @@ import CatCollars from './pages/shop-for-cats/CatCollars';
 import CatGrooming from './pages/shop-for-cats/CatGrooming';
 import DogPharmacyPage from './pages/pharmacy/dogs';
 import CatPharmacyPage from './pages/pharmacy/cats';
+import PharmacyCollectionPage from './pages/pharmacy/PharmacyCollectionPage';
 import PetServicesPage from './pages/pet-services';
 import ComingSoon from './pages/ComingSoon';
 import PetBoardingPage from './pages/pet-services/PetBoarding';
@@ -217,6 +218,7 @@ function App() {
                 <Route path="/shop-for-dogs/dog-health-hygiene/supplements" element={<DogHealthHygiene initialActive="Supplements" />} />
                 <Route path="/shop-for-dogs/dog-health-hygiene/tick-flea-control" element={<DogHealthHygiene initialActive="Tick & Flea Control" />} />
                 {/* Pharmacy landing pages */}
+                <Route path="/pharmacy" element={<PharmacyCollectionPage />} />
                 <Route path="/pharmacy/dogs" element={<DogPharmacyPage />} />
                 <Route path="/pharmacy/cats" element={<CatPharmacyPage />} />
 

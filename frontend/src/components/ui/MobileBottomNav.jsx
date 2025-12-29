@@ -32,7 +32,7 @@ const MobileBottomNav = () => {
             label: 'Pharmacy'
         },
         {
-            path: '/cart',
+            path: '/shopping-cart',
             icon: (active) => (
                 <div className="relative">
                     <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${active ? 'text-orange-500' : 'text-gray-600'}`} fill={active ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">

@@ -16,7 +16,13 @@ const OrderSuccessModal = ({
 }) => {
   if (!isOpen) return null;
 
-  const orderId = orderData?.id || orderData?.orderId || 'N/A';
+  // Resolve order identifier from multiple possible response shapes
+  const resolveOrderId = (od) => {
+    if (!od) return null;
+    return od?.orderId || od?.id || od?.order_no || od?.orderNumber || od?.order_number || od?.razorpayOrderId || od?.razorpay_order_id || od?.reference || od?.ref || od?.payment?.reference || od?.payment?.razorpay_order_id || null;
+  };
+  const resolvedOrderId = resolveOrderId(orderData);
+  const orderId = resolvedOrderId ?? null;
   const orderAmount = Number(orderData?.totalAmount ?? orderData?.amount ?? 0);
   const paymentMethod = orderData?.paymentMethod || 'COD';
   const customerName = orderData?.customerName || orderData?.user?.name || 'Customer';
@@ -55,7 +61,7 @@ const OrderSuccessModal = ({
           <div className="bg-gray-50 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-gray-600">Order ID</span>
-              <span className="text-lg font-bold text-gray-900">#{orderId}</span>
+              <span className="text-lg font-bold text-gray-900">{orderId ? `#${orderId}` : 'N/A'}</span>
             </div>
             
             <div className="flex items-center justify-between mb-3">
@@ -118,8 +124,8 @@ const OrderSuccessModal = ({
               onClick={onViewOrders}
               className="w-full bg-orange-500 text-white py-3 px-4 rounded-xl font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2"
             >
-              <Package size={18} />3
-              <span>View My Orders</span>
+              <Package size={18} />
+              <span>{itemCount} View My Orders</span>
               <ArrowRight size={16} />
             </button>
             

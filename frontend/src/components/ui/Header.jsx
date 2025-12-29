@@ -123,10 +123,36 @@ const Header = ({ onSearch = () => { } }) => {
     setSearchLoading(true);
     const timer = setTimeout(async () => {
       try {
-        const list = await fetch('/api/products');
+        // Use customer-facing endpoint so we get in-stock, enriched products
+        const list = await fetch('/api/admin/products/customer');
         let items = await list.json();
         const qLower = q.toLowerCase();
-        items = items.filter(p => String(p?.name || p?.title || '').toLowerCase().includes(qLower));
+        const buildSearchText = (p) => {
+          const parts = [];
+          if (p?.name) parts.push(p.name);
+          if (p?.title) parts.push(p.title);
+          if (p?.description) parts.push(p.description);
+          if (p?.brand) parts.push(typeof p.brand === 'string' ? p.brand : (p.brand?.name || ''));
+          if (p?.category) parts.push(typeof p.category === 'string' ? p.category : (p.category?.name || ''));
+          if (p?.subcategory) parts.push(typeof p.subcategory === 'string' ? p.subcategory : (p.subcategory?.name || ''));
+          if (p?.sub) parts.push(p.sub);
+          if (p?.subCategory) parts.push(p.subCategory);
+          if (p?.metadata && typeof p.metadata === 'object') {
+            if (p.metadata.subcategoryLabel) parts.push(String(p.metadata.subcategoryLabel));
+            if (p.metadata.manufacturer) parts.push(String(p.metadata.manufacturer));
+            if (p.metadata.filters && typeof p.metadata.filters === 'object') {
+              try {
+                Object.values(p.metadata.filters).forEach(v => {
+                  if (Array.isArray(v)) parts.push(v.join(' ')); else if (v) parts.push(String(v));
+                });
+              } catch (e) { }
+            }
+          }
+          if (Array.isArray(p?.tags)) parts.push(p.tags.join(' '));
+          if (p?.sku) parts.push(String(p.sku));
+          return parts.join(' ').toLowerCase();
+        };
+        items = items.filter(p => buildSearchText(p).includes(qLower));
         const limited = items.slice(0, 8).map(p => ({
           id: p?.id,
           name: p?.name || p?.title,
@@ -675,7 +701,7 @@ const Header = ({ onSearch = () => { } }) => {
                   }}
                 >
                   <span>Dogs</span>
-                  <Icon name="ChevronDown" size={16} />
+                  <Icon name={isMegaMenuOpen && activeMegaCategory === 'dogs' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
 
                 <button
@@ -687,7 +713,7 @@ const Header = ({ onSearch = () => { } }) => {
                   }}
                 >
                   <span>Cats</span>
-                  <Icon name="ChevronDown" size={16} />
+                  <Icon name={isMegaMenuOpen && activeMegaCategory === 'cats' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
 
                 <Link 
@@ -715,7 +741,7 @@ const Header = ({ onSearch = () => { } }) => {
                 >
                   <span>Pharmacy</span>
                   <span className="bg-[#ff7a00] text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
-                  <Icon name="ChevronDown" size={16} />
+                  <Icon name={isMegaMenuOpen && activeMegaCategory === 'pharmacy' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
 
                 <Link 
@@ -736,7 +762,7 @@ const Header = ({ onSearch = () => { } }) => {
                 >
                   <span>PET&CO Outlet</span>
                   <span className="bg-[#ff7a00] text-white text-xs font-semibold px-2 py-0.5 rounded">60% Off</span>
-                  <Icon name="ChevronDown" size={16} />
+                  <Icon name={isMegaMenuOpen && activeMegaCategory === 'outlet' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
               </div>
 
