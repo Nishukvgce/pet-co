@@ -22,6 +22,7 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
+  const [errors, setErrors] = useState({});
 
   // Build a duration->price map from options
   const priceMap = useMemo(() => {
@@ -89,7 +90,15 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
   minDate.setDate(minDate.getDate() + 1);
   const minDateStr = minDate.toISOString().split('T')[0];
 
-  const setField = (field, value) => setForm((p) => ({ ...p, [field]: value }));
+  const setField = (field, value) => {
+    setForm((p) => ({ ...p, [field]: value }));
+    setErrors((prev) => {
+      if (!prev) return prev;
+      const copy = { ...prev };
+      if (copy[field]) delete copy[field];
+      return copy;
+    });
+  };
   const setRule = (key, value) => setForm((p) => ({ ...p, rules: { ...p.rules, [key]: value } }));
 
   const stepForward = () => setStep((s) => Math.min(3, s + 1));
@@ -197,45 +206,50 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
   const submit = async (e) => {
     e?.preventDefault?.();
     
-    // Enhanced validation for all required fields
+    // Enhanced validation for all required fields (use inline errors instead of alert popups)
+    const newErrors = {};
     if (!form.petName || !form.petName.trim()) {
-      alert('Pet name is required');
-      return;
+      newErrors.petName = 'Pet name is required';
     }
-    
+
     if (!form.date) {
-      alert('Preferred date is required');
-      return;
+      newErrors.date = 'Preferred date is required';
     }
-    
+
     if (!form.timeSlot) {
-      alert('Time slot is required');
-      return;
+      newErrors.timeSlot = 'Time slot is required';
     }
-    
+
     const ownerName = form.recipientName || user?.name;
     if (!ownerName || !ownerName.trim()) {
-      alert('Owner/Recipient name is required');
-      return;
+      newErrors.recipientName = 'Owner/Recipient name is required';
     }
-    
+
     const phoneNumber = form.contactNumber || user?.phone;
     if (!phoneNumber || !phoneNumber.trim()) {
-      alert('Phone number is required');
-      return;
+      newErrors.contactNumber = 'Phone number is required';
     }
-    
-    // Validate address components
+
+    // Validate address components (but do not show intrusive alerts for address type or gender)
     if (!form.area || !form.area.trim()) {
-      alert('Area is required for pet walking service');
-      return;
+      newErrors.area = 'Area is required for pet walking service';
     }
-    
+
     if (!form.cityStateCountry || !form.cityStateCountry.trim()) {
-      alert('City/State/Country is required');
+      newErrors.cityStateCountry = 'City/State/Country is required';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      // Scroll to first errored field for visibility
+      const firstKey = Object.keys(newErrors)[0];
+      try {
+        const el = document.querySelector(`[name="${firstKey}"]`) || document.getElementById(firstKey);
+        if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (e) { /* ignore */ }
       return;
     }
-    
+
     console.log('[DEBUG] All validations passed, submitting walking booking...');
     setIsSubmitting(true);
     try {
@@ -399,10 +413,12 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
                 />
                 <Input
                   label="Date *"
+                  name="date"
                   type="date"
                   min={minDateStr}
                   value={form.date}
                   onChange={(e) => setField('date', e.target.value)}
+                  error={errors.date}
                   required
                 />
                 <Select
@@ -412,6 +428,7 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
                   options={timeSlots.map((t) => ({ value: t, label: t }))}
                   required
                 />
+                {errors.timeSlot && <p className="text-sm text-destructive">{errors.timeSlot}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -446,7 +463,7 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
               <h3 className="text-lg font-heading font-semibold text-foreground">Step 2: Pet Information</h3>
               <p className="text-sm text-muted-foreground">Enter your pet's details</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input label="Pet Name *" value={form.petName} onChange={(e) => setField('petName', e.target.value)} placeholder="Enter pet name" required />
+                <Input label="Pet Name *" name="petName" value={form.petName} onChange={(e) => setField('petName', e.target.value)} placeholder="Enter pet name" required error={errors.petName} />
                 <Select label="Pet Type *" value={form.petType} onChange={(v) => setField('petType', v)} options={[{value:'dog',label:'Dog'},{value:'cat',label:'Cat'}]} required />
                 {form.petType === 'dog' ? (
                   <Input
@@ -500,8 +517,8 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
             <div className="space-y-4">
               <h3 className="text-lg font-heading font-semibold text-foreground">Step 3: Complete Address</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input label="Area" value={form.area} onChange={(e) => setField('area', e.target.value)} placeholder="e.g., Banashankari" />
-                <Input label="City, State, Country" value={form.cityStateCountry} onChange={(e) => setField('cityStateCountry', e.target.value)} placeholder="e.g., Bengaluru, Karnataka, India" />
+                <Input label="Area" name="area" value={form.area} onChange={(e) => setField('area', e.target.value)} placeholder="e.g., Banashankari" error={errors.area} />
+                <Input label="City, State, Country" name="cityStateCountry" value={form.cityStateCountry} onChange={(e) => setField('cityStateCountry', e.target.value)} placeholder="e.g., Bengaluru, Karnataka, India" error={errors.cityStateCountry} />
               </div>
               <div className="flex items-center gap-3">
                 <Button variant="outline" iconName="MapPin" onClick={fetchCurrentAddress}>Use Current Location (GPS)</Button>
@@ -522,8 +539,8 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
                 <Input label="Society/Building Name" value={form.building} onChange={(e) => setField('building', e.target.value)} placeholder="Enter society or building name" />
                 <Input label="Floor" value={form.floor} onChange={(e) => setField('floor', e.target.value)} placeholder="Enter floor number" />
                 <Input label="Landmark" value={form.landmark} onChange={(e) => setField('landmark', e.target.value)} placeholder="Enter nearby landmark" />
-                <Input label="Recipient Name" value={form.recipientName} onChange={(e) => setField('recipientName', e.target.value)} placeholder="Who will hand over pet?" />
-                <Input label="Contact Number" type="tel" value={form.contactNumber} onChange={(e) => setField('contactNumber', e.target.value)} placeholder="+91XXXXXXXXXX" />
+                <Input label="Recipient Name" name="recipientName" value={form.recipientName} onChange={(e) => setField('recipientName', e.target.value)} placeholder="Who will hand over pet?" error={errors.recipientName} />
+                <Input label="Contact Number" name="contactNumber" type="tel" value={form.contactNumber} onChange={(e) => setField('contactNumber', e.target.value)} placeholder="+91XXXXXXXXXX" error={errors.contactNumber} />
               </div>
 
               <div className="flex justify-between pt-2">
