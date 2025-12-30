@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Header from '../../components/ui/Header';
 import Footer from '../homepage/components/Footer';
@@ -381,7 +381,9 @@ const PharmacyCollectionPage = ({ subLabel }) => {
             <div className="bg-green-500 text-white text-[11px] px-2 py-0.5 rounded-t-md">{p.badges?.[0]}</div>
           </div>
           <div className="mt-2 h-36 md:h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
-            <img src={p.image} alt={p.name} className="max-h-32 md:max-h-40 object-contain" />
+            <Link to={`/product-full/${p.id}`} aria-label={`Open ${p.name} full page`} className="block w-full h-full flex items-center justify-center">
+              <img src={p.image} alt={p.name} className="max-h-32 md:max-h-40 object-contain" onError={(e)=>{e.target.src='/assets/images/no_image.png'}} />
+            </Link>
           </div>
           <h3 className="mt-2 text-xs md:text-sm font-semibold text-foreground">{p.name}</h3>
           <div className="mt-2 flex flex-wrap gap-2">

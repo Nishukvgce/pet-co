@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import { useCart } from '../../contexts/CartContext';
 import Footer from '../homepage/components/Footer';
@@ -64,12 +65,14 @@ const ProductCard = ({ p }) => {
         </div>
         <div className="relative mb-4">
           <div className="h-40 md:h-48 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
-            <img 
-              src={getImageUrl(p.image)} 
-              alt={p.name} 
-              className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
-              onError={(e) => e.target.src = '/assets/images/no_image.png'}
-            />
+            <Link to={`/product-full/${p.id}`} aria-label={`Open ${p.name} full page`} className="block w-full h-full flex items-center justify-center">
+              <img 
+                src={getImageUrl(p.image)} 
+                alt={p.name} 
+                className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
+                onError={(e) => e.target.src = '/assets/images/no_image.png'}
+              />
+            </Link>
           </div>
           {!isInStock && (
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg">
