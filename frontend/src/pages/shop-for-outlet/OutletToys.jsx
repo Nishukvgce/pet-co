@@ -6,6 +6,7 @@ import { useCart } from '../../contexts/CartContext';
 import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import productApi from '../../services/productApi';
+import { resolveImageUrl } from '../../lib/imageUtils';
 
 // Outlet Toys categories - matching backend subcategory names
 const categories = [
@@ -29,15 +30,10 @@ const ProductCard = ({ p }) => {
   const discount = originalPrice > currentPrice ? Math.round(100 - (currentPrice / originalPrice) * 100) : 0;
   const isInStock = currentVariant.stock > 0;
 
-  // Handle backend image URLs
+  // Resolve image URL using shared helper so backend baseURL and various path formats are handled
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/assets/images/no_image.png';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    if (imageUrl.startsWith('/admin/')) {
-      // Backend image path - construct full URL
-      return `http://localhost:8080${imageUrl}`;
-    }
-    return imageUrl;
+    const resolved = resolveImageUrl(imageUrl || '');
+    return resolved || '/assets/images/no_image.png';
   };
 
   const handleAddToCart = () => {
@@ -73,65 +69,57 @@ const ProductCard = ({ p }) => {
           )}
         </div>
 
-        {/* Product Image */}
+        {/* Product Image with overlays */}
         <div className="relative mb-4">
           <div className="h-40 md:h-48 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
-            <img 
-              src={getImageUrl(p.image)} 
-              alt={p.name} 
-              className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
-                e.target.src = '/assets/images/no_image.png';
-              }}
-            />
+            <Link to={`/product-full/${p.id}`} aria-label={`Open ${p.name} full page`} className="block w-full h-full flex items-center justify-center">
+              <img 
+                src={getImageUrl(p.image)} 
+                alt={p.name} 
+                className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
+                onError={(e) => { e.target.src = '/assets/images/no_image.png'; }}
+              />
+            </Link>
+
+            {!isInStock && (
+              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg z-10">
+                <span className="text-white font-bold text-sm">Out of Stock</span>
+              </div>
+            )}
           </div>
-          {!isInStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg">
-              <span className="text-white font-bold text-sm">Out of Stock</span>
-            </div>
-          )}
         </div>
-        
+
         {/* Product Name */}
         <h3 className="text-sm md:text-base font-semibold text-foreground mb-3 line-clamp-2 leading-tight overflow-hidden" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>{p.name}</h3>
 
-        {/* Variant chips */}
+        {/* Variant chips (show weight + price) */}
         {variants.length > 1 && (
           <div className="mb-4 flex flex-wrap gap-2">
             {variants.map((v, i) => (
-              <span 
-                key={i} 
+              <button 
+                key={i}
                 onClick={() => setVariantIdx(i)}
-                className={`text-xs font-medium px-3 py-1.5 border rounded-full cursor-pointer transition-all duration-200 ${
-                  i === variantIdx 
-                    ? 'border-orange-500 bg-orange-50 text-orange-600' 
-                    : 'border-border hover:border-orange-300 hover:bg-orange-50'
-                }`}
-              >
-                {v.weight ? `${v.weight}${v.weightUnit || ''}` : 'Default'}
-              </span>
+                className={`flex flex-col items-center text-xs font-medium px-3 py-2 border rounded-lg cursor-pointer transition-all duration-200 ${i === variantIdx ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-border hover:border-orange-300 hover:bg-orange-50'}`}>
+                <span className="leading-tight">{v.weight ? `${v.weight}${v.weightUnit || ''}` : 'Default'}</span>
+                <span className="text-[11px] text-muted-foreground mt-1">₹{(v.price || currentPrice).toLocaleString()}</span>
+              </button>
             ))}
           </div>
         )}
 
-        {/* Price and Add to Cart */}
+        {/* Price and circular Add button */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            <div className="text-lg md:text-xl font-bold text-foreground">₹{currentPrice}</div>
+            <div className="text-lg md:text-xl font-bold text-foreground">₹{currentPrice.toLocaleString()}</div>
             {originalPrice > currentPrice && (
-              <div className="text-sm text-muted-foreground line-through">₹{originalPrice}</div>
+              <div className="text-sm text-muted-foreground line-through">₹{originalPrice.toLocaleString()}</div>
             )}
           </div>
-          <button 
+          <button
             onClick={handleAddToCart}
             disabled={!isInStock}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-              isInStock 
-                ? 'bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white hover:shadow-md'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {isInStock ? 'Add' : 'Unavailable'}
+            className={`w-12 h-12 rounded-full text-sm font-medium transition-colors duration-200 flex items-center justify-center ${isInStock ? 'bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-md' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
+            {isInStock ? 'Add' : '—'}
           </button>
         </div>
       </div>

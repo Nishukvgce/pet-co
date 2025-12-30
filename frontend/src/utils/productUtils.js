@@ -244,6 +244,24 @@ export const normalizeProductFromApi = (product = {}) => {
     return acc;
   }, {});
 
+  // Normalize explicit foodType metadata into filters so UI can filter by Veg/Non-Veg
+  const rawFoodType = metadata.foodType || product.foodType;
+  const normalizedFoodType = ensureArray(rawFoodType)
+    .map((ft) => {
+      if (!ft) return null;
+      const key = `${ft}`.toString().toLowerCase();
+      if (key.includes('non') && key.includes('veg')) return 'Non-Vegetarian';
+      if (key.includes('non') && key.includes('veg') === false && key.includes('veg')) return 'Non-Vegetarian';
+      if (key.includes('non') && !key.includes('veg')) return 'Non-Vegetarian';
+      if (key.includes('veg')) return 'Vegetarian';
+      return toTitleCase(`${ft}`);
+    })
+    .filter(Boolean);
+
+  if (normalizedFoodType.length) {
+    normalizedFilters.foodType = normalizedFoodType;
+  }
+
   const variants = ensureArray(metadata.variants || product.variants).map((variant, idx) => ({
     id: variant?.id || `variant-${idx}`,
     weight: variant?.weight || '',

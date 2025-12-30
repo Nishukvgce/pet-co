@@ -100,6 +100,7 @@ const dogFoodSections = [
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Giant', 'Mini', 'Maxi']),
   buildSection('productTypes', 'Product Type', ['Combo', 'Dry Food', 'Food Toppers', 'Treat', 'Wet Food']),
   buildSection('specialDiets', 'Special Diet', ['60% Protein', '100% Vegetarian', 'Chicken Free', 'Grain Free', 'High Protein', 'Hypoallergenic']),
+  buildSection('foodType', 'Veg / Non-Veg', ['Vegetarian', 'Non-Vegetarian']),
   buildSection('proteinSource', 'Protein Source', ['Blueberry', 'Chicken', 'Duck', 'Egg', 'Fish', 'Fruits', 'Lamb', 'Spinach', 'Turkey']),
   buildSection('priceRanges', 'Price', ['INR 10 - INR 300', 'INR 301 - INR 500', 'INR 501 - INR 1000', 'INR 1000 - INR 2000', 'INR 2000+']),
   buildSection('weights', 'Weight', ['70 g', '100 g', '150 g', '200 g', '300 g', '340 g', '370 g', '400 g', '500 g', '800 g', '1 kg', '1.5 kg', '2 kg', '3 kg', '5 kg', '10 kg', '20 kg']),

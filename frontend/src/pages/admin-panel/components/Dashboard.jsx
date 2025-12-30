@@ -7,6 +7,7 @@ import dataService from '../../../services/dataService';
 import userApi from '../../../services/userApi';
 import orderApi from '../../../services/orderApi';
 import productApi from '../../../services/productApi';
+import apiClient from '../../../services/api';
 import { 
   exportToCSV, 
   filterDataByDateRange, 
@@ -417,19 +418,41 @@ const Dashboard = () => {
   };
 
   // CSV Export Functions
+  const downloadFromApi = async (path, params = {}, filenameFallback) => {
+    try {
+      // Use apiClient so baseURL and auth headers are applied
+      const resp = await apiClient.get(path, { params, responseType: 'blob' });
+      const blob = resp.data;
+      const cd = resp.headers['content-disposition'] || resp.headers['Content-Disposition'];
+      let filename = filenameFallback || 'export.csv';
+      if (cd) {
+        const match = cd.match(/filename="?(.*)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+      const link = document.createElement('a');
+      const urlBlob = window.URL.createObjectURL(blob);
+      link.href = urlBlob;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(urlBlob);
+    } catch (err) {
+      console.error('Export error', err);
+      const message = err?.response?.data || err.message || 'Export failed';
+      alert('Export failed. See console for details.');
+    }
+  };
+
   const handleExportOrders = (filterType) => {
-    const filteredOrders = filterDataByDateRange(rawData.orders, filterType);
-    const formattedData = formatOrdersForCSV(filteredOrders);
-    const filename = `orders_${filterType}_${new Date().toISOString().split('T')[0]}`;
-    exportToCSV(formattedData, filename);
+    const filename = `orders_${filterType}_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadFromApi('admin/export/orders', { period: filterType }, filename);
     setShowExportMenu(false);
   };
 
   const handleExportUsers = (filterType) => {
-    const filteredUsers = filterDataByDateRange(rawData.users.filter(u => u.role === 'customer'), filterType);
-    const formattedData = formatUsersForCSV(filteredUsers);
-    const filename = `users_${filterType}_${new Date().toISOString().split('T')[0]}`;
-    exportToCSV(formattedData, filename);
+    const filename = `users_${filterType}_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadFromApi('admin/export/customers', { period: filterType }, filename);
     setShowExportMenu(false);
   };
 
