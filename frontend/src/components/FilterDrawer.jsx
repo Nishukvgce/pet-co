@@ -4,7 +4,7 @@ const FilterDrawer = ({ open, onClose, sections = [], selected = {}, onToggle = 
   const drawerContentRef = useRef(null);
 
   return (
-    <div aria-hidden={!open} className={`fixed inset-0 z-50 pointer-events-none ${open ? '' : ''}`}>
+    <div aria-hidden={!open} className={`fixed inset-0 pointer-events-none ${open ? '' : ''}`} style={{ zIndex: 9999 }}>
       <div
         onClick={onClose}
         className={`absolute inset-0 bg-black/40 transition-opacity ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0'}`}
@@ -50,7 +50,7 @@ const FilterDrawer = ({ open, onClose, sections = [], selected = {}, onToggle = 
           ))}
         </div>
 
-        <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
+        <div className="fixed bottom-16 sm:bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between" style={{ zIndex: 10000 }}>
           <button onClick={onClear} className="text-sm text-orange-500">Clear All</button>
           <button onClick={onApply} className="bg-orange-500 text-white px-5 py-2 rounded">Apply Filters</button>
         </div>
