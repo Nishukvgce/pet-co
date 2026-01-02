@@ -645,7 +645,8 @@ export const CartProvider = ({ children }) => {
       return { valid: false, reason: 'No items in cart' };
     }
     const { petType = null, category = null, subcategory = null } = context;
-    const res = await couponApi.validate({ code, subtotal, petType, category, subcategory });
+    // Prefer server-side apply which validates + persists to checkout selection
+    const res = await couponApi.apply({ code, subtotal, petType, category, subcategory, email: user?.email, userId: user?.id });
     if (!res.valid) {
       setAppliedCoupon(null);
       setCouponDiscount(0);
@@ -659,6 +660,16 @@ export const CartProvider = ({ children }) => {
   const removeCoupon = () => {
     setAppliedCoupon(null);
     setCouponDiscount(0);
+    try {
+      if (user?.email) {
+        (async () => {
+          const checkoutApi = (await import('../services/checkoutApi')).default;
+          await checkoutApi.saveSelection(user.email, { couponCode: null });
+        })();
+      }
+    } catch (e) {
+      // ignore
+    }
   };
 
   const getCartTotal = () => {

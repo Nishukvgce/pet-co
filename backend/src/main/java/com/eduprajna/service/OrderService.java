@@ -36,15 +36,21 @@ public class OrderService {
     private final CheckoutSelectionRepository selectionRepo;
     private final AddressRepository addressRepo;
     private final com.eduprajna.repository.ProductRepository productRepo;
+    private final com.eduprajna.roots.coupons.CouponRepository couponRepo;
+    private final com.eduprajna.roots.coupons.CouponRedemptionRepository redemptionRepo;
 
     public OrderService(OrderRepository orderRepo, CartItemRepository cartRepo, 
                        CheckoutSelectionRepository selectionRepo, AddressRepository addressRepo,
-                       com.eduprajna.repository.ProductRepository productRepo) {
+                       com.eduprajna.repository.ProductRepository productRepo,
+                       com.eduprajna.roots.coupons.CouponRepository couponRepo,
+                       com.eduprajna.roots.coupons.CouponRedemptionRepository redemptionRepo) {
         this.orderRepo = orderRepo;
         this.cartRepo = cartRepo;
         this.selectionRepo = selectionRepo;
         this.addressRepo = addressRepo;
         this.productRepo = productRepo;
+        this.couponRepo = couponRepo;
+        this.redemptionRepo = redemptionRepo;
     }
 
     /**
@@ -160,9 +166,16 @@ public class OrderService {
         double subtotal = cart.stream()
             .mapToDouble(ci -> (ci.getPriceAtAdd() != null ? ci.getPriceAtAdd() : 0.0) * ci.getQuantity())
             .sum();
-        double shippingFee = "express".equalsIgnoreCase(selection.getDeliveryOption()) ? 100.0 : 50.0;
-        double total = subtotal + shippingFee;
-        
+
+        // Shipping fee: ₹50 when subtotal < ₹500, otherwise Free
+        double shippingFee = (selection.getShippingFee() != null) ? selection.getShippingFee() : ((subtotal >= 500.0) ? 0.0 : 50.0);
+        double total;
+        if (selection.getTotal() != null) {
+            total = selection.getTotal();
+        } else {
+            total = subtotal + shippingFee;
+        }
+
         order.setSubtotal(subtotal);
         order.setShippingFee(shippingFee);
         order.setTotal(total);
@@ -235,6 +248,28 @@ public class OrderService {
         
         // 10. Update user's order count
         user.incrementTotalOrders();
+
+        // 11. Record coupon redemption if a coupon code was applied in checkout selection
+        try {
+            CheckoutSelection sel = selectionRepo.findByUser(user).orElse(null);
+            if (sel != null && sel.getCouponCode() != null && !sel.getCouponCode().trim().isEmpty()) {
+                String code = sel.getCouponCode().trim();
+                var oc = couponRepo.findByCodeIgnoreCase(code);
+                if (oc.isPresent()) {
+                    var coupon = oc.get();
+                    boolean already = redemptionRepo.existsByCoupon_IdAndUser_Id(coupon.getId(), user.getId());
+                    if (!already) {
+                        com.eduprajna.roots.coupons.CouponRedemption cr = new com.eduprajna.roots.coupons.CouponRedemption();
+                        cr.setCoupon(coupon);
+                        cr.setUser(user);
+                        redemptionRepo.save(cr);
+                        logger.info("Recorded coupon redemption for code {} user {}", code, user.getEmail());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to record coupon redemption: {}", e.getMessage());
+        }
         
         return savedOrder;
     }
@@ -279,18 +314,21 @@ public class OrderService {
         Double subtotal = selection.getSubtotal();
         Double shippingFee = selection.getShippingFee();
         Double total = selection.getTotal();
-        
+
         logger.debug("CheckoutSelection found - ID: {}, DeliveryOption: {}, PaymentMethod: {}", 
                     selection.getId(), selection.getDeliveryOption(), selection.getPaymentMethod());
         logger.debug("CheckoutSelection totals - subtotal: {}, shippingFee: {}, total: {}", 
                     subtotal, shippingFee, total);
-        
-        if (subtotal == null || shippingFee == null || total == null) {
-            logger.error("Order totals are null in checkout selection. Subtotal: {}, ShippingFee: {}, Total: {}", 
-                        subtotal, shippingFee, total);
-            throw new IllegalStateException("Order totals not found in checkout selection");
+
+        if (subtotal == null) {
+            logger.error("Order subtotal is null in checkout selection.");
+            throw new IllegalStateException("Order subtotal not found in checkout selection");
         }
-        
+
+        // If shippingFee is missing, default to threshold rule; if total missing, derive from subtotal + shipping
+        if (shippingFee == null) shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
+        if (total == null) total = subtotal + shippingFee; // selection may have already applied coupon
+
         order.setSubtotal(subtotal);
         order.setShippingFee(shippingFee);
         order.setTotal(total);
@@ -335,6 +373,28 @@ public class OrderService {
         
         // Update user's order count
         user.incrementTotalOrders();
+
+        // Record coupon redemption if a coupon code was applied in checkout selection
+        try {
+            CheckoutSelection sel = selectionRepo.findByUser(user).orElse(null);
+            if (sel != null && sel.getCouponCode() != null && !sel.getCouponCode().trim().isEmpty()) {
+                String code = sel.getCouponCode().trim();
+                var oc = couponRepo.findByCodeIgnoreCase(code);
+                if (oc.isPresent()) {
+                    var coupon = oc.get();
+                    boolean already = redemptionRepo.existsByCoupon_IdAndUser_Id(coupon.getId(), user.getId());
+                    if (!already) {
+                        com.eduprajna.roots.coupons.CouponRedemption cr = new com.eduprajna.roots.coupons.CouponRedemption();
+                        cr.setCoupon(coupon);
+                        cr.setUser(user);
+                        redemptionRepo.save(cr);
+                        logger.info("Recorded coupon redemption for code {} user {} (online)", code, user.getEmail());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to record coupon redemption (online): {}", e.getMessage());
+        }
         
         return savedOrder;
     }

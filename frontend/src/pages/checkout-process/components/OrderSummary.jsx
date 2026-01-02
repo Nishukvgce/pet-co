@@ -12,7 +12,8 @@ const OrderSummary = ({
   total = 0,
   onApplyCoupon,
   appliedCoupon = null,
-  isCollapsible = false 
+  isCollapsible = false,
+  serverReview = null
 }) => {
   const [isExpanded, setIsExpanded] = useState(!isCollapsible);
   const [couponCode, setCouponCode] = useState('');
@@ -49,10 +50,11 @@ const OrderSummary = ({
   ];
 
   const items = cartItems?.length > 0 ? cartItems : mockCartItems;
-  const calculatedSubtotal = subtotal || items?.reduce((sum, item) => sum + (item?.price * item?.quantity), 0);
-  const calculatedShipping = shipping || (calculatedSubtotal >= 499 ? 0 : 49);
-  const calculatedDiscount = discount || 0;
-  const calculatedTotal = total || (calculatedSubtotal + calculatedShipping - calculatedDiscount);
+  // If server review data exists, prefer server-provided totals (server applies coupon and sets shipping)
+  const calculatedSubtotal = serverReview?.subtotal ?? subtotal ?? items?.reduce((sum, item) => sum + (item?.price * item?.quantity), 0);
+  const calculatedShipping = serverReview?.shippingFee ?? shipping ?? (calculatedSubtotal >= 500 ? 0 : 50);
+  const calculatedTotal = serverReview?.total ?? total ?? (calculatedSubtotal + calculatedShipping - (discount || 0));
+  const calculatedDiscount = Math.max(0, (calculatedSubtotal - calculatedTotal)) || (discount || 0);
 
   const handleApplyCoupon = () => {
     setCouponError('');
@@ -221,10 +223,10 @@ const OrderSummary = ({
           </div>
 
           {/* Free Shipping Notice */}
-          {calculatedSubtotal < 499 && (
+          {calculatedSubtotal < 500 && (
             <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
               <p className="font-caption text-xs text-warning-foreground">
-                Add ₹{(499 - calculatedSubtotal)?.toFixed(2)} more for free shipping!
+                Add ₹{(500 - calculatedSubtotal)?.toFixed(2)} more for free shipping!
               </p>
             </div>
           )}

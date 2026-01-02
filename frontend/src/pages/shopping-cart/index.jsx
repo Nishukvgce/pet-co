@@ -41,12 +41,9 @@ const ShoppingCart = () => {
   
   // Shipping calculation based on location
   const getShippingCost = () => {
-    if (shippingLocation === 'bengaluru') {
-      return discountedSubtotal >= 499 ? 0 : 49;
-    } else if (shippingLocation === 'other') {
-      return discountedSubtotal >= 999 ? 0 : 99;
-    }
-    return 0;
+    // Shipping rule: ₹50 when subtotal < ₹500, otherwise Free
+    if (discountedSubtotal >= 500) return 0;
+    return 50;
   };
   
   const shipping = getShippingCost();
@@ -104,7 +101,7 @@ const ShoppingCart = () => {
     <>
       <Helmet>
         <title>Shopping Cart - PET&CO | Review Your Natural Products</title>
-        <meta name="description" content="Review and modify your cart items. Secure checkout with natural and organic food products. Free shipping available on orders above ₹499 in Bengaluru." />
+        <meta name="description" content="Review and modify your cart items. Secure checkout with natural and organic food products. Free shipping available on orders above ₹500." />
         <meta name="keywords" content="shopping cart, natural products, organic food, checkout, free shipping, PET&CO" />
       </Helmet>
       <div className="min-h-screen bg-background">

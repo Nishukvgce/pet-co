@@ -49,15 +49,20 @@ const ProductCard = ({ p }) => {
   const handleAddToCart = () => {
     if (!isInStock) return;
     
-    addToCart({
-      id: p.id,
-      name: p.name,
-      image: getImageUrl(p.image),
-      price: currentPrice,
-      variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
-      quantity: 1,
-      category: 'Outlet Food & Treats'
-    });
+    (async () => {
+      try {
+        await addToCart({
+          productId: p.id,
+          id: p.id,
+          name: p.name,
+          image: getImageUrl(p.image),
+          price: currentPrice,
+          variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
+          quantity: 1,
+          category: 'Outlet Food & Treats'
+        });
+      } catch (e) {}
+    })();
   };
 
   return (

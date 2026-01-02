@@ -172,7 +172,7 @@ const CheckoutProcess = () => {
     const itemQuantity = parseInt(item?.quantity) || 0;
     return sum + (itemPrice * itemQuantity);
   }, 0);
-  const shippingCost = deliveryData?.price || (subtotal >= 499 ? 0 : 49);
+  const shippingCost = deliveryData?.price || (subtotal >= 500 ? 0 : 50);
   const discountAmount = couponDiscount || 0;
   const total = subtotal + shippingCost - discountAmount;
 
@@ -405,7 +405,7 @@ const CheckoutProcess = () => {
             shippingAddress={shippingData}
             deliveryOption={deliveryData}
             paymentMethod={paymentData?.method}
-            orderTotal={total}
+            orderTotal={orderReviewData?.total ?? total}
             orderReviewData={orderReviewData}
             isProcessing={isProcessing}
             error={error}
@@ -539,6 +539,7 @@ const CheckoutProcess = () => {
                 shipping={shippingCost}
                 discount={discountAmount}
                 total={total}
+                serverReview={orderReviewData}
                 onApplyCoupon={handleApplyCoupon}
                 appliedCoupon={appliedCoupon}
               />
@@ -561,6 +562,7 @@ const CheckoutProcess = () => {
               shipping={shippingCost}
               discount={discountAmount}
               total={total}
+              serverReview={orderReviewData}
               onApplyCoupon={handleApplyCoupon}
               appliedCoupon={appliedCoupon}
             />

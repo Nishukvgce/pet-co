@@ -34,6 +34,7 @@ public class PaymentController {
     private final com.eduprajna.service.CartService cartService;
     private final com.eduprajna.repository.CheckoutSelectionRepository selectionRepo;
     private final com.eduprajna.repository.AddressRepository addressRepo;
+    private final com.eduprajna.roots.coupons.CouponService couponService;
 
     @Value("${razorpay.keyId:}")
     private String razorpayKeyId;
@@ -41,7 +42,8 @@ public class PaymentController {
     public PaymentController(RazorpayService razorpayService, OrderService orderService, UserService userService, OrderRepository orderRepo,
                              com.eduprajna.service.CartService cartService,
                              com.eduprajna.repository.CheckoutSelectionRepository selectionRepo,
-                             com.eduprajna.repository.AddressRepository addressRepo) {
+                             com.eduprajna.repository.AddressRepository addressRepo,
+                             com.eduprajna.roots.coupons.CouponService couponService) {
         this.razorpayService = razorpayService;
         this.orderService = orderService;
         this.userService = userService;
@@ -49,6 +51,7 @@ public class PaymentController {
         this.cartService = cartService;
         this.selectionRepo = selectionRepo;
         this.addressRepo = addressRepo;
+        this.couponService = couponService;
     }
 
     @PostMapping("/create-order")
@@ -99,7 +102,9 @@ public class PaymentController {
                         ci.getProduct().getName(), ci.getQuantity(), price, price * ci.getQuantity());
                 }
                 
-                shippingFee = "express".equalsIgnoreCase(selection.getDeliveryOption()) ? 100.0 : 50.0;
+                // Shipping fee removed; default to 0 and total equals subtotal (coupon already applied in selection if any)
+                // Shipping fee: ₹50 when subtotal < ₹500, otherwise Free
+                shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
                 total = subtotal + shippingFee;
                 
                 // Save calculated totals back to selection for order service
@@ -179,9 +184,24 @@ public class PaymentController {
                         subtotal += price * ci.getQuantity();
                     }
                     
-                    double shippingFee = "express".equalsIgnoreCase(selection.getDeliveryOption()) ? 100.0 : 50.0;
-                    double total = subtotal + shippingFee;
-                    
+                    // Shipping fee: ₹50 when subtotal < ₹500, otherwise Free
+                    double shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
+                    double discount = 0.0;
+                    try {
+                        if (selection.getCouponCode() != null && !selection.getCouponCode().trim().isEmpty()) {
+                            var vr = couponService.validate(selection.getCouponCode().trim(), subtotal, null, null, null, java.time.LocalDateTime.now(), user.getId());
+                            if (vr != null && vr.isValid()) {
+                                discount = vr.getDiscount();
+                            } else {
+                                selection.setCouponCode(null);
+                            }
+                        }
+                    } catch (Exception e) {
+                        // ignore
+                    }
+
+                    double total = Math.max(0.0, subtotal + shippingFee - discount);
+
                     selection.setSubtotal(subtotal);
                     selection.setShippingFee(shippingFee);
                     selection.setTotal(total);

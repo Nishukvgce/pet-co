@@ -10,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CouponService {
     private final CouponRepository repo;
+    private final CouponRedemptionRepository redemptionRepo;
 
-    public CouponService(CouponRepository repo) {
+    public CouponService(CouponRepository repo, CouponRedemptionRepository redemptionRepo) {
         this.repo = repo;
+        this.redemptionRepo = redemptionRepo;
     }
 
     public List<Coupon> listAll() { return repo.findAll(); }
@@ -43,7 +45,7 @@ public class CouponService {
     public Optional<Coupon> findByCode(String code) { return repo.findByCodeIgnoreCase(code); }
 
     @Transactional(readOnly = true)
-    public ValidationResult validate(String code, double subtotal, String petType, String category, String subcategory, LocalDateTime now) {
+    public ValidationResult validate(String code, double subtotal, String petType, String category, String subcategory, LocalDateTime now, Long userId) {
         Optional<Coupon> oc = findByCode(code);
         if (oc.isEmpty()) return ValidationResult.invalid("Coupon not found");
         Coupon c = oc.get();
@@ -54,6 +56,12 @@ public class CouponService {
         if (c.getApplicablePetType() != null && petType != null && !c.getApplicablePetType().equalsIgnoreCase(petType)) return ValidationResult.invalid("Not applicable for pet type");
         if (c.getApplicableCategory() != null && category != null && !c.getApplicableCategory().equalsIgnoreCase(category)) return ValidationResult.invalid("Not applicable for category");
         if (c.getApplicableSubcategory() != null && subcategory != null && !c.getApplicableSubcategory().equalsIgnoreCase(subcategory)) return ValidationResult.invalid("Not applicable for subcategory");
+
+        // If userId provided, ensure this coupon hasn't already been redeemed by this user
+        if (userId != null) {
+            boolean used = redemptionRepo.existsByCoupon_IdAndUser_Id(c.getId(), userId);
+            if (used) return ValidationResult.invalid("Coupon already used by this user");
+        }
 
         double discount;
         if (c.getDiscountType() == Coupon.DiscountType.PERCENT) {

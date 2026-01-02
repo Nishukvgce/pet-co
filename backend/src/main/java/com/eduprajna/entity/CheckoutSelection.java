@@ -38,6 +38,9 @@ public class CheckoutSelection {
     @Column(nullable = true)
     private Double total; // Total amount at checkout time
 
+    @Column(name = "coupon_code", nullable = true)
+    private String couponCode;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public User getUser() { return user; }
@@ -54,6 +57,8 @@ public class CheckoutSelection {
     public void setShippingFee(Double shippingFee) { this.shippingFee = shippingFee; }
     public Double getTotal() { return total; }
     public void setTotal(Double total) { this.total = total; }
+    public String getCouponCode() { return couponCode; }
+    public void setCouponCode(String couponCode) { this.couponCode = couponCode; }
 }
 
 

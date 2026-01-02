@@ -17,14 +17,27 @@ const couponApi = {
     const res = await api.delete(`/coupons/${id}`);
     return res?.data;
   },
-  validate: async ({ code, subtotal, petType, category, subcategory }) => {
+  validate: async ({ code, subtotal, petType, category, subcategory, email }) => {
     try {
-      const res = await api.post('/coupons/validate', {
-        code, subtotal, petType, category, subcategory
-      });
+      const payload = { code, subtotal, petType, category, subcategory };
+      if (email) payload.email = email;
+      const res = await api.post('/coupons/validate', payload);
       return { valid: true, ...res?.data };
     } catch (err) {
       const reason = err?.response?.data?.reason || 'Invalid coupon';
+      return { valid: false, reason };
+    }
+  }
+  ,
+  apply: async ({ code, subtotal, petType, category, subcategory, email, userId }) => {
+    try {
+      const payload = { code, subtotal, petType, category, subcategory };
+      if (email) payload.email = email;
+      if (userId) payload.userId = userId;
+      const res = await api.post('/coupons/apply', payload);
+      return { valid: true, ...res?.data };
+    } catch (err) {
+      const reason = err?.response?.data?.reason || 'Failed to apply coupon';
       return { valid: false, reason };
     }
   }

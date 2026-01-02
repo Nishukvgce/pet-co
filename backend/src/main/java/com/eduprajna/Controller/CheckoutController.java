@@ -49,15 +49,17 @@ public class CheckoutController {
     private final CheckoutSelectionRepository selectionRepo;
     private final AddressRepository addressRepo;
     private final OrderService orderService;
+    private final com.eduprajna.roots.coupons.CouponService couponService;
 
     public CheckoutController(UserService userService, CartService cartService, 
                             CheckoutSelectionRepository selectionRepo, AddressRepository addressRepo, 
-                            OrderService orderService) {
+                            OrderService orderService, com.eduprajna.roots.coupons.CouponService couponService) {
         this.userService = userService;
         this.cartService = cartService;
         this.selectionRepo = selectionRepo;
         this.addressRepo = addressRepo;
         this.orderService = orderService;
+        this.couponService = couponService;
     }
 
     /**
@@ -124,6 +126,13 @@ public class CheckoutController {
                 logger.debug("Updated payment method: {}", paymentMethod);
             }
 
+            // Optional: coupon code applied by user
+            if (body.get("couponCode") != null) {
+                String couponCode = (String) body.get("couponCode");
+                selection.setCouponCode(couponCode);
+                logger.debug("Set coupon code on selection: {}", couponCode);
+            }
+
             // Recalculate totals if delivery option was changed
             if (body.get("deliveryOption") != null || selection.getSubtotal() == null) {
                 List<CartItem> cart = cartService.getCart(user);
@@ -134,9 +143,28 @@ public class CheckoutController {
                             return (price != null ? price : 0.0) * ci.getQuantity();
                         })
                         .sum();
-                    double shippingFee = "express".equalsIgnoreCase(selection.getDeliveryOption()) ? 100.0 : 50.0;
-                    double total = subtotal + shippingFee;
-                    
+                    // Shipping fee removed: orders should not include extra delivery charges
+                    // Shipping fee: ₹50 when subtotal < ₹500, otherwise Free
+                    double shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
+
+                    // If a coupon code is present, attempt to validate and apply discount
+                    double discount = 0.0;
+                    try {
+                        if (selection.getCouponCode() != null && !selection.getCouponCode().trim().isEmpty()) {
+                            var vr = couponService.validate(selection.getCouponCode().trim(), subtotal, null, null, null, java.time.LocalDateTime.now(), user.getId());
+                            if (vr != null && vr.isValid()) {
+                                discount = vr.getDiscount();
+                            } else {
+                                // invalid coupon -> clear code so UX doesn't persist an invalid coupon
+                                selection.setCouponCode(null);
+                            }
+                        }
+                    } catch (Exception e) {
+                        // Validation failure should not block checkout; continue without discount
+                    }
+
+                    double total = Math.max(0.0, subtotal + shippingFee - discount);
+
                     selection.setSubtotal(subtotal);
                     selection.setShippingFee(shippingFee);
                     selection.setTotal(total);
@@ -238,10 +266,27 @@ public class CheckoutController {
                 return dto;
             }).collect(Collectors.toList());
 
-            // 9. Calculate totals
+            // 9. Calculate totals (shipping fee removed)
             double subtotal = items.stream().mapToDouble(i -> i.lineTotal).sum();
-            double shippingFee = "express".equalsIgnoreCase(selection.getDeliveryOption()) ? 100.0 : 50.0;
-            double total = subtotal + shippingFee;
+            // Shipping fee: ₹50 when subtotal < ₹500, otherwise Free
+            double shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
+
+            // If coupon exists on selection, validate and apply discount
+            double discount = 0.0;
+            try {
+                if (selection.getCouponCode() != null && !selection.getCouponCode().trim().isEmpty()) {
+                    var vr = couponService.validate(selection.getCouponCode().trim(), subtotal, null, null, null, java.time.LocalDateTime.now(), selection.getUser() != null ? selection.getUser().getId() : null);
+                    if (vr != null && vr.isValid()) {
+                        discount = vr.getDiscount();
+                    } else {
+                        selection.setCouponCode(null);
+                    }
+                }
+            } catch (Exception e) {
+                // swallow - no discount applied
+            }
+
+            double total = Math.max(0.0, subtotal + shippingFee - discount);
 
             // 9.5. Save calculated totals back to CheckoutSelection for later use
             selection.setSubtotal(subtotal);

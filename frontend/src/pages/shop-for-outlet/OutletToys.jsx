@@ -39,18 +39,22 @@ const ProductCard = ({ p }) => {
     return resolved || '/assets/images/no_image.png';
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!isInStock) return;
-    
-    addToCart({
-      id: p.id,
-      name: p.name,
-      image: getImageUrl(p.image),
-      price: currentPrice,
-      variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
-      quantity: 1,
-      category: 'Outlet Toys'
-    });
+    try {
+      await addToCart({
+        productId: p.id,
+        id: p.id,
+        name: p.name,
+        image: getImageUrl(p.image),
+        price: currentPrice,
+        variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
+        quantity: 1,
+        category: 'Outlet Toys'
+      });
+    } catch (e) {
+      // addToCart already shows notifications; swallow to avoid uncaught promise
+    }
   };
 
   return (

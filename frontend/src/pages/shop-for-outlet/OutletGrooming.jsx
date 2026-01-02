@@ -33,17 +33,22 @@ const ProductCard = ({ p }) => {
 
   const imgSrc = resolveImageUrl(p.image || p.imageUrl || (p.images && p.images[0])) || '/assets/images/no_image.png';
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!isInStock) return;
-    addToCart({
-      id: p.id,
-      name: p.name,
-      image: getImageUrl(p.image),
-      price: currentPrice,
-      variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
-      quantity: 1,
-      category: 'Outlet Grooming & Care'
-    });
+    try {
+      await addToCart({
+        productId: p.id,
+        id: p.id,
+        name: p.name,
+        image: imgSrc,
+        price: currentPrice,
+        variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
+        quantity: 1,
+        category: 'Outlet Grooming & Care'
+      });
+    } catch (e) {
+      // Already handled by addToCart notifications
+    }
   };
 
   return (
