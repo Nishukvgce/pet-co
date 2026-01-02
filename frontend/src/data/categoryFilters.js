@@ -390,6 +390,12 @@ export const CATEGORY_FILTERS = {
       food: buildSubcategoryConfig('Outlet Food', outletFoodSections),
       toys: buildSubcategoryConfig('Outlet Toys', outletToysSections),
       training: buildSubcategoryConfig('Outlet Training', outletTrainingSections),
+      feeding: buildSubcategoryConfig('Outlet Feeding', dogBowlsSections),
+      beds: buildSubcategoryConfig('Outlet Beds', dogBedsSections),
+      travel: buildSubcategoryConfig('Outlet Travel', dogTravelSections),
+      accessories: buildSubcategoryConfig('Outlet Accessories', catCollarsAccessorySections),
+      walking: buildSubcategoryConfig('Outlet Walking', dogWalkSections),
+      grooming: buildSubcategoryConfig('Outlet Grooming', dogGroomingSections),
       all: buildSubcategoryConfig('All Outlet', outletFoodSections)
     }
   }

@@ -6,6 +6,8 @@ import { useCart } from '../../contexts/CartContext';
 import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import productApi from '../../services/productApi';
+import FilterDrawer from '../../components/FilterDrawer';
+import { getFilterSections } from '../../data/categoryFilters';
 
 const categories = [
   { id: 'pet-beds', label: 'Pet Beds', img: '/assets/images/dog/db1.webp' },
@@ -127,12 +129,17 @@ const OutletBedsComfort = ({ initialActive = 'All Beds & Comfort' }) => {
   const [active, setActive] = useState(initialActive);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const [appliedFilters, setAppliedFilters] = useState({});
+
+  const sections = getFilterSections('outlet', 'beds');
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        const params = { type: 'Outlet' };
+        const params = { type: 'Outlet', ...appliedFilters };
         const apiData = await productApi.getCustomerProducts(params);
         
         let filteredProducts = (apiData || []).filter(item => {
@@ -186,7 +193,26 @@ const OutletBedsComfort = ({ initialActive = 'All Beds & Comfort' }) => {
       }
     };
     load();
-  }, [active]);
+    }, [active, appliedFilters]);
+
+  const toggleFilterOption = (sectionId, option) => {
+    setSelectedFilters(prev => {
+      const current = new Set(prev[sectionId] || []);
+      if (current.has(option)) current.delete(option); else current.add(option);
+      return { ...prev, [sectionId]: Array.from(current) };
+    });
+  };
+
+  const clearFilters = () => setSelectedFilters({});
+
+  const applyFilters = () => {
+    const params = {};
+    Object.keys(selectedFilters).forEach(k => {
+      if ((selectedFilters[k] || []).length) params[k] = selectedFilters[k].join(',');
+    });
+    setAppliedFilters(params);
+    setFilterOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -249,6 +275,12 @@ const OutletBedsComfort = ({ initialActive = 'All Beds & Comfort' }) => {
                 <p className="text-sm text-muted-foreground">
                   {loading ? 'Loading...' : `${products.length} products found`}
                 </p>
+                <button onClick={() => setFilterOpen(true)} className="ml-2 inline-flex items-center gap-2 px-3 py-1.5 border border-border rounded text-sm bg-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 019 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                  </svg>
+                  <span>Filter</span>
+                </button>
                 {products.length > 0 && !loading && (
                   <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
@@ -282,6 +314,16 @@ const OutletBedsComfort = ({ initialActive = 'All Beds & Comfort' }) => {
           </div>
         </div>
       </div>
+      <FilterDrawer
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        sections={sections}
+        selected={selectedFilters}
+        onToggle={toggleFilterOption}
+        onClear={clearFilters}
+        onApply={applyFilters}
+        total={products.length}
+      />
       <Footer /><MobileBottomNav />
     </div>
   );
