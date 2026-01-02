@@ -9,6 +9,7 @@ import productApi from '../../services/productApi';
 import { normalizePrice } from '../../utils/priceNormalization';
 import FilterDrawer from '../../components/FilterDrawer';
 import { getFilterSections } from '../../data/categoryFilters';
+import MobileCategoryStrip from '../../components/MobileCategoryStrip';
 
 // Outlet Food & Treats categories - matching backend subcategory names
 const categories = [

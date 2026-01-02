@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Header from '../../components/ui/Header';
 import { useCart } from '../../contexts/CartContext';
+import { resolveImageUrl } from '../../lib/imageUtils';
 import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import api from '../../services/api';
@@ -38,7 +39,7 @@ const ProductCard = ({ p }) => {
           <div className="bg-green-500 text-white text-xs px-3 py-1 rounded-t-md">{p.badges?.[0]}</div>
         </div>
         <div className="mt-3 h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
-          <img src={p.image} alt={p.name} className="max-h-40 object-contain" />
+          <img src={resolveImageUrl(p.image) || '/assets/images/no_image.png'} alt={p.name} className="max-h-40 object-contain" />
         </div>
         <h3 className="mt-3 text-sm font-semibold text-foreground">{p.name}</h3>
         <div className="mt-3 flex flex-wrap gap-2">

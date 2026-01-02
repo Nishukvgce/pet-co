@@ -1,19 +1,23 @@
 import React, { useEffect, useRef } from 'react';
+import { resolveImageUrl } from '../lib/imageUtils';
 
 function Image({
   src,
-  alt = "Image Name",
-  className = "",
+  alt = 'Image Name',
+  className = '',
   ...props
 }) {
   // Track when we started loading the current src so we can measure load duration
   const startRef = useRef(null);
   const { onLoad: userOnLoad, onError: userOnError, ...rest } = props;
 
+  // Normalize src coming from backend (relative paths) to absolute URLs
+  const resolvedSrc = resolveImageUrl(src) || '/assets/images/no_image.png';
+
   useEffect(() => {
     // reset start time when src changes
     startRef.current = typeof performance !== 'undefined' ? performance.now() : Date.now();
-  }, [src]);
+  }, [resolvedSrc]);
 
   const handleLoad = (e) => {
     try {
@@ -22,7 +26,7 @@ function Image({
       if (import.meta?.env?.MODE !== 'production') {
         // Lightweight debug info to help diagnose slow loads (only in non-prod)
         // eslint-disable-next-line no-console
-        console.log('AppImage: loaded', { src, duration });
+        console.log('AppImage: loaded', { src: resolvedSrc, duration });
       }
     } catch (err) {
       // swallow
@@ -40,7 +44,7 @@ function Image({
 
   return (
     <img
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       className={className}
       loading="lazy"

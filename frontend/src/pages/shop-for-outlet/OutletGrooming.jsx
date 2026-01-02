@@ -9,6 +9,8 @@ import productApi from '../../services/productApi';
 import FilterDrawer from '../../components/FilterDrawer';
 import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 import { getFilterSections } from '../../data/categoryFilters';
+import AppImage from '../../components/AppImage';
+import { resolveImageUrl } from '../../lib/imageUtils';
 
 const categories = [
   { id: 'combs', label: 'Combs', img: '/assets/images/dog/db1.webp' },
@@ -29,14 +31,7 @@ const ProductCard = ({ p }) => {
   const discount = originalPrice > currentPrice ? Math.round(100 - (currentPrice / originalPrice) * 100) : 0;
   const isInStock = currentVariant.stock > 0;
 
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/assets/images/no_image.png';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    if (imageUrl.startsWith('/admin/')) {
-      return `http://localhost:8080${imageUrl}`;
-    }
-    return imageUrl;
-  };
+  const imgSrc = resolveImageUrl(p.image || p.imageUrl || (p.images && p.images[0])) || '/assets/images/no_image.png';
 
   const handleAddToCart = () => {
     if (!isInStock) return;
@@ -68,17 +63,16 @@ const ProductCard = ({ p }) => {
             </div>
           )}
         </div>
-        <div className="relative mb-4">
-          <div className="h-40 md:h-48 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
-            <Link to={`/product-full/${p.id}`} aria-label={`Open ${p.name} full page`} className="block w-full h-full flex items-center justify-center">
-              <img 
-                src={getImageUrl(p.image)} 
-                alt={p.name} 
-                className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
-                onError={(e) => e.target.src = '/assets/images/no_image.png'}
-              />
-            </Link>
-          </div>
+          <div className="relative mb-4">
+            <div className="h-40 md:h-48 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
+              <Link to={`/product-full/${p.id}`} aria-label={`Open ${p.name} full page`} className="block w-full h-full flex items-center justify-center">
+                <AppImage
+                  src={imgSrc}
+                  alt={p.name}
+                  className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
+                />
+              </Link>
+            </div>
           {!isInStock && (
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg">
               <span className="text-white font-bold text-sm">Out of Stock</span>
