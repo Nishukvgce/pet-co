@@ -11,7 +11,18 @@ const UserAuth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn, signUp } = useAuth ? useAuth() : { signIn: async () => ({ user: null, error: { message: 'No Auth' } }), signUp: async () => ({ user: null, error: { message: 'No Auth' } }) };
-  const [isLogin, setIsLogin] = useState(true);
+  const initialIsLogin = (() => {
+    if (location.state?.mode === 'register') return false;
+    if (location.pathname && location.pathname.includes('register')) return false;
+    return true;
+  })();
+  const [isLogin, setIsLogin] = useState(initialIsLogin);
+
+  // Keep isLogin in sync when route or state changes (e.g., navigating to /user-register)
+  React.useEffect(() => {
+    const shouldBeLogin = !(location.state?.mode === 'register' || (location.pathname && location.pathname.includes('register')));
+    setIsLogin(shouldBeLogin);
+  }, [location.pathname, location.state]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({

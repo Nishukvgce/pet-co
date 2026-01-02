@@ -1,24 +1,53 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const LoginModal = ({ onClose }) => {
-  const [step, setStep] = useState(1);
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [otp, setOtp] = useState('');
+  const [view, setView] = useState('choice') // 'choice' | 'login' | 'register'
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  const handleMobileSubmit = () => {
-    // Simulate sending OTP
-    setStep(2);
-  };
+  const { signIn, signUp } = useAuth()
+  const navigate = useNavigate()
 
-  const handleOtpSubmit = () => {
-    // Simulate OTP verification
-    alert('OTP Verified!');
-  };
+  // login fields
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  // register fields
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [regEmail, setRegEmail] = useState('')
+  const [regPassword, setRegPassword] = useState('')
+
+  const handleLogin = async () => {
+    setError(null)
+    setLoading(true)
+    const result = await signIn(email, password)
+    setLoading(false)
+    if (result.error) {
+      setError(result.error.message || 'Login failed')
+    } else {
+      onClose && onClose()
+    }
+  }
+
+  const handleRegister = async () => {
+    setError(null)
+    setLoading(true)
+    const payload = { name, email: regEmail, password: regPassword, phone }
+    const result = await signUp(payload)
+    setLoading(false)
+    if (result.error) {
+      setError(result.error.message || 'Registration failed')
+    } else {
+      onClose && onClose()
+    }
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-900 text-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-white text-lg hover:text-gray-400"
@@ -46,68 +75,117 @@ const LoginModal = ({ onClose }) => {
           </div>
         </div>
 
-        {step === 1 && (
+        {view === 'choice' && (
+          <div className="space-y-4">
+            <p className="text-center">Are you a new user?</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  navigate('/user-login')
+                  onClose && onClose()
+                }}
+                className="flex-1 bg-blue-500 text-white rounded-lg px-4 py-2"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => {
+                  navigate('/user-register')
+                  onClose && onClose()
+                }}
+                className="flex-1 bg-green-500 text-white rounded-lg px-4 py-2"
+              >
+                Register
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-4 text-center">Or continue as guest</p>
+          </div>
+        )}
+
+        {view === 'login' && (
           <div>
-            <label className="block text-sm mb-2">Login / Signup</label>
-            <div className="flex items-center border border-gray-700 rounded-lg px-4 py-2 mb-4">
-              <span className="text-green-500 mr-2">+91</span>
+            <label className="block text-sm mb-2">Login</label>
+            <div className="mb-3">
               <input
-                type="text"
-                placeholder="Enter Mobile Number"
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                className="flex-1 bg-transparent text-white focus:outline-none"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-transparent border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none"
               />
             </div>
-            <div className="flex items-center mb-4">
-              <input type="checkbox" className="mr-2" />
-              <span className="text-sm text-gray-400">Notify me for any updates & offers</span>
+            <div className="mb-3">
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-transparent border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none"
+              />
             </div>
+            {error && <p className="text-red-400 text-sm mb-2">{error}</p>}
             <button
-              onClick={handleMobileSubmit}
+              onClick={handleLogin}
+              disabled={loading}
               className="w-full bg-blue-500 text-white rounded-lg px-4 py-2"
             >
-              Submit
+              {loading ? 'Logging in...' : 'Login'}
             </button>
             <p className="text-xs text-gray-400 mt-4 text-center">
-              I accept that I have read & understood Gokwik's <a href="#" className="text-blue-400 hover:underline">Privacy Policy</a> and <a href="#" className="text-blue-400 hover:underline">T&Cs</a>.
-            </p>
-            <p className="text-xs text-gray-400 mt-2 text-center">
-              <a href="#" className="text-blue-400 hover:underline">Trouble logging in?</a>
+              <button onClick={() => setView('choice')} className="text-blue-400 hover:underline">Back</button>
             </p>
           </div>
         )}
 
-        {step === 2 && (
+        {view === 'register' && (
           <div>
-            <p className="text-sm text-gray-400 mb-4">We have sent a verification code to {mobileNumber}</p>
-            <div className="grid grid-cols-4 gap-2 mb-4">
-              {[...Array(4)].map((_, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  maxLength="1"
-                  className="w-full text-center border border-gray-700 rounded-lg px-2 py-2 bg-transparent text-white focus:outline-none"
-                  value={otp[index] || ''}
-                  onChange={(e) => {
-                    const newOtp = otp.split('');
-                    newOtp[index] = e.target.value;
-                    setOtp(newOtp.join(''));
-                  }}
-                />
-              ))}
+            <label className="block text-sm mb-2">Register</label>
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-transparent border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none"
+              />
             </div>
+            <div className="mb-3">
+              <input
+                type="tel"
+                placeholder="Phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-transparent border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none"
+              />
+            </div>
+            <div className="mb-3">
+              <input
+                type="email"
+                placeholder="Email"
+                value={regEmail}
+                onChange={(e) => setRegEmail(e.target.value)}
+                className="w-full bg-transparent border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none"
+              />
+            </div>
+            <div className="mb-3">
+              <input
+                type="password"
+                placeholder="Password"
+                value={regPassword}
+                onChange={(e) => setRegPassword(e.target.value)}
+                className="w-full bg-transparent border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none"
+              />
+            </div>
+            {error && <p className="text-red-400 text-sm mb-2">{error}</p>}
             <button
-              onClick={handleOtpSubmit}
+              onClick={handleRegister}
+              disabled={loading}
               className="w-full bg-green-500 text-white rounded-lg px-4 py-2"
             >
-              Verify
+              {loading ? 'Registering...' : 'Register'}
             </button>
-            <p className="text-sm text-gray-400 mt-4 text-center">
-              <button className="text-blue-400 hover:underline">Resend OTP</button>
-            </p>
-            <p className="text-xs text-gray-400 mt-2 text-center">
-              <a href="#" className="text-blue-400 hover:underline">Trouble logging in?</a>
+            <p className="text-xs text-gray-400 mt-4 text-center">
+              <button onClick={() => setView('choice')} className="text-blue-400 hover:underline">Back</button>
             </p>
           </div>
         )}

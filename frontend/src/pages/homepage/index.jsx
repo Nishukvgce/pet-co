@@ -14,6 +14,8 @@ import DogBanner from './components/DogBanner';
 import Footer from './components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import WinterCollection from './components/WinterCollection'; // Updated import path for WinterCollection
+import LoginModal from '../../components/ui/LoginModal';
+import { useAuth } from '../../contexts/AuthContext';
 
 // MobileHome removed to unify mobile and desktop into one responsive page
 
@@ -23,6 +25,8 @@ const Homepage = () => {
   const { addToCart, getCartItemCount, cartItems } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMegaMenuOpenMobile, setIsMegaMenuOpenMobile] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   // Mock cart data for demonstration
   useEffect(() => {
@@ -48,6 +52,21 @@ const Homepage = () => {
     // Assuming addToCart handles adding items and the context maintains the state.
     // If initial cart state is needed, it should be handled within CartContext.
   }, []);
+
+  // Open auth modal on first load only when user is not logged in
+  useEffect(() => {
+    if (authLoading) return;
+    try {
+      const alreadyShown = sessionStorage.getItem('authModalShown');
+      if (!user && !alreadyShown) {
+        setShowAuthModal(true);
+        sessionStorage.setItem('authModalShown', '1');
+      }
+    } catch (e) {
+      // ignore sessionStorage errors
+      if (!user) setShowAuthModal(true);
+    }
+  }, [user, authLoading]);
 
   const handleAddToCart = (product) => {
     const cartItem = {
@@ -173,6 +192,7 @@ const Homepage = () => {
 
         {/* Footer */}
         <Footer />
+        {showAuthModal && <LoginModal onClose={() => setShowAuthModal(false)} />}
 
         {/* Mobile Bottom Navigation */}
         <MobileBottomNav />

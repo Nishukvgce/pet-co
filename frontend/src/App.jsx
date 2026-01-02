@@ -5,6 +5,7 @@ import { CartProvider } from './contexts/CartContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
+import TimedAuthPopup from './components/TimedAuthPopup';
 
 // Import your page components
 import Homepage from './pages/homepage';
@@ -138,6 +139,7 @@ function App() {
           <div className="App">
             <ErrorBoundary>
               <ScrollToTop />
+              <TimedAuthPopup />
               <Routes>
                 <Route path="/" element={<Homepage />} />
                 <Route path="/homepage" element={<Homepage />} />
