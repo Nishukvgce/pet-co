@@ -192,13 +192,25 @@ const OutletAccessories = ({ initialActive = 'All Accessories' }) => {
     <div className="min-h-screen bg-background">
       <Helmet><title>Outlet Accessories - Pet & Co</title></Helmet>
       <Header />
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 pb-24">
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Outlet Accessories</h1>
           <p className="text-sm text-muted-foreground mt-2">Discounted accessories and training aids for your pets</p>
         </div>
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="w-full lg:w-72 space-y-3">
+          <div className="w-full lg:hidden mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-3">Categories</h3>
+            <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4">
+              {categories.map(c => (
+                <button key={c.id} onClick={() => setActive(c.label)} className={`min-w-[140px] flex-shrink-0 flex items-center gap-3 p-3 rounded-lg transition-all duration-200 border ${active === c.label ? 'bg-orange-50 border-orange-300 shadow-sm' : 'bg-white border-border'}`}>
+                  <img src={c.img} alt={c.label} className="w-12 h-12 object-cover rounded-md" onError={(e)=>e.target.src='/assets/images/no_image.png'} />
+                  <div className="text-sm font-medium leading-tight text-left">{c.label}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="hidden lg:block w-72 space-y-3">
             <h3 className="text-lg font-semibold text-foreground mb-4">Categories</h3>
             {categories.map(c => (
               <button key={c.id} onClick={() => setActive(c.label)}
@@ -216,9 +228,7 @@ const OutletAccessories = ({ initialActive = 'All Accessories' }) => {
                   />
                 </div>
                 <div className="flex-1">
-                  <div className={`font-semibold text-sm ${
-                    active === c.label ? 'text-orange-600' : 'text-foreground'
-                  }`}>
+                  <div className={`font-semibold text-sm ${active === c.label ? 'text-orange-600' : 'text-foreground'}`}>
                     {c.label}
                   </div>
                   {active === c.label && (
@@ -231,6 +241,7 @@ const OutletAccessories = ({ initialActive = 'All Accessories' }) => {
               </button>
             ))}
           </div>
+
           <div className="flex-1">
             <div className="mb-6 bg-white rounded-lg p-4 border border-border">
               <h2 className="text-2xl font-bold text-foreground mb-2">{active}</h2>
