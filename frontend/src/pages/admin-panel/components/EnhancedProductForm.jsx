@@ -80,6 +80,10 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
         unitType: '',
         // if unitType === 'size', `size` can hold numeric values with unit
         size: '',
+        // sizeCategory: Small/Medium/Large/Extra Large (optional human-friendly label)
+        sizeCategory: '',
+        // sizeMode: controls whether admin wants numeric measurement, label, or both
+        sizeMode: 'measurement',
         weightUnit: 'g',
         sizeUnit: 'cm',
         label: '',
@@ -1050,6 +1054,8 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
         weight: '',
         unitType: '',
         size: '',
+        sizeCategory: '',
+        sizeMode: 'measurement',
         weightUnit: prev.weightUnit || 'g',
         sizeUnit: 'cm',
         label: '',
@@ -1642,7 +1648,7 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-1">Type</label>
                         <select
-                          value={variant.unitType || 'weight'}
+                          value={variant.unitType || ''}
                           onChange={(e) => handleVariantChange(index, 'unitType', e.target.value)}
                           className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground"
                         >
@@ -1657,24 +1663,59 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                           Value {!variant.unitType && <span className="text-xs text-muted-foreground">(Optional)</span>}
                         </label>
                         {variant.unitType === 'size' ? (
-                          <div className="flex gap-2">
-                            <Input
-                              value={variant.size}
-                              onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                              placeholder="10"
-                            />
-                            <select
-                              value={variant.sizeUnit || 'cm'}
-                              onChange={(e) => handleVariantChange(index, 'sizeUnit', e.target.value)}
-                              className="h-10 px-2 rounded-md border border-border bg-background text-foreground"
-                            >
-                              <option value="mm">mm</option>
-                              <option value="cm">cm</option>
-                              <option value="m">m</option>
-                              <option value="inch">inch</option>
-                              <option value="ft">ft</option>
-                            </select>
-                          </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <label className="text-sm text-muted-foreground">Mode:</label>
+                                <select
+                                  value={variant.sizeMode || 'measurement'}
+                                  onChange={(e) => handleVariantChange(index, 'sizeMode', e.target.value)}
+                                  className="h-10 px-3 rounded-md border border-border bg-background text-foreground"
+                                >
+                                  <option value="measurement">Measurement</option>
+                                  <option value="label">Label</option>
+                                  <option value="both">Both</option>
+                                </select>
+                              </div>
+
+                              {/* Measurement input (numeric + unit) */}
+                              {(variant.sizeMode === 'measurement' || variant.sizeMode === 'both') && (
+                                <div className="flex gap-2 items-center">
+                                  <Input
+                                    value={variant.size}
+                                    onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                                    placeholder="10"
+                                  />
+                                  <select
+                                    value={variant.sizeUnit || 'cm'}
+                                    onChange={(e) => handleVariantChange(index, 'sizeUnit', e.target.value)}
+                                    className="h-10 px-2 rounded-md border border-border bg-background text-foreground"
+                                  >
+                                    <option value="mm">mm</option>
+                                    <option value="cm">cm</option>
+                                    <option value="m">m</option>
+                                    <option value="inch">inch</option>
+                                    <option value="ft">ft</option>
+                                  </select>
+                                </div>
+                              )}
+
+                              {/* Size label select */}
+                              {(variant.sizeMode === 'label' || variant.sizeMode === 'both') && (
+                                <div>
+                                  <select
+                                    value={variant.sizeCategory || ''}
+                                    onChange={(e) => handleVariantChange(index, 'sizeCategory', e.target.value)}
+                                    className="h-10 px-3 rounded-md border border-border bg-background text-foreground w-full"
+                                  >
+                                    <option value="">Size Category (optional)</option>
+                                    <option value="Small">Small</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Large">Large</option>
+                                    <option value="Extra Large">Extra Large</option>
+                                  </select>
+                                </div>
+                              )}
+                            </div>
                         ) : variant.unitType === 'weight' ? (
                           <div className="flex gap-2">
                             <Input
