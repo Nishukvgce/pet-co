@@ -8,6 +8,7 @@ import { useCart } from '../../contexts/CartContext';
 import { getFilterConfig, getSortOptions } from '../../data/categoryFilters';
 import productApi from '../../services/productApi';
 import apiClient from '../../services/api';
+import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 
 const slugify = (s = '') => String(s || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
@@ -498,27 +499,17 @@ const PharmacyCollectionPage = ({ subLabel }) => {
             className="col-span-12 lg:col-span-9 xl:col-span-10"
             style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}
           >
-            {/* Mobile category scroller (horizontal) - shows on small screens */}
+            {/* Mobile vertical category sidebar (top-down) - replaces horizontal scroller */}
             <div className="lg:hidden mb-4">
-              <div className="overflow-x-auto hide-scrollbar px-4">
-                <div className="inline-flex items-center gap-3 py-2">
-                  {categories.map((c) => {
-                    const isActive = active === c.label;
-                    return (
-                      <button
-                        key={c.id}
-                        onClick={() => handleCategoryClick(c)}
-                        className={`flex-shrink-0 flex flex-col items-center gap-1 p-2 bg-white rounded-lg border transition-shadow ${isActive ? 'ring-2 ring-orange-400 shadow-sm' : 'border-border'}`}
-                        style={{ minWidth: 84 }}
-                      >
-                        <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${isActive ? '' : ''}`}>
-                          <img src={c.img} alt={c.label} className="w-full h-full object-cover pointer-events-none" />
-                        </div>
-                        <span className="text-xs text-center leading-tight mt-1">{c.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+              <div className="w-20">
+                <MobileCategorySidebar
+                  categories={categories}
+                  active={active}
+                  setActive={(label) => {
+                    const cat = categories.find(c => c.label === label);
+                    if (cat) handleCategoryClick(cat);
+                  }}
+                />
               </div>
             </div>
 
