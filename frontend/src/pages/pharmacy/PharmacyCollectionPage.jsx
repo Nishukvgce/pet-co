@@ -385,17 +385,17 @@ const PharmacyCollectionPage = ({ subLabel }) => {
     const discountPerc = p.original ? Math.round(((Number(p.original) - displayPrice) / Number(p.original)) * 100) : 0;
 
     return (
-      <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm relative">
+      <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm relative flex flex-col h-full">
         {/* Discount badge */}
         {p.original && discountPerc > 0 && (
-          <div className="absolute left-2 top-2 bg-red-500 text-white text-[11px] px-2 py-0.5 rounded">{discountPerc}% OFF</div>
+          <div className="absolute left-2 top-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded z-10">{discountPerc}% OFF</div>
         )}
 
         {/* Wishlist icon */}
         <button
           aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
           onClick={(e) => { e.stopPropagation(); e.preventDefault(); if (inWishlist) removeFromWishlist(p.id); else addToWishlist({ id: p.id, name: p.name, price: p.price }); }}
-          className="absolute right-2 top-2 text-gray-500 hover:text-orange-500 bg-white/90 rounded-full p-1 shadow-sm"
+          className="absolute right-2 top-2 text-gray-500 hover:text-orange-500 bg-white/90 rounded-full p-1.5 shadow-sm z-10"
         >
           {inWishlist ? (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
@@ -408,7 +408,7 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           )}
         </button>
 
-        <div className="p-2 md:p-3">
+        <div className="p-2 md:p-3 flex-1 flex flex-col">
           {/* Top badge (first badge) */}
           {p.badges?.[0] && (
             <div className="h-6 flex items-center justify-start">
@@ -417,7 +417,7 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           )}
 
           {/* Image */}
-          <div className="mt-2 h-36 md:h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
+          <div className="mt-2 h-32 md:h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
             <Link to={`/product-full/${p.id}`} aria-label={`Open ${p.name} full page`} className="block w-full h-full flex items-center justify-center">
               <img src={p.image} alt={p.name} className="max-h-32 md:max-h-40 object-contain" onError={(e) => { e.target.src = '/assets/images/no_image.png'; }} />
             </Link>
@@ -427,7 +427,7 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           <h3 className="mt-2 text-sm md:text-sm font-semibold text-foreground leading-tight">{p.name}</h3>
 
           {/* Secondary info: petType / subcategory if available */}
-          <div className="mt-1 text-xs text-muted-foreground flex items-center gap-2">
+          <div className="mt-1 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
             {p.petType && <span className="px-2 py-0.5 bg-gray-100 rounded text-[11px]">{p.petType}</span>}
             {p.subcategory && <span className="px-2 py-0.5 bg-gray-100 rounded text-[11px]">{p.subcategory}</span>}
           </div>
@@ -438,30 +438,30 @@ const PharmacyCollectionPage = ({ subLabel }) => {
               <button
                 key={i}
                 onClick={() => setSelectedVariant(v)}
-                className={`text-[11px] px-2 py-0.5 border border-border rounded ${selectedVariant && selectedVariant.label === v.label ? 'bg-orange-500 text-white' : 'bg-white'}`}
+                className={`text-xs px-2 py-1 border border-border rounded ${selectedVariant && selectedVariant.label === v.label ? 'bg-orange-500 text-white' : 'bg-white'}`}
               >
                 <div className="flex items-center gap-2">
-                  <span>{v.label}</span>
-                  {v.price != null && <span className="text-[10px] text-muted-foreground">₹{Number(v.price).toFixed(0)}</span>}
+                  <span className="leading-tight">{v.label}</span>
+                  {v.price != null && <span className="text-[11px] text-muted-foreground">₹{Number(v.price).toFixed(0)}</span>}
                 </div>
               </button>
             ))}
           </div>
+        </div>
 
-          {/* Price + Add button */}
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <div className="text-base md:text-lg font-bold">₹{Number(displayPrice || 0).toFixed(2)}</div>
-              {p.original ? <div className="text-sm text-muted-foreground line-through">₹{Number(p.original).toFixed(2)}</div> : null}
-            </div>
-
-            <button
-              onClick={() => addToCart({ id: p.id, name: p.name, price: displayPrice, variant: selectedVariant?.label || null }, 1)}
-              className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm shadow-md"
-            >
-              Add
-            </button>
+        {/* Footer: price + add button fixed to bottom of card */}
+        <div className="p-2 md:p-3 border-t bg-white flex items-center justify-between">
+          <div>
+            <div className="text-base md:text-lg font-bold">₹{Number(displayPrice || 0).toFixed(2)}</div>
+            {p.original ? <div className="text-sm text-muted-foreground line-through">₹{Number(p.original).toFixed(2)}</div> : null}
           </div>
+
+          <button
+            onClick={() => addToCart({ id: p.id, name: p.name, price: displayPrice, variant: selectedVariant?.label || null }, 1)}
+            className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm shadow-md"
+          >
+            Add
+          </button>
         </div>
       </article>
     );
@@ -511,7 +511,7 @@ const PharmacyCollectionPage = ({ subLabel }) => {
       <Header cartItemCount={getCartItemCount()} cartItems={cartItems} onSearch={() => { }} />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-12 gap-3 md:gap-6">
+        <div className="grid grid-cols-[80px_1fr] lg:grid-cols-12 gap-3 md:gap-6">
           {/* Sidebar - Categories */}
           {/* Desktop/Tablet sidebar (hidden on small screens) */}
           <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
@@ -542,28 +542,29 @@ const PharmacyCollectionPage = ({ subLabel }) => {
             </div>
           </aside>
 
+          {/* Mobile vertical category sidebar (left column on small screens) */}
+          <div className="block lg:hidden col-span-1">
+            <div className="w-20">
+              <MobileCategorySidebar
+                categories={categories}
+                active={active}
+                setActive={(label) => {
+                  const cat = categories.find(c => c.label === label);
+                  if (cat) handleCategoryClick(cat);
+                }}
+              />
+            </div>
+          </div>
+
           {/* Main Content */}
           {/* Main Content */}
           {/* On small screens the main column takes full width; sidebar is replaced by a horizontal scroller above */}
           <main
             ref={rightRef}
             onWheel={handleRightWheel}
-            className="col-span-12 lg:col-span-9 xl:col-span-10"
+            className="col-span-1 lg:col-span-9 xl:col-span-10"
             style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}
           >
-            {/* Mobile vertical category sidebar (top-down) - replaces horizontal scroller */}
-            <div className="lg:hidden mb-4">
-              <div className="w-20">
-                <MobileCategorySidebar
-                  categories={categories}
-                  active={active}
-                  setActive={(label) => {
-                    const cat = categories.find(c => c.label === label);
-                    if (cat) handleCategoryClick(cat);
-                  }}
-                />
-              </div>
-            </div>
 
             {/* Top filter bar */}
             <div className="mb-4 flex items-center justify-between">
@@ -630,7 +631,7 @@ const PharmacyCollectionPage = ({ subLabel }) => {
             </div>
 
             {/* Product grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
               {loadingProducts ? (
                 <div className="col-span-full py-12 text-center text-muted-foreground">Loading pharmacy products...</div>
               ) : filteredProducts.length > 0 ? (
