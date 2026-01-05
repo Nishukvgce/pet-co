@@ -228,11 +228,12 @@ const OutletAccessories = ({ initialActive = 'All Accessories' }) => {
           <p className="text-sm text-muted-foreground mt-2">Discounted accessories and training aids for your pets</p>
         </div>
         <div className="flex flex-row gap-6">
-          <div className="w-20 lg:hidden">
+          {/* Mobile vertical category sidebar (top-down) - placed to the left on small screens */}
+          <div className="block lg:hidden w-20">
             <MobileCategorySidebar categories={categories} active={active} setActive={setActive} />
           </div>
-
-          <div className="hidden lg:block w-72 space-y-3">
+          {/* Category Sidebar (desktop) */}
+          <div className="hidden lg:block w-64 xl:w-72 space-y-3">
             <h3 className="text-lg font-semibold text-foreground mb-4">Categories</h3>
             {categories.map(c => (
               <button key={c.id} onClick={() => setActive(c.label)}
@@ -277,12 +278,12 @@ const OutletAccessories = ({ initialActive = 'All Accessories' }) => {
                   </svg>
                   <span>Filter</span>
                 </button>
-                {products.length > 0 && !loading && (
-                  <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                    Live inventory
-                  </div>
-                )}
+                {/* {products.length > 0 && !loading && (
+                  // <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                  //   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  //   Live inventory
+                  // </div>
+                )} */}
               </div>
             </div>
             {loading ? (
@@ -303,7 +304,7 @@ const OutletAccessories = ({ initialActive = 'All Accessories' }) => {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
                 {products.map(p => <ProductCard key={p.id} p={p} />)}
               </div>
             )}

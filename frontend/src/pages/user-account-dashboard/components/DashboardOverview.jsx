@@ -5,12 +5,12 @@ import Button from '../../../components/ui/Button';
 
 const DashboardOverview = ({ user, recentOrders, loyaltyPoints, wishlistCount, pendingReviewsCount }) => {
   const quickActions = [
-    {
-      title: 'Reorder',
-      description: 'Buy previous items',
-      icon: 'RotateCcw',
-      action: 'orders'
-    },
+    // {
+    //   title: 'Reorder',
+    //   description: 'Buy previous items',
+    //   icon: 'RotateCcw',
+    //   action: 'orders'
+    // },
     {
       title: 'Update Profile',
       description: 'Edit personal info',

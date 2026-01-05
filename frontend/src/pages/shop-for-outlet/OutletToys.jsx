@@ -8,8 +8,8 @@ import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import productApi from '../../services/productApi';
 import { resolveImageUrl } from '../../lib/imageUtils';
 import FilterDrawer from '../../components/FilterDrawer';
-import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 import { getFilterSections } from '../../data/categoryFilters';
+import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 
 // Outlet Toys categories - matching backend subcategory names
 const categories = [
@@ -252,12 +252,12 @@ const OutletToys = ({ initialActive = 'All Toys' }) => {
         </div>
 
         <div className="flex flex-row gap-6">
-          <div className="w-20 lg:hidden">
+          {/* Mobile vertical category sidebar (top-down) - placed to the left on small screens */}
+          <div className="block lg:hidden w-20">
             <MobileCategorySidebar categories={categories} active={active} setActive={setActive} />
           </div>
-
           {/* Category Sidebar (desktop) */}
-          <div className="hidden lg:block w-72 space-y-3">
+          <div className="hidden lg:block w-64 xl:w-72 space-y-3">
             <h3 className="text-lg font-semibold text-foreground mb-4">Categories</h3>
             {categories.map(c => (
               <button
@@ -310,12 +310,12 @@ const OutletToys = ({ initialActive = 'All Toys' }) => {
                   </svg>
                   <span>Filter</span>
                 </button>
-                {products.length > 0 && !loading && (
+                {/* {products.length > 0 && !loading && (
                   <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                     Live inventory
                   </div>
-                )}
+                )} */}
               </div>
             </div>
 
@@ -337,7 +337,7 @@ const OutletToys = ({ initialActive = 'All Toys' }) => {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
                 {products.map(p => (
                   <ProductCard key={p.id} p={p} />
                 ))}

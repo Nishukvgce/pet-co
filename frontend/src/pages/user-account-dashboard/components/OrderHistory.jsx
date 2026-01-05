@@ -921,12 +921,12 @@ const OrderHistory = () => {
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-2 pt-2">
                     {/* Reorder button for delivered orders */}
-                    {order?.status?.toLowerCase() === 'delivered' && (
+                    {/* {order?.status?.toLowerCase() === 'delivered' && (
                       <Button variant="default" size="sm">
                         <Icon name="RotateCcw" className="h-4 w-4 mr-2" />
                         Reorder
                       </Button>
-                    )}
+                    )} */}
                     
                     {/* Track order button for processing/shipped orders */}
                     {(order?.status?.toLowerCase() === 'processing' || order?.status?.toLowerCase() === 'shipped') && (
@@ -984,12 +984,12 @@ const OrderHistory = () => {
                     </Button>
                     
                     {/* Return/Exchange button for delivered orders */}
-                    {order?.status?.toLowerCase() === 'delivered' && (
+                    {/* {order?.status?.toLowerCase() === 'delivered' && (
                       <Button variant="outline" size="sm">
                         <Icon name="RefreshCcw" className="h-4 w-4 mr-2" />
                         Return/Exchange
                       </Button>
-                    )}
+                    )} */}
                   </div>
                 </div>
               )}
