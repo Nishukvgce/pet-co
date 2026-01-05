@@ -57,7 +57,10 @@ const CouponsAdmin = () => {
                 <option value="FIXED">Fixed</option>
               </select>
               <input className="border p-2 rounded w-full md:w-24" type="number" step="0.01" placeholder="Value" value={form.value} onChange={e=>setForm({...form, value:parseFloat(e.target.value||0)})} />
-              <input className="border p-2 rounded w-full md:w-40" type="number" step="0.01" placeholder="Min Subtotal" value={form.minSubtotal} onChange={e=>setForm({...form, minSubtotal:parseFloat(e.target.value||0)})} />
+              <div className="flex w-full md:w-40">
+                <span className="inline-flex items-center px-3 border border-r-0 rounded-l bg-gray-50 text-sm">₹</span>
+                <input className="border p-2 rounded-r w-full" type="number" step="0.01" placeholder="Min Subtotal" value={form.minSubtotal} onChange={e=>setForm({...form, minSubtotal:parseFloat(e.target.value||0)})} />
+              </div>
             </div>
             {/* Category, Subcategory and PetType inputs removed per request */}
             <div className="flex flex-col md:flex-row gap-2">
