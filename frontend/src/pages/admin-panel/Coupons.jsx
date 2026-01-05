@@ -53,25 +53,25 @@ const CouponsAdmin = () => {
           <div className="space-y-3">
             <input className="w-full border p-2 rounded" placeholder="Code" value={form.code} onChange={e=>setForm({...form, code:e.target.value})} />
             <input className="w-full border p-2 rounded" placeholder="Description" value={form.description} onChange={e=>setForm({...form, description:e.target.value})} />
-            <div className="flex gap-2">
-              <select className="border p-2 rounded" value={form.discountType} onChange={e=>setForm({...form, discountType:e.target.value})}>
+            <div className="flex flex-col md:flex-row gap-2">
+              <select className="border p-2 rounded w-full md:w-auto md:flex-1" value={form.discountType} onChange={e=>setForm({...form, discountType:e.target.value})}>
                 <option value="PERCENT">Percent</option>
                 <option value="FIXED">Fixed</option>
               </select>
-              <input className="border p-2 rounded w-24" type="number" step="0.01" placeholder="Value" value={form.value} onChange={e=>setForm({...form, value:parseFloat(e.target.value||0)})} />
-              <input className="border p-2 rounded w-40" type="number" step="0.01" placeholder="Min Subtotal" value={form.minSubtotal} onChange={e=>setForm({...form, minSubtotal:parseFloat(e.target.value||0)})} />
+              <input className="border p-2 rounded w-full md:w-24" type="number" step="0.01" placeholder="Value" value={form.value} onChange={e=>setForm({...form, value:parseFloat(e.target.value||0)})} />
+              <input className="border p-2 rounded w-full md:w-40" type="number" step="0.01" placeholder="Min Subtotal" value={form.minSubtotal} onChange={e=>setForm({...form, minSubtotal:parseFloat(e.target.value||0)})} />
             </div>
-            <div className="flex gap-2">
-              <input className="border p-2 rounded" placeholder="PetType (Dog/Cat)" value={form.applicablePetType} onChange={e=>setForm({...form, applicablePetType:e.target.value})} />
-              <input className="border p-2 rounded" placeholder="Category" value={form.applicableCategory} onChange={e=>setForm({...form, applicableCategory:e.target.value})} />
+            <div className="flex flex-col md:flex-row gap-2">
+              <input className="border p-2 rounded w-full md:flex-1" placeholder="PetType (Dog/Cat)" value={form.applicablePetType} onChange={e=>setForm({...form, applicablePetType:e.target.value})} />
+              <input className="border p-2 rounded w-full md:flex-1" placeholder="Category" value={form.applicableCategory} onChange={e=>setForm({...form, applicableCategory:e.target.value})} />
             </div>
-            <input className="border p-2 rounded" placeholder="Subcategory" value={form.applicableSubcategory} onChange={e=>setForm({...form, applicableSubcategory:e.target.value})} />
-            <div className="flex gap-2">
-              <input className="border p-2 rounded" type="datetime-local" value={form.startDate} onChange={e=>setForm({...form, startDate:e.target.value})} />
-              <input className="border p-2 rounded" type="datetime-local" value={form.endDate} onChange={e=>setForm({...form, endDate:e.target.value})} />
+            <input className="border p-2 rounded w-full" placeholder="Subcategory" value={form.applicableSubcategory} onChange={e=>setForm({...form, applicableSubcategory:e.target.value})} />
+            <div className="flex flex-col md:flex-row gap-2">
+              <input className="border p-2 rounded w-full md:w-1/2" type="datetime-local" value={form.startDate} onChange={e=>setForm({...form, startDate:e.target.value})} />
+              <input className="border p-2 rounded w-full md:w-1/2" type="datetime-local" value={form.endDate} onChange={e=>setForm({...form, endDate:e.target.value})} />
             </div>
             <label className="flex items-center gap-2"><input type="checkbox" checked={form.active} onChange={e=>setForm({...form, active:e.target.checked})} /> Active</label>
-            <Button onClick={save}>{editingId ? 'Update' : 'Create'}</Button>
+            <Button onClick={save} className="w-full md:w-auto" >{editingId ? 'Update' : 'Create'}</Button>
           </div>
         </div>
         <div className="border rounded p-4">
@@ -79,15 +79,15 @@ const CouponsAdmin = () => {
           {loading ? <p>Loading...</p> : (
             <div className="space-y-2">
               {coupons.map(c => (
-                <div key={c.id} className="border rounded p-3 flex items-center justify-between">
+                <div key={c.id} className="border rounded p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                   <div>
                     <div className="font-medium">{c.code} {c.active ? <span className="text-green-600">(Active)</span> : <span className="text-gray-500">(Inactive)</span>}</div>
                     <div className="text-sm text-gray-600">{c.description}</div>
                     <div className="text-xs text-gray-500">{c.discountType} {c.value}{c.discountType==='PERCENT'?'%':''} • Min ₹{c.minSubtotal ?? 0}</div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={()=>edit(c)}>Edit</Button>
-                    <Button variant="destructive" onClick={()=>remove(c.id)}>Delete</Button>
+                  <div className="flex gap-2 mt-2 md:mt-0">
+                    <Button variant="outline" className="w-full md:w-auto" onClick={()=>edit(c)}>Edit</Button>
+                    <Button variant="destructive" className="w-full md:w-auto" onClick={()=>remove(c.id)}>Delete</Button>
                   </div>
                 </div>
               ))}
