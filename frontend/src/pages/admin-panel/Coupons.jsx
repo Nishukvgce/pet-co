@@ -4,7 +4,7 @@ import Button from '../../components/ui/Button';
 
 const emptyForm = {
   code: '', description: '', discountType: 'PERCENT', value: 10,
-  minSubtotal: 0, applicablePetType: '', applicableCategory: '', applicableSubcategory: '',
+  minSubtotal: 0,
   startDate: '', endDate: '', active: true
 };
 
@@ -22,8 +22,6 @@ const CouponsAdmin = () => {
 
   const save = async () => {
     const payload = { ...form };
-    // Normalize blanks to null where appropriate
-    ['applicablePetType','applicableCategory','applicableSubcategory'].forEach(k=>{ if(!payload[k]) payload[k]=null; });
     if (!editingId) {
       await couponApi.create(payload);
     } else {
@@ -37,7 +35,7 @@ const CouponsAdmin = () => {
     setEditingId(c.id);
     setForm({
       code: c.code || '', description: c.description || '', discountType: c.discountType || 'PERCENT', value: c.value || 0,
-      minSubtotal: c.minSubtotal ?? 0, applicablePetType: c.applicablePetType || '', applicableCategory: c.applicableCategory || '', applicableSubcategory: c.applicableSubcategory || '',
+      minSubtotal: c.minSubtotal ?? 0,
       startDate: c.startDate || '', endDate: c.endDate || '', active: !!c.active
     });
   };
@@ -61,11 +59,7 @@ const CouponsAdmin = () => {
               <input className="border p-2 rounded w-full md:w-24" type="number" step="0.01" placeholder="Value" value={form.value} onChange={e=>setForm({...form, value:parseFloat(e.target.value||0)})} />
               <input className="border p-2 rounded w-full md:w-40" type="number" step="0.01" placeholder="Min Subtotal" value={form.minSubtotal} onChange={e=>setForm({...form, minSubtotal:parseFloat(e.target.value||0)})} />
             </div>
-            <div className="flex flex-col md:flex-row gap-2">
-              <input className="border p-2 rounded w-full md:flex-1" placeholder="PetType (Dog/Cat)" value={form.applicablePetType} onChange={e=>setForm({...form, applicablePetType:e.target.value})} />
-              <input className="border p-2 rounded w-full md:flex-1" placeholder="Category" value={form.applicableCategory} onChange={e=>setForm({...form, applicableCategory:e.target.value})} />
-            </div>
-            <input className="border p-2 rounded w-full" placeholder="Subcategory" value={form.applicableSubcategory} onChange={e=>setForm({...form, applicableSubcategory:e.target.value})} />
+            {/* Category, Subcategory and PetType inputs removed per request */}
             <div className="flex flex-col md:flex-row gap-2">
               <input className="border p-2 rounded w-full md:w-1/2" type="datetime-local" value={form.startDate} onChange={e=>setForm({...form, startDate:e.target.value})} />
               <input className="border p-2 rounded w-full md:w-1/2" type="datetime-local" value={form.endDate} onChange={e=>setForm({...form, endDate:e.target.value})} />
