@@ -176,9 +176,13 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           name: item?.name || item?.title,
           image: resolveImageUrl(item),
           badges: Array.isArray(item?.badges) ? item.badges : [],
-          variants: item?.variants?.map(v => v?.label || v?.size || v?.weight).filter(Boolean) || ['Default'],
-          price: Number(item?.price || 0),
-          original: Number(item?.originalPrice || 0) || null,
+          variants: (item?.variants || []).map(v => {
+            if (!v) return null;
+            if (typeof v === 'string') return { label: v, price: null };
+            return { label: v.label || v.size || v.weight || 'Default', price: (v.price != null ? Number(v.price) : null) };
+          }).filter(Boolean).length ? (item?.variants || []).map(v => (typeof v === 'string' ? { label: v, price: null } : { label: v.label || v.size || v.weight || 'Default', price: (v.price != null ? Number(v.price) : null) })) : [{ label: 'Default', price: null }],
+            price: Number(item?.price || 0),
+            original: Number(item?.originalPrice || 0) || null,
           category: item?.category || '',
           subcategory: item?.subcategory || '',
           petType: item?.petType || '',
@@ -238,16 +242,17 @@ const PharmacyCollectionPage = ({ subLabel }) => {
     console.log(`PharmacyCollectionPage: After category filter (${pageCategory}): ${working.length} products`);
     
     // Step 2: Filter by subcategory if specified
+    // Use slugified comparison to handle spaces/hyphens/case reliably
     const activeSubcategory = active && !active.toLowerCase().includes('all') ? active : null;
     if (activeSubcategory && activeSubcategory.trim()) {
-      const targetSub = norm(activeSubcategory);
+      const targetSubSlug = slugify(activeSubcategory);
       working = working.filter(p => {
-        const productSub = norm(p.subcategory || '');
-        return productSub === targetSub || 
-               productSub.includes(targetSub.replace(/-/g, '')) ||
-               targetSub.includes(productSub.replace(/-/g, ''));
+        const productSub = String(p.subcategory || '');
+        const productSubSlug = slugify(productSub);
+        // match exact slug or fuzzy contains
+        return productSubSlug === targetSubSlug || productSubSlug.includes(targetSubSlug) || targetSubSlug.includes(productSubSlug);
       });
-      console.log(`PharmacyCollectionPage: After subcategory filter (${activeSubcategory}): ${working.length} products`);
+      console.log(`PharmacyCollectionPage: After subcategory filter (${activeSubcategory} -> ${targetSubSlug}): ${working.length} products`);
     }
     
     // Step 3: Apply drawer filters (selectedFilters)
@@ -374,38 +379,85 @@ const PharmacyCollectionPage = ({ subLabel }) => {
   };
 
   const ProductCard = ({ p }) => {
-    const [selectedVariant, setSelectedVariant] = useState((p.variants || [null])[0] || null);
+    const [selectedVariant, setSelectedVariant] = useState((p.variants && p.variants[0]) || { label: null, price: null });
+    const inWishlist = isInWishlist(p.id);
+    const displayPrice = (selectedVariant && selectedVariant.price != null) ? selectedVariant.price : Number(p.price || 0);
+    const discountPerc = p.original ? Math.round(((Number(p.original) - displayPrice) / Number(p.original)) * 100) : 0;
+
     return (
-      <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm">
+      <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm relative">
+        {/* Discount badge */}
+        {p.original && discountPerc > 0 && (
+          <div className="absolute left-2 top-2 bg-red-500 text-white text-[11px] px-2 py-0.5 rounded">{discountPerc}% OFF</div>
+        )}
+
+        {/* Wishlist icon */}
+        <button
+          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+          onClick={(e) => { e.stopPropagation(); e.preventDefault(); if (inWishlist) removeFromWishlist(p.id); else addToWishlist({ id: p.id, name: p.name, price: p.price }); }}
+          className="absolute right-2 top-2 text-gray-500 hover:text-orange-500 bg-white/90 rounded-full p-1 shadow-sm"
+        >
+          {inWishlist ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 20.657l-8.828-8.829a4 4 0 010-5.656z" />
+            </svg>
+          )}
+        </button>
+
         <div className="p-2 md:p-3">
-          <div className="h-6 flex items-center justify-start">
-            <div className="bg-green-500 text-white text-[11px] px-2 py-0.5 rounded-t-md">{p.badges?.[0]}</div>
-          </div>
+          {/* Top badge (first badge) */}
+          {p.badges?.[0] && (
+            <div className="h-6 flex items-center justify-start">
+              <div className="bg-green-500 text-white text-[11px] px-2 py-0.5 rounded-t-md">{p.badges?.[0]}</div>
+            </div>
+          )}
+
+          {/* Image */}
           <div className="mt-2 h-36 md:h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
             <Link to={`/product-full/${p.id}`} aria-label={`Open ${p.name} full page`} className="block w-full h-full flex items-center justify-center">
-              <img src={p.image} alt={p.name} className="max-h-32 md:max-h-40 object-contain" onError={(e)=>{e.target.src='/assets/images/no_image.png'}} />
+              <img src={p.image} alt={p.name} className="max-h-32 md:max-h-40 object-contain" onError={(e) => { e.target.src = '/assets/images/no_image.png'; }} />
             </Link>
           </div>
-          <h3 className="mt-2 text-xs md:text-sm font-semibold text-foreground">{p.name}</h3>
+
+          {/* Title / Type */}
+          <h3 className="mt-2 text-sm md:text-sm font-semibold text-foreground leading-tight">{p.name}</h3>
+
+          {/* Secondary info: petType / subcategory if available */}
+          <div className="mt-1 text-xs text-muted-foreground flex items-center gap-2">
+            {p.petType && <span className="px-2 py-0.5 bg-gray-100 rounded text-[11px]">{p.petType}</span>}
+            {p.subcategory && <span className="px-2 py-0.5 bg-gray-100 rounded text-[11px]">{p.subcategory}</span>}
+          </div>
+
+          {/* Variants */}
           <div className="mt-2 flex flex-wrap gap-2">
-            {p.variants.map((v, i) => (
+            {Array.isArray(p.variants) && p.variants.map((v, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedVariant(v)}
-                className={`text-[11px] px-2 py-0.5 border border-border rounded ${selectedVariant === v ? 'bg-green-600 text-white' : 'bg-white'}`}
+                className={`text-[11px] px-2 py-0.5 border border-border rounded ${selectedVariant && selectedVariant.label === v.label ? 'bg-orange-500 text-white' : 'bg-white'}`}
               >
-                {v}
+                <div className="flex items-center gap-2">
+                  <span>{v.label}</span>
+                  {v.price != null && <span className="text-[10px] text-muted-foreground">₹{Number(v.price).toFixed(0)}</span>}
+                </div>
               </button>
             ))}
           </div>
+
+          {/* Price + Add button */}
           <div className="mt-3 flex items-center justify-between">
             <div>
-              <div className="text-base md:text-lg font-bold">₹{p.price.toFixed(2)}</div>
-              {p.original && <div className="text-sm text-muted-foreground line-through">₹{p.original}</div>}
+              <div className="text-base md:text-lg font-bold">₹{Number(displayPrice || 0).toFixed(2)}</div>
+              {p.original ? <div className="text-sm text-muted-foreground line-through">₹{Number(p.original).toFixed(2)}</div> : null}
             </div>
+
             <button
-              onClick={() => addToCart({ id: p.id, name: p.name, price: p.price }, 1)}
-              className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm"
+              onClick={() => addToCart({ id: p.id, name: p.name, price: displayPrice, variant: selectedVariant?.label || null }, 1)}
+              className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm shadow-md"
             >
               Add
             </button>

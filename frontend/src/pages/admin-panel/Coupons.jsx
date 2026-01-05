@@ -3,8 +3,9 @@ import couponApi from '../../services/couponApi';
 import Button from '../../components/ui/Button';
 
 const emptyForm = {
-  code: '', description: '', discountType: 'PERCENT', value: 10,
-  minSubtotal: 0,
+  code: '', description: '', discountType: 'PERCENT', value: '',
+  // allow empty string so admin can clear this field; we'll send null when empty
+  minSubtotal: '',
   startDate: '', endDate: '', active: true
 };
 
@@ -22,6 +23,8 @@ const CouponsAdmin = () => {
 
   const save = async () => {
     const payload = { ...form };
+    // send null for empty minSubtotal so backend doesn't treat it as 0
+    if (payload.minSubtotal === '') payload.minSubtotal = null;
     if (!editingId) {
       await couponApi.create(payload);
     } else {
@@ -35,7 +38,8 @@ const CouponsAdmin = () => {
     setEditingId(c.id);
     setForm({
       code: c.code || '', description: c.description || '', discountType: c.discountType || 'PERCENT', value: c.value || 0,
-      minSubtotal: c.minSubtotal ?? 0,
+      // allow empty string for editable field; map numeric values when present
+      minSubtotal: c.minSubtotal == null ? '' : c.minSubtotal,
       startDate: c.startDate || '', endDate: c.endDate || '', active: !!c.active
     });
   };
@@ -59,7 +63,17 @@ const CouponsAdmin = () => {
               <input className="border p-2 rounded w-full md:w-24" type="number" step="0.01" placeholder="Value" value={form.value} onChange={e=>setForm({...form, value:parseFloat(e.target.value||0)})} />
               <div className="flex w-full md:w-40">
                 <span className="inline-flex items-center px-3 border border-r-0 rounded-l bg-gray-50 text-sm">₹</span>
-                <input className="border p-2 rounded-r w-full" type="number" step="0.01" placeholder="Min Subtotal" value={form.minSubtotal} onChange={e=>setForm({...form, minSubtotal:parseFloat(e.target.value||0)})} />
+                <input
+                  className="border p-2 rounded-r w-full"
+                  type="number"
+                  step="0.01"
+                  placeholder="Min Subtotal"
+                  value={form.minSubtotal}
+                  onChange={e=>{
+                    const v = e.target.value;
+                    setForm(prev => ({ ...prev, minSubtotal: v === '' ? '' : parseFloat(v) }));
+                  }}
+                />
               </div>
             </div>
             {/* Category, Subcategory and PetType inputs removed per request */}
