@@ -186,9 +186,6 @@ const Homepage = () => {
 
           {/* Bestsellers Carousel */}
           <BestsellersCarousel onAddToCart={handleAddToCart} />
-
-          {/* Winter Collection Section */}
-          <WinterCollection /> {/* Integrated WinterCollection component */}
         </main>
 
         {/* Footer */}
