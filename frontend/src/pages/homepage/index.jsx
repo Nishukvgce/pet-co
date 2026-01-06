@@ -72,11 +72,12 @@ const Homepage = () => {
     const cartItem = {
       id: `${product.id}-default`,
       productId: product.id,
+      variantId: product.variantId || 'default',
       name: product.name,
       price: product.salePrice || product.price,
       originalPrice: product.originalPrice || product.price,
       image: product.image,
-      variant: 'Default',
+      variant: product.variant || 'Default',
       category: product.category,
       brand: product.brand
     };

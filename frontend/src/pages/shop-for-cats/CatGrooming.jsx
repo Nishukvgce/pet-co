@@ -32,6 +32,7 @@ const ProductCard = ({ p }) => {
     const productToAdd = {
       id: p.id,
       productId: p.id,
+      variantId: selectedVariant?.id || 'default',
       name: p.name,
       image: p.image,
       price: p.price,

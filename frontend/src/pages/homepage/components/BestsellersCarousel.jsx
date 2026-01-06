@@ -134,11 +134,15 @@ const BestsellersCarousel = ({ onAddToCart }) => {
     if (onAddToCart) {
       onAddToCart({
         id: product?.id,
+        productId: product?.id,
+        variantId: product?.variantId || 'default',
         name: product?.name,
         price: product?.price || product?.salePrice || 0,
         originalPrice: product?.originalPrice || product?.price || product?.salePrice || 0,
         image: product?.image,
-        variant: product?.weight,
+        variant: product?.weight || product?.variant || 'Default',
+        category: product?.category || 'Product',
+        brand: product?.brand || 'Brand',
         quantity: 1
       });
     }

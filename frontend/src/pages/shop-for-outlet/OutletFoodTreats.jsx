@@ -51,12 +51,15 @@ const ProductCard = ({ p }) => {
     
     (async () => {
       try {
+        const variantId = currentVariant?.id || `v${variantIdx}`;
         await addToCart({
           productId: p.id,
           id: p.id,
+          variantId,
           name: p.name,
           image: getImageUrl(p.image),
           price: currentPrice,
+          originalPrice: originalPrice,
           variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
           quantity: 1,
           category: 'Outlet Food & Treats'

@@ -176,35 +176,64 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           name: item?.name || item?.title,
           image: resolveImageUrl(item),
           badges: Array.isArray(item?.badges) ? item.badges : [],
-          variants: (item?.variants || []).map(v => {
-            if (!v) return null;
-            if (typeof v === 'string') return { label: v, price: null };
+          variants: (() => {
+            // Extract variants from metadata first, then fallback to direct variants
+            const variantsFromMetadata = item?.metadata?.variants || [];
+            const fallbackVariants = item?.variants || [];
+            const sourceVariants = variantsFromMetadata.length > 0 ? variantsFromMetadata : fallbackVariants;
             
-            // Build complete variant label with units from database storage
-            let label = '';
-            if (v.weight && v.weight.toString().trim()) {
-              // Display weight with unit (e.g., "50g", "1kg")
-              const weight = v.weight.toString().trim();
-              const unit = v.weightUnit?.toString().trim() || '';
-              label = unit ? `${weight}${unit}` : weight;
-            } else if (v.size && v.size.toString().trim()) {
-              // Display size with unit (e.g., "10cm", "5inch")  
-              const size = v.size.toString().trim();
-              const unit = v.sizeUnit?.toString().trim() || '';
-              label = unit ? `${size}${unit}` : size;
-            } else if (v.label) {
-              label = v.label.toString().trim();
-            } else {
-              label = 'Default';
-            }
-            
-            return { 
-              label, 
-              price: (v.price != null ? Number(v.price) : null),
-              // Keep original variant data for reference
-              originalVariant: v
-            };
-          }).filter(Boolean),
+            return sourceVariants.map(v => {
+              if (!v) return null;
+              if (typeof v === 'string') return { label: v, price: null };
+              
+              // Build complete variant label with units from database storage
+              let label = null;
+              if (v.weight && v.weight.toString().trim()) {
+                // Display weight with unit (e.g., "50g", "1kg")
+                const weight = v.weight.toString().trim();
+                const unit = v.weightUnit?.toString().trim() || '';
+                label = unit ? `${weight}${unit}` : weight;
+              } else if (v.size && v.size.toString().trim()) {
+                // Check if there's a size category (Small, Medium, Large, etc.)
+                if (v.sizeCategory && v.sizeCategory.toString().trim()) {
+                  const category = v.sizeCategory.toString().trim();
+                  // If size is different from category, it's a measurement
+                  if (v.size !== v.sizeCategory) {
+                    const size = v.size.toString().trim();
+                    const unit = v.sizeUnit?.toString().trim() || '';
+                    const measurement = unit ? `${size}${unit}` : size;
+                    label = `${category} (${measurement})`;
+                  } else {
+                    label = category;
+                  }
+                } else {
+                  // Display size with unit (e.g., "10cm", "5inch")  
+                  const size = v.size.toString().trim();
+                  const unit = v.sizeUnit?.toString().trim() || '';
+                  label = unit ? `${size}${unit}` : size;
+                }
+              } else if (v.sizeCategory && v.sizeCategory.toString().trim()) {
+                // Use size category alone if no size measurement
+                label = v.sizeCategory.toString().trim();
+              } else if (v.label && v.label.toString().trim() && v.label !== 'Default') {
+                label = v.label.toString().trim();
+              } else if (v.name && v.name.toString().trim() && v.name !== 'Default') {
+                label = v.name.toString().trim();
+              }
+              
+              // Skip variants without meaningful labels
+              if (!label) {
+                return null;
+              }
+              
+              return { 
+                label, 
+                price: (v.price != null ? Number(v.price) : null),
+                // Keep original variant data for reference
+                originalVariant: v
+              };
+            }).filter(Boolean);
+          })(),
           price: Number(item?.price || 0),
           original: Number(item?.originalPrice || 0) || null,
           category: item?.category || '',
@@ -212,9 +241,14 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           petType: item?.petType || '',
           tags: Array.isArray(item?.tags) ? item.tags : []
         })).map(p => {
-          // Ensure at least one variant exists
+          // Only ensure a variant exists if the product should have variants
+          // Don't add 'Default' variants unnecessarily
           if (!p.variants.length) {
-            p.variants = [{ label: 'Default', price: null }];
+            // Check if this is a single-variant product that needs a default
+            const hasPrice = p.price && p.price > 0;
+            if (hasPrice) {
+              p.variants = [{ label: `₹${p.price}`, price: p.price }];
+            }
           }
           return p;
         });
@@ -487,7 +521,18 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           </div>
 
           <button
-            onClick={() => addToCart({ id: p.id, name: p.name, price: displayPrice, variant: selectedVariant?.label || null }, 1)}
+            onClick={() => addToCart({
+              id: p.id,
+              productId: p.id,
+              variantId: selectedVariant?.originalVariant?.id || selectedVariant?.id || 'default',
+              name: p.name,
+              image: p.image,
+              price: displayPrice,
+              originalPrice: p.original || displayPrice,
+              variant: selectedVariant?.label || 'Default',
+              category: 'Pharmacy',
+              brand: p.brand || ''
+            }, 1)}
             className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm shadow-md"
           >
             Add

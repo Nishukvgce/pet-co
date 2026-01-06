@@ -34,11 +34,15 @@ const ProductCard = ({ p }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation();
     if (!isInStock) return;
+    const variantId = currentVariant?.id || `v${variantIdx}`;
     addToCart({
       id: p.id,
+      productId: p.id,
+      variantId,
       name: p.name,
       image: p.image,
       price: currentPrice,
+      originalPrice: originalPrice,
       variant: currentVariant.weight || currentVariant.size || currentVariant.label || 'Default',
       brand,
       quantity: 1,

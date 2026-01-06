@@ -648,7 +648,6 @@ const UserAccountDashboard = () => {
           <WishlistSection
             wishlistItems={wishlistItems}
             onRemoveFromWishlist={handleRemoveFromWishlist}
-            onAddToCart={handleAddToCart}
           />
         );
       case 'reviews':

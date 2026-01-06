@@ -4,7 +4,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Image from '../../../components/AppImage';
 
-const WishlistSection = ({ wishlistItems, onRemoveFromWishlist, onAddToCart }) => {
+const WishlistSection = ({ wishlistItems, onRemoveFromWishlist }) => {
   const [sortBy, setSortBy] = useState('recent');
   const [removingIds, setRemovingIds] = useState(new Set());
 
@@ -28,17 +28,6 @@ const WishlistSection = ({ wishlistItems, onRemoveFromWishlist, onAddToCart }) =
         return new Date(b.addedDate) - new Date(a.addedDate);
     }
   });
-
-  const handleAddToCart = (item) => {
-    onAddToCart({
-      id: item?.id,
-      name: item?.name,
-      price: item?.price,
-      image: item?.image,
-      variant: item?.selectedVariant || item?.variants?.[0],
-      quantity: 1
-    });
-  };
 
   const calculateDiscount = (originalPrice, salePrice) => {
     return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
@@ -207,36 +196,25 @@ const WishlistSection = ({ wishlistItems, onRemoveFromWishlist, onAddToCart }) =
                 </p>
 
                 {/* Actions */}
-                <div className="space-y-2">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    fullWidth
-                    onClick={() => handleAddToCart(item)}
-                    disabled={item?.inStock === false}
-                    iconName="ShoppingCart"
-                    iconPosition="left"
-                  >
-                    {item?.inStock === false ? 'Out of Stock' : 'Add to Cart'}
-                  </Button>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                    <Link to={`/product-detail-page?id=${item?.id}`}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                      >
-                        View Details
-                      </Button>
-                    </Link>
-                    <Link to={`/product-full/${item?.id}`}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                      >
-                        Full Page
-                      </Button>
-                    </Link>
-                  </div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                  <Link to={`/product-detail-page?id=${item?.id}`}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      fullWidth
+                    >
+                      View Details
+                    </Button>
+                  </Link>
+                  <Link to={`/product-full/${item?.id}`}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      fullWidth
+                    >
+                      Full Page
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

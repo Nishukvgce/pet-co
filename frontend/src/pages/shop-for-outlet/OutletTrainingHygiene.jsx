@@ -37,11 +37,15 @@ const ProductCard = ({ p }) => {
 
   const handleAddToCart = () => {
     if (!isInStock) return;
+    const variantId = currentVariant?.id || `v${variantIdx}`;
     addToCart({
       id: p.id,
+      productId: p.id,
+      variantId,
       name: p.name,
       image: getImageUrl(p.image),
       price: currentPrice,
+      originalPrice: originalPrice,
       variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
       quantity: 1,
       category: 'Outlet Training & Hygiene'
