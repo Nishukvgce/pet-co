@@ -640,6 +640,8 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
               weight,
               unitType,
               size,
+              sizeCategory: variant?.sizeCategory || '',
+              sizeMode: variant?.sizeMode || 'measurement',
               weightUnit,
               sizeUnit,
               label,

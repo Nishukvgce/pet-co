@@ -346,26 +346,99 @@ const ProductManagement = () => {
       const normalizedProducts = apiProducts.map((p) => {
         // Extract variants from metadata if available
         const variantsFromMetadata = p?.metadata?.variants || [];
-        const processedVariants = variantsFromMetadata.map(variant => ({
-          id: variant.id || 'default',
-          name: variant.weight || variant.size || variant.name || 'Default',
-          weight: variant.weight,
-          size: variant.size,
-          price: parseFloat(variant.price) || 0,
-          originalPrice: parseFloat(variant.originalPrice) || 0,
-          stock: parseInt(variant.stock) || 0,
-          inStock: (parseInt(variant.stock) || 0) > 0
-        }));
+        const processedVariants = variantsFromMetadata.map(variant => {
+          // Build complete variant name with units from database
+          let name = 'Default';
+          if (variant.weight && variant.weight.toString().trim()) {
+            // Display weight with unit (e.g., "50g", "1kg")
+            const weight = variant.weight.toString().trim();
+            const unit = variant.weightUnit?.toString().trim() || '';
+            name = unit ? `${weight}${unit}` : weight;
+          } else if (variant.size && variant.size.toString().trim()) {
+            // For size variants, check if it's a category (Small/Medium/Large) or measurement
+            if (variant.sizeCategory && variant.sizeCategory.toString().trim()) {
+              // Use size category label (Small, Medium, Large, Extra Large)
+              name = variant.sizeCategory.toString().trim();
+              // If there's also a numeric size, append it
+              if (variant.size !== variant.sizeCategory) {
+                const size = variant.size.toString().trim();
+                const unit = variant.sizeUnit?.toString().trim() || '';
+                const measurement = unit ? `${size}${unit}` : size;
+                name = `${name} (${measurement})`;
+              }
+            } else {
+              // Display size with unit (e.g., "10cm", "5inch")  
+              const size = variant.size.toString().trim();
+              const unit = variant.sizeUnit?.toString().trim() || '';
+              name = unit ? `${size}${unit}` : size;
+            }
+          } else if (variant.sizeCategory && variant.sizeCategory.toString().trim()) {
+            // Use size category alone if no size measurement
+            name = variant.sizeCategory.toString().trim();
+          } else if (variant.label && variant.label.toString().trim()) {
+            name = variant.label.toString().trim();
+          } else if (variant.name && variant.name.toString().trim()) {
+            name = variant.name.toString().trim();
+          }
+          
+          return {
+            id: variant.id || 'default',
+            name,
+            weight: variant.weight,
+            size: variant.size,
+            sizeCategory: variant.sizeCategory,
+            weightUnit: variant.weightUnit,
+            sizeUnit: variant.sizeUnit,
+            label: variant.label,
+            price: parseFloat(variant.price) || 0,
+            originalPrice: parseFloat(variant.originalPrice) || 0,
+            stock: parseInt(variant.stock) || 0,
+            inStock: (parseInt(variant.stock) || 0) > 0
+          };
+        });
         
         // Also check if variants exist in p.variants (fallback)
         const fallbackVariants = p?.variants || [];
         if (processedVariants.length === 0 && fallbackVariants.length > 0) {
           fallbackVariants.forEach(variant => {
+            // Build complete variant name with units for fallback variants too
+            let name = 'Default';
+            if (variant.weight && variant.weight.toString().trim()) {
+              const weight = variant.weight.toString().trim();
+              const unit = variant.weightUnit?.toString().trim() || '';
+              name = unit ? `${weight}${unit}` : weight;
+            } else if (variant.size && variant.size.toString().trim()) {
+              // For size variants, check if it's a category or measurement
+              if (variant.sizeCategory && variant.sizeCategory.toString().trim()) {
+                name = variant.sizeCategory.toString().trim();
+                if (variant.size !== variant.sizeCategory) {
+                  const size = variant.size.toString().trim();
+                  const unit = variant.sizeUnit?.toString().trim() || '';
+                  const measurement = unit ? `${size}${unit}` : size;
+                  name = `${name} (${measurement})`;
+                }
+              } else {
+                const size = variant.size.toString().trim();
+                const unit = variant.sizeUnit?.toString().trim() || '';
+                name = unit ? `${size}${unit}` : size;
+              }
+            } else if (variant.sizeCategory && variant.sizeCategory.toString().trim()) {
+              name = variant.sizeCategory.toString().trim();
+            } else if (variant.label && variant.label.toString().trim()) {
+              name = variant.label.toString().trim();
+            } else if (variant.name && variant.name.toString().trim()) {
+              name = variant.name.toString().trim();
+            }
+            
             processedVariants.push({
               id: variant.id || 'default',
-              name: variant.weight || variant.size || variant.name || 'Default',
+              name,
               weight: variant.weight,
               size: variant.size,
+              sizeCategory: variant.sizeCategory,
+              weightUnit: variant.weightUnit,
+              sizeUnit: variant.sizeUnit,
+              label: variant.label,
               price: parseFloat(variant.price) || parseFloat(p?.price) || 0,
               originalPrice: parseFloat(variant.originalPrice) || parseFloat(p?.originalPrice) || 0,
               stock: parseInt(variant.stock) || 0,
@@ -405,37 +478,90 @@ const ProductManagement = () => {
     }
   };
 
-  // Format variant label consistently: prefer explicit units (g/kg) when weight is numeric
+  // Format variant label consistently using database unit fields
   const formatVariantLabel = (variant) => {
-    const raw = String(variant?.weight || variant?.size || variant?.name || '').trim();
-    if (!raw) return 'Variant';
+    if (!variant) return 'Variant';
 
-    const lower = raw.toLowerCase();
-    // If weight already mentions kg explicitly
-    const numericStr = String(raw).replace(/[^0-9.]/g, '');
-    const n = Number(numericStr);
-
-    if (lower.includes('kg')) {
-      // normalize: extract number if present
-      if (!Number.isNaN(n) && n > 0) return `${n} kg`;
-      return raw.replace(/kg/i, 'kg').trim();
+    // Use weight with unit if available
+    if (variant.weight && variant.weight.toString().trim()) {
+      const weight = variant.weight.toString().trim();
+      const unit = variant.weightUnit?.toString().trim() || '';
+      return unit ? `${weight}${unit}` : `${weight}`;
     }
-    if (lower.includes('g') || lower.includes('gram')) {
-      if (!Number.isNaN(n) && n > 0) return `${n} g`;
-      return raw.replace(/grams?/i, 'g').trim();
-    }
-
-    // If raw is purely numeric, infer units: >=1000 => kg, else g
-    if (!Number.isNaN(n) && n > 0) {
-      if (n >= 1000) {
-        const kg = (n / 1000).toString().replace(/\.0+$/, '');
-        return `${kg} kg`;
+    
+    // Use size with unit if available
+    if (variant.size && variant.size.toString().trim()) {
+      // Check if there's a size category (Small, Medium, Large, etc.)
+      if (variant.sizeCategory && variant.sizeCategory.toString().trim()) {
+        const category = variant.sizeCategory.toString().trim();
+        // If size is different from category, it's a measurement
+        if (variant.size !== variant.sizeCategory) {
+          const size = variant.size.toString().trim();
+          const unit = variant.sizeUnit?.toString().trim() || '';
+          const measurement = unit ? `${size}${unit}` : size;
+          return `${category} (${measurement})`;
+        }
+        return category;
+      } else {
+        // Regular size with unit
+        const size = variant.size.toString().trim();
+        const unit = variant.sizeUnit?.toString().trim() || '';
+        return unit ? `${size}${unit}` : `${size}`;
       }
-      return `${n} g`;
+    }
+    
+    // Use size category alone if no size measurement
+    if (variant.sizeCategory && variant.sizeCategory.toString().trim()) {
+      return variant.sizeCategory.toString().trim();
+    }
+    
+    // Use label if available
+    if (variant.label && variant.label.toString().trim()) {
+      return variant.label.toString().trim();
+    }
+    
+    // Use name if available (this is the processed name that already includes units)
+    if (variant.name && variant.name.toString().trim()) {
+      return variant.name.toString().trim();
     }
 
-    // Fallback: return original
-    return raw;
+    return 'Variant';
+  };
+
+  // Format stock status with descriptive labels and appropriate styling
+  const getStockStatus = (stock) => {
+    if (stock === 0) {
+      return { label: 'Out of Stock', color: 'text-red-600', bgColor: 'bg-red-50 border-red-200' };
+    } else if (stock <= 5) {
+      return { label: 'Low Stock', color: 'text-orange-600', bgColor: 'bg-orange-50 border-orange-200' };
+    } else if (stock <= 10) {
+      return { label: 'Normal Stock', color: 'text-yellow-600', bgColor: 'bg-yellow-50 border-yellow-200' };
+    } else {
+      return { label: 'Good Stock', color: 'text-green-600', bgColor: 'bg-green-50 border-green-200' };
+    }
+  };
+
+  // Get total stock summary with descriptive status
+  const getTotalStockSummary = (variants) => {
+    const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
+    const outOfStockCount = variants.filter(v => v.stock === 0).length;
+    const lowStockCount = variants.filter(v => v.stock > 0 && v.stock <= 5).length;
+    
+    let status = 'Good';
+    let color = 'text-green-600';
+    
+    if (totalStock === 0) {
+      status = 'Out of Stock';
+      color = 'text-red-600';
+    } else if (outOfStockCount > 0 || lowStockCount > variants.length / 2) {
+      status = 'Low Stock';
+      color = 'text-orange-600';
+    } else if (totalStock <= 10) {
+      status = 'Normal';
+      color = 'text-yellow-600';
+    }
+    
+    return { totalStock, status, color, outOfStockCount, lowStockCount };
   };
 
   // Remove stray text nodes that are just '0' inside the product grid (cleanup for legacy stray renders)
@@ -713,33 +839,48 @@ const ProductManagement = () => {
                         ₹{Math.min(...product.variants.map(v => v.price)).toFixed(0)} - ₹{Math.max(...product.variants.map(v => v.price)).toFixed(0)}
                       </span>
                       <span className="text-gray-500">•</span>
-                      <span className={`font-medium ${
-                        product.variants.reduce((sum, v) => sum + v.stock, 0) > 10 ? 'text-green-600' :
-                        product.variants.reduce((sum, v) => sum + v.stock, 0) > 0 ? 'text-yellow-600' :
-                        'text-red-600'
-                      }`}>
-                        {product.variants.reduce((sum, v) => sum + v.stock, 0)} total stock
-                      </span>
+                      {(() => {
+                        const stockSummary = getTotalStockSummary(product.variants);
+                        return (
+                          <span className={`font-medium ${stockSummary.color}`}>
+                            {stockSummary.totalStock} total units ({stockSummary.status})
+                          </span>
+                        );
+                      })()}
                     </div>
-                    {product.variants.some(v => v.stock === 0) && (
-                      <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">
-                        {product.variants.filter(v => v.stock === 0).length} out
-                      </span>
-                    )}
+                    {(() => {
+                      const stockSummary = getTotalStockSummary(product.variants);
+                      if (stockSummary.outOfStockCount > 0) {
+                        return (
+                          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">
+                            {stockSummary.outOfStockCount} out of stock
+                          </span>
+                        );
+                      } else if (stockSummary.lowStockCount > 0) {
+                        return (
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+                            {stockSummary.lowStockCount} low stock
+                          </span>
+                        );
+                      }
+                      return null;
+                    })()} 
                   </div>
                   
                   {/* Top Variants - Horizontal Pills */}
                   <div className="flex flex-wrap gap-1 mt-1.5">
-                    {product.variants.slice(0, 4).map((variant, index) => (
-                      <div key={variant.id || index} className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs border ${
-                        variant.stock > 0 
-                          ? 'bg-green-50 border-green-200 text-green-800'
-                          : 'bg-red-50 border-red-200 text-red-800'
-                      }`}>
-                        <span className="font-medium">{formatVariantLabel(variant)}</span>
-                        <span className="text-xs font-bold">{variant.stock}</span>
-                      </div>
-                    ))}
+                    {product.variants.slice(0, 4).map((variant, index) => {
+                      const stockStatus = getStockStatus(variant.stock);
+                      return (
+                        <div key={variant.id || index} className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs border ${
+                          stockStatus.bgColor
+                        }`}>
+                          <span className="font-medium">{formatVariantLabel(variant)}</span>
+                          <span className="text-xs text-gray-600">₹{variant.price?.toFixed(0) || '0'}</span>
+                          <span className={`text-xs font-bold ${stockStatus.color}`}>{variant.stock} units</span>
+                        </div>
+                      );
+                    })}
                     {product.variants.length > 4 && (
                       <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
                         +{product.variants.length - 4}
