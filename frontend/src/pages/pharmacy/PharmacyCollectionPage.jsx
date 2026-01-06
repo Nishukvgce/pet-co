@@ -179,15 +179,45 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           variants: (item?.variants || []).map(v => {
             if (!v) return null;
             if (typeof v === 'string') return { label: v, price: null };
-            return { label: v.label || v.size || v.weight || 'Default', price: (v.price != null ? Number(v.price) : null) };
-          }).filter(Boolean).length ? (item?.variants || []).map(v => (typeof v === 'string' ? { label: v, price: null } : { label: v.label || v.size || v.weight || 'Default', price: (v.price != null ? Number(v.price) : null) })) : [{ label: 'Default', price: null }],
-            price: Number(item?.price || 0),
-            original: Number(item?.originalPrice || 0) || null,
+            
+            // Build complete variant label with units from database storage
+            let label = '';
+            if (v.weight && v.weight.toString().trim()) {
+              // Display weight with unit (e.g., "50g", "1kg")
+              const weight = v.weight.toString().trim();
+              const unit = v.weightUnit?.toString().trim() || '';
+              label = unit ? `${weight}${unit}` : weight;
+            } else if (v.size && v.size.toString().trim()) {
+              // Display size with unit (e.g., "10cm", "5inch")  
+              const size = v.size.toString().trim();
+              const unit = v.sizeUnit?.toString().trim() || '';
+              label = unit ? `${size}${unit}` : size;
+            } else if (v.label) {
+              label = v.label.toString().trim();
+            } else {
+              label = 'Default';
+            }
+            
+            return { 
+              label, 
+              price: (v.price != null ? Number(v.price) : null),
+              // Keep original variant data for reference
+              originalVariant: v
+            };
+          }).filter(Boolean),
+          price: Number(item?.price || 0),
+          original: Number(item?.originalPrice || 0) || null,
           category: item?.category || '',
           subcategory: item?.subcategory || '',
           petType: item?.petType || '',
           tags: Array.isArray(item?.tags) ? item.tags : []
-        }));
+        })).map(p => {
+          // Ensure at least one variant exists
+          if (!p.variants.length) {
+            p.variants = [{ label: 'Default', price: null }];
+          }
+          return p;
+        });
 
         console.log('PharmacyCollectionPage: Loaded', normalized.length, 'products');
 

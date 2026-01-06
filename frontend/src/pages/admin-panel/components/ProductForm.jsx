@@ -13,6 +13,39 @@ const ProductForm = ({ product, onSave, onCancel }) => {
     const v = `${value}`.trim();
     return v ? [v] : [];
   };
+  // prune empty deep (keeps numbers and files/blobs)
+  const pruneEmptyDeep = (value) => {
+    const isBlobLike = (typeof Blob !== 'undefined' && value instanceof Blob) || (typeof File !== 'undefined' && value instanceof File);
+    if (value === null || value === undefined) return undefined;
+    if (isBlobLike) return value;
+    if (value instanceof Date) return value;
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      return trimmed.length === 0 ? undefined : trimmed;
+    }
+    if (Array.isArray(value)) {
+      const cleaned = value.map(pruneEmptyDeep).filter(v => v !== undefined);
+      return cleaned.length === 0 ? undefined : cleaned;
+    }
+    if (typeof value === 'object') {
+      const out = {};
+      Object.entries(value).forEach(([k, v]) => {
+        const cleaned = pruneEmptyDeep(v);
+        if (cleaned !== undefined) out[k] = cleaned;
+      });
+      return Object.keys(out).length === 0 ? undefined : out;
+    }
+    return value;
+  };
+
+  const parseNumberOrUndefined = (v) => {
+    if (v === null || v === undefined) return undefined;
+    if (typeof v === 'number') return v;
+    const s = String(v).trim();
+    if (s === '') return undefined;
+    const n = Number(s);
+    return Number.isNaN(n) ? undefined : n;
+  };
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -247,14 +280,14 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             return sel ? (sel.slug || sel.name || sel.id) : formData.category;
           } catch (e) { return formData.category; }
         })(),
-        price: parseFloat(formData.price),
-        originalPrice: parseFloat(formData.originalPrice),
-        stockQuantity: parseInt(formData.stockQuantity),
+        price: parseNumberOrUndefined(formData.price),
+        originalPrice: parseNumberOrUndefined(formData.originalPrice),
+        stockQuantity: parseNumberOrUndefined(formData.stockQuantity),
         ingredients: formData.ingredients,
         benefits: formData.benefits,
         inStock: !!formData.inStock,
-        rating: product?.rating || 4.5,
-        reviewCount: product?.reviewCount || 0,
+        rating: product?.rating,
+        reviewCount: product?.reviewCount,
         badges: product?.badges || []
       };
 
@@ -277,25 +310,29 @@ const ProductForm = ({ product, onSave, onCancel }) => {
         // ignore metadata enrichment errors
       }
 
-      if (product) {
+          // Prune productData to only include fields provided
+          const pruned = pruneEmptyDeep(productData) || {};
+
+          if (product) {
         // Edit mode: update product
         if (imageFile) {
           // If new image is uploaded, use FormData for update
           const form = new FormData();
-          form.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
+          form.append('product', new Blob([JSON.stringify(pruned)], { type: 'application/json' }));
           form.append('image', imageFile);
           await dataService.updateProductWithImage(product.id, form);
         } else {
           // Preserve existing imageUrl if no new image is uploaded
           if (product?.imageUrl) {
-            productData.imageUrl = product.imageUrl;
+            pruned.imageUrl = product.imageUrl;
           }
-          await dataService.updateProduct(product.id, productData);
+          await dataService.updateProduct(product.id, pruned);
         }
       } else {
         // Add mode: use FormData for image upload
         const form = new FormData();
-        form.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
+          const prunedNew = pruneEmptyDeep(productData) || {};
+          form.append('product', new Blob([JSON.stringify(prunedNew)], { type: 'application/json' }));
         form.append('image', imageFile);
         await dataService.addProduct(form, true);
       }

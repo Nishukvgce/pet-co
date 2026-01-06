@@ -772,7 +772,7 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
       texture: metadata.texture || product.texture || '',
       servingSize: metadata.servingSize || product.servingSize || '',
       packCount: metadata.packCount || product.packCount || '',
-      weightUnit: metadata.weightUnit || product.weightUnit || 'g',
+      weightUnit: metadata.weightUnit || product.weightUnit || '',
       flavors: Array.isArray(metadata.flavors) ? metadata.flavors.join(', ') : product.flavors || metadata.flavors || '',
       colors: Array.isArray(metadata.colors) ? metadata.colors.join(', ') : product.colors || metadata.colors || '',
       // Pharmacy fields
@@ -1056,8 +1056,8 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
         size: '',
         sizeCategory: '',
         sizeMode: 'measurement',
-        weightUnit: prev.weightUnit || 'g',
-        sizeUnit: 'cm',
+        weightUnit: prev.weightUnit ?? '',
+        sizeUnit: prev.sizeUnit ?? '',
         label: '',
         price: '',
         originalPrice: '',
@@ -1141,15 +1141,25 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
 
     try {
       // Prepare product data
+      const parseNumberOrUndefined = (v) => {
+        if (v === null || v === undefined) return undefined;
+        if (typeof v === 'number') return v;
+        const s = String(v).trim();
+        if (s === '') return undefined;
+        const n = Number(s);
+        return Number.isNaN(n) ? undefined : n;
+      };
+
       const productData = {
         ...formData,
-        price: parseFloat(formData.price) || 0,
-        originalPrice: parseFloat(formData.originalPrice) || 0,
+        // only set numeric fields if admin provided values; otherwise keep undefined so prune can remove them
+        price: parseNumberOrUndefined(formData.price),
+        originalPrice: parseNumberOrUndefined(formData.originalPrice),
         // NOTE: EnhancedProductForm doesn't show a stockQuantity field in the UI.
         // We will reconcile stockQuantity from variants (authoritative) below.
-        stockQuantity: parseInt(formData.stockQuantity) || 0,
-        rating: parseFloat(formData.rating) || 0,
-        reviewCount: parseInt(formData.reviewCount) || 0,
+        stockQuantity: parseNumberOrUndefined(formData.stockQuantity),
+        rating: parseNumberOrUndefined(formData.rating),
+        reviewCount: parseNumberOrUndefined(formData.reviewCount),
         
         // Process features
         features: formData.features.filter(f => f.trim()),
@@ -1160,12 +1170,12 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
         // Process tags
         tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
         
-        // Process variants
+        // Process variants (preserve units and only parse numeric values if provided)
         variants: formData.variants.map(v => ({
           ...v,
-          price: parseFloat(v.price) || 0,
-          originalPrice: parseFloat(v.originalPrice) || 0,
-          stock: parseInt(v.stock) || 0
+          price: parseNumberOrUndefined(v.price),
+          originalPrice: parseNumberOrUndefined(v.originalPrice),
+          stock: parseNumberOrUndefined(v.stock)
         }))
       };
 
@@ -1265,9 +1275,12 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
       const pruned = pruneEmptyDeep(productData.metadata);
       productData.metadata = pruned || {};
 
+      // Prune the full productData so only fields provided by admin are sent.
+      const prunedProductData = pruneEmptyDeep(productData) || {};
+
       // Build final payload. We keep variants only inside metadata to avoid any
       // JSON key ordering pitfalls during backend binding (metadata vs variants).
-      const productPayload = { ...productData };
+      const productPayload = { ...prunedProductData };
       delete productPayload.variants;
 
       // Always use FormData for create/update so backend receives multipart/form-data
@@ -1686,7 +1699,7 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                                     placeholder="10"
                                   />
                                   <select
-                                    value={variant.sizeUnit || 'cm'}
+                                    value={variant.sizeUnit ?? formData.sizeUnit ?? ''}
                                     onChange={(e) => handleVariantChange(index, 'sizeUnit', e.target.value)}
                                     className="h-10 px-2 rounded-md border border-border bg-background text-foreground"
                                   >
@@ -1724,10 +1737,11 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                               placeholder="500"
                             />
                             <select
-                              value={variant.weightUnit || formData.weightUnit || 'g'}
+                              value={variant.weightUnit ?? formData.weightUnit ?? ''}
                               onChange={(e) => handleVariantChange(index, 'weightUnit', e.target.value)}
                               className="h-10 px-2 rounded-md border border-border bg-background text-foreground"
                             >
+                              <option value="">Unit</option>
                               <option value="g">g</option>
                               <option value="kg">kg</option>
                               <option value="ml">ml</option>

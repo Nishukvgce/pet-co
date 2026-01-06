@@ -163,6 +163,28 @@ public class Product {
     @Column(name = "expiry_date", length = 255)
     private String expiryDate; // Expiry date
     
+    // Filter Information Fields - extracted from metadata.filters for direct querying
+    @Column(name = "brands", columnDefinition = "TEXT")
+    private String brands; // JSON array of brands ["Brand1", "Brand2"]
+    
+    @Column(name = "life_stages", columnDefinition = "TEXT") 
+    private String lifeStages; // JSON array of life stages ["Adult", "Puppy"]
+    
+    @Column(name = "breed_sizes", columnDefinition = "TEXT")
+    private String breedSizes; // JSON array of breed sizes ["Small Breed", "Large Breed"]
+    
+    @Column(name = "special_diets", columnDefinition = "TEXT")
+    private String specialDiets; // JSON array of special diets ["Organic", "Grain Free"]
+    
+    @Column(name = "protein_sources", columnDefinition = "TEXT") 
+    private String proteinSources; // JSON array of protein sources ["Chicken", "Fish"]
+    
+    @Column(name = "product_weights", columnDefinition = "TEXT")
+    private String productWeights; // JSON array of available weights ["50", "100", "1"]
+    
+    @Column(name = "price_ranges", columnDefinition = "TEXT")
+    private String priceRanges; // JSON array of price ranges ["INR 10 - INR 300"]
+    
     public String getFoodType() {
         return foodType;
     }
@@ -342,37 +364,11 @@ public class Product {
         }
     }
 
-    // Provide a transient 'images' property for convenience so frontend can read product.images
-    @Transient
-    @SuppressWarnings("unchecked")
-    public List<String> getImages() {
-        if (this.metadata != null) {
-            Object imgs = this.metadata.get("images");
-            if (imgs instanceof List) {
-                return (List<String>) imgs;
-            }
-        }
-        List<String> single = new ArrayList<>();
-        if (this.imageUrl != null && !this.imageUrl.isEmpty()) {
-            single.add(this.imageUrl);
-            return single;
-        }
-        return new ArrayList<>();
-    }
-
-    @Transient
-    public void setImages(List<String> images) {
-        if (this.metadata == null) this.metadata = new HashMap<>();
-        this.metadata.put("images", images);
-        if (images != null && !images.isEmpty()) {
-            this.imageUrl = images.get(0);
-        }
-    }
+    // Internal helper to manage images in metadata (not exposed to JSON)
     
-    // Variant helper methods
-    @Transient
+    // Internal helper to access variants from metadata (not exposed to JSON)
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> getVariants() {
+    public List<Map<String, Object>> getVariantsInternal() {
         if (this.metadata != null) {
             Object variants = this.metadata.get("variants");
             if (variants instanceof List) {
@@ -382,15 +378,15 @@ public class Product {
         return new ArrayList<>();
     }
     
-    @Transient
-    public void setVariants(List<Map<String, Object>> variants) {
+    // Internal helper to set variants in metadata (not exposed to JSON)
+    public void setVariantsInternal(List<Map<String, Object>> variants) {
         if (this.metadata == null) this.metadata = new HashMap<>();
         this.metadata.put("variants", variants);
     }
     
     @Transient
     public boolean hasVariants() {
-        List<Map<String, Object>> variants = getVariants();
+        List<Map<String, Object>> variants = getVariantsInternal();
         return variants != null && !variants.isEmpty();
     }
     
@@ -398,7 +394,7 @@ public class Product {
     @SuppressWarnings("unchecked")
     public Map<String, Object> getVariantById(String variantId) {
         if (variantId == null || variantId.isEmpty()) return null;
-        List<Map<String, Object>> variants = getVariants();
+        List<Map<String, Object>> variants = getVariantsInternal();
         for (Map<String, Object> variant : variants) {
             if (variantId.equals(variant.get("id"))) {
                 return variant;
@@ -722,5 +718,62 @@ public class Product {
     
     public void setExpiryDate(String expiryDate) {
         this.expiryDate = expiryDate;
+    }
+    
+    // Getters and setters for filter fields
+    public String getBrands() {
+        return brands;
+    }
+    
+    public void setBrands(String brands) {
+        this.brands = brands;
+    }
+    
+    public String getLifeStages() {
+        return lifeStages;
+    }
+    
+    public void setLifeStages(String lifeStages) {
+        this.lifeStages = lifeStages;
+    }
+    
+    public String getBreedSizes() {
+        return breedSizes;
+    }
+    
+    public void setBreedSizes(String breedSizes) {
+        this.breedSizes = breedSizes;
+    }
+    
+    public String getSpecialDiets() {
+        return specialDiets;
+    }
+    
+    public void setSpecialDiets(String specialDiets) {
+        this.specialDiets = specialDiets;
+    }
+    
+    public String getProteinSources() {
+        return proteinSources;
+    }
+    
+    public void setProteinSources(String proteinSources) {
+        this.proteinSources = proteinSources;
+    }
+    
+    public String getProductWeights() {
+        return productWeights;
+    }
+    
+    public void setProductWeights(String productWeights) {
+        this.productWeights = productWeights;
+    }
+    
+    public String getPriceRanges() {
+        return priceRanges;
+    }
+    
+    public void setPriceRanges(String priceRanges) {
+        this.priceRanges = priceRanges;
     }
 }

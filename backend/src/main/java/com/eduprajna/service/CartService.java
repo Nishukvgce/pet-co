@@ -71,7 +71,7 @@ public class CartService {
             Double price = null;
             if (variantId != null && !variantId.isEmpty() && product.hasVariants()) {
                 try {
-                    java.util.List<java.util.Map<String, Object>> vars = product.getVariants();
+                    java.util.List<java.util.Map<String, Object>> vars = product.getVariantsInternal();
                     if (vars != null) {
                         for (java.util.Map<String, Object> v : vars) {
                             if (variantId.equals(v.get("id"))) {
@@ -96,7 +96,7 @@ public class CartService {
             // Also update snapshot price to the newly selected variant price
             if (product.hasVariants()) {
                 try {
-                    java.util.List<java.util.Map<String, Object>> vars = product.getVariants();
+                    java.util.List<java.util.Map<String, Object>> vars = product.getVariantsInternal();
                     for (java.util.Map<String, Object> v : vars) {
                         if (variantId.equals(v.get("id"))) {
                             Object p = v.get("price");

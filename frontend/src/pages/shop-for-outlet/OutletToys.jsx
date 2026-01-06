@@ -7,6 +7,7 @@ import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import productApi from '../../services/productApi';
 import { resolveImageUrl } from '../../lib/imageUtils';
+import { normalizeProductFromApi } from '../../utils/productUtils';
 import FilterDrawer from '../../components/FilterDrawer';
 import { getFilterSections } from '../../data/categoryFilters';
 import MobileCategorySidebar from '../../components/MobileCategorySidebar';
@@ -48,7 +49,21 @@ const ProductCard = ({ p }) => {
         name: p.name,
         image: getImageUrl(p.image),
         price: currentPrice,
-        variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
+        variant: (() => {
+          if (currentVariant.weight && currentVariant.weight.toString().trim()) {
+            const weight = currentVariant.weight.toString().trim();
+            const unit = currentVariant.weightUnit?.toString().trim() || '';
+            return unit ? `${weight}${unit}` : weight;
+          } else if (currentVariant.size && currentVariant.size.toString().trim()) {
+            const size = currentVariant.size.toString().trim();
+            const unit = currentVariant.sizeUnit?.toString().trim() || '';
+            return unit ? `${size}${unit}` : size;
+          } else if (currentVariant.label) {
+            return currentVariant.label.toString().trim();
+          } else {
+            return 'Default';
+          }
+        })(),
         quantity: 1,
         category: 'Outlet Toys'
       });
@@ -99,18 +114,38 @@ const ProductCard = ({ p }) => {
         {/* Product Name */}
         <h3 className="text-sm md:text-base font-semibold text-foreground mb-3 line-clamp-2 leading-tight overflow-hidden" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>{p.name}</h3>
 
-        {/* Variant chips (show weight + price) */}
+        {/* Variant chips (show weight/size with units + price) */}
         {variants.length > 1 && (
           <div className="mb-4 flex flex-wrap gap-2">
-            {variants.map((v, i) => (
-              <button 
-                key={i}
-                onClick={() => setVariantIdx(i)}
-                className={`flex flex-col items-center text-xs font-medium px-3 py-2 border rounded-lg cursor-pointer transition-all duration-200 ${i === variantIdx ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-border hover:border-orange-300 hover:bg-orange-50'}`}>
-                <span className="leading-tight">{v.weight ? `${v.weight}${v.weightUnit || ''}` : 'Default'}</span>
-                <span className="text-[11px] text-muted-foreground mt-1">₹{(v.price || currentPrice).toLocaleString()}</span>
-              </button>
-            ))}
+            {variants.map((v, i) => {
+              // Build complete variant label with units from database
+              let label = '';
+              if (v.weight && v.weight.toString().trim()) {
+                // Display weight with unit (e.g., "50g", "1kg")
+                const weight = v.weight.toString().trim();
+                const unit = v.weightUnit?.toString().trim() || '';
+                label = unit ? `${weight}${unit}` : weight;
+              } else if (v.size && v.size.toString().trim()) {
+                // Display size with unit (e.g., "10cm", "5inch")  
+                const size = v.size.toString().trim();
+                const unit = v.sizeUnit?.toString().trim() || '';
+                label = unit ? `${size}${unit}` : size;
+              } else if (v.label) {
+                label = v.label.toString().trim();
+              } else {
+                label = 'Default';
+              }
+              
+              return (
+                <button 
+                  key={i}
+                  onClick={() => setVariantIdx(i)}
+                  className={`flex flex-col items-center text-xs font-medium px-3 py-2 border rounded-lg cursor-pointer transition-all duration-200 ${i === variantIdx ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-border hover:border-orange-300 hover:bg-orange-50'}`}>
+                  <span className="leading-tight">{label}</span>
+                  <span className="text-[11px] text-muted-foreground mt-1">₹{(v.price || currentPrice).toLocaleString()}</span>
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -173,32 +208,36 @@ const OutletToys = ({ initialActive = 'All Toys' }) => {
           return subcategoryMatch;
         });
 
-        // Normalize the filtered products
+        // Normalize products using shared productUtils for consistency
         const normalized = filteredProducts.map(item => {
-          const variants = item?.variants || [];
-          const hasValidVariants = variants.length > 0;
+          // Use shared normalization to ensure variant units are preserved
+          const normalizedItem = normalizeProductFromApi(item);
           
-          // Get the primary image
-          const primaryImage = item?.imageUrl || 
-                               (item?.images && item.images.length > 0 ? item.images[0] : null) || 
-                               '/assets/images/no_image.png';
+          // Ensure we have at least one variant with proper fallback
+          const variants = normalizedItem.variants && normalizedItem.variants.length > 0 
+            ? normalizedItem.variants 
+            : [{
+                id: 'default',
+                weight: 'Default',
+                unitType: 'weight',
+                weightUnit: '',
+                sizeUnit: '',
+                price: Number(item?.price || 0),
+                originalPrice: Number(item?.originalPrice || item?.mrp || 0),
+                stock: item?.stockQuantity || 0
+              }];
           
           return {
-            id: item?.id,
-            name: item?.name,
-            image: primaryImage,
-            badges: item?.badges || ['Outlet'],
-            variants: hasValidVariants ? variants : [{
-              weight: 'Default',
-              price: Number(item?.price || 0),
-              originalPrice: Number(item?.originalPrice || item?.mrp || 0),
-              stock: item?.stockQuantity || 0
-            }],
-            price: Number(item?.price || 0),
-            original: Number(item?.originalPrice || item?.mrp || 0) || null,
-            category: item?.category || '',
-            subcategory: item?.subcategory || '',
-            stockQuantity: item?.stockQuantity || 0
+            id: normalizedItem.id,
+            name: normalizedItem.name,
+            image: normalizedItem.image,
+            badges: normalizedItem.badges || ['Outlet'],
+            variants: variants,
+            price: normalizedItem.price,
+            original: normalizedItem.originalPrice,
+            category: normalizedItem.category,
+            subcategory: normalizedItem.subcategory,
+            stockQuantity: normalizedItem.stockQuantity || 0
           };
         });
 

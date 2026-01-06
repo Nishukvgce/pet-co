@@ -215,7 +215,24 @@ const ProductCard = ({ p }) => {
           {variants.length > 1 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {variants.map((v, i) => {
-                const label = typeof v === 'string' ? v : (v.weight || v.label || `${v.size || ''}`);
+                // Build complete variant label with units from database
+                let label = '';
+                if (v.weight && v.weight.toString().trim()) {
+                  // Display weight with unit (e.g., "50g", "1kg")
+                  const weight = v.weight.toString().trim();
+                  const unit = v.weightUnit?.toString().trim() || '';
+                  label = unit ? `${weight}${unit}` : weight;
+                } else if (v.size && v.size.toString().trim()) {
+                  // Display size with unit (e.g., "10cm", "5inch")  
+                  const size = v.size.toString().trim();
+                  const unit = v.sizeUnit?.toString().trim() || '';
+                  label = unit ? `${size}${unit}` : size;
+                } else if (v.label) {
+                  label = v.label.toString().trim();
+                } else {
+                  label = `Variant ${i + 1}`;
+                }
+                
                 const variantPrice = v.price || p.price;
                 const active = i === selectedVariantIdx;
                 return (

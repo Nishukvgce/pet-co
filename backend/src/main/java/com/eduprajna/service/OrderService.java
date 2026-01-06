@@ -198,7 +198,7 @@ public class OrderService {
                 boolean hasVariants = product.hasVariants();
                 if (variantId != null && !variantId.isEmpty() && hasVariants) {
                     // Update variant stock
-                    List<Map<String, Object>> variants = product.getVariants();
+                    List<Map<String, Object>> variants = product.getVariantsInternal();
                     for (Map<String, Object> variant : variants) {
                         if (variantId.equals(variant.get("id"))) {
                             Object stockObj = variant.get("stock");
@@ -218,7 +218,7 @@ public class OrderService {
                             break;
                         }
                     }
-                    product.setVariants(variants);
+                    product.setVariantsInternal(variants);
                 } else {
                     // Update main product stock
                     Integer stockQty = product.getStockQuantity();

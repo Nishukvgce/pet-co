@@ -268,6 +268,7 @@ export const normalizeProductFromApi = (product = {}) => {
     unitType: variant?.unitType || variant?.size ? 'size' : 'weight',
     size: variant?.size || '',
     weightUnit: variant?.weightUnit || '',
+    sizeUnit: variant?.sizeUnit || '',
     price: variant?.price ?? '',
     originalPrice: variant?.originalPrice ?? '',
     stock: variant?.stock ?? ''

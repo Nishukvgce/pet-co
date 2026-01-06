@@ -341,7 +341,7 @@ public class ProductController {
         
         // If product has variants, check if any variant has stock
         if (product.hasVariants()) {
-            return product.getVariants().stream()
+            return product.getVariantsInternal().stream()
                 .anyMatch(variant -> {
                     Object stockObj = variant.get("stock");
                     if (stockObj instanceof Number) {
@@ -736,22 +736,17 @@ public class ProductController {
             Map<String, Object> md = p.getMetadata();
             if (md == null) md = new HashMap<>();
             
-            // Add foodType to metadata if not present (for frontend reading)
-            if (p.getFoodType() != null && !p.getFoodType().isBlank()) {
-                md.put("foodType", p.getFoodType());
-            }
+            // Only add essential data that frontend needs for display
+            // Avoid duplicating data that's already in columns
             
-            // Add features to metadata (parse JSON string back to array)
-            // Always populate from column to ensure array format
+            // Add features as array format for frontend (parse JSON string back to array)
             if (p.getFeatures() != null && !p.getFeatures().isBlank()) {
                 try {
-                    // Parse JSON array string ["item1", "item2"] back to List
                     String featuresJson = p.getFeatures();
                     if (featuresJson.startsWith("[") && featuresJson.endsWith("]")) {
                         List<String> featuresList = new ArrayList<>();
                         String content = featuresJson.substring(1, featuresJson.length() - 1);
                         if (!content.isBlank()) {
-                            // Simple JSON array parser
                             String[] items = content.split("\",\\s*\"");
                             for (String item : items) {
                                 String cleaned = item.replace("\"", "").trim();
@@ -762,26 +757,19 @@ public class ProductController {
                         }
                         md.put("features", featuresList);
                     } else {
-                        // If it's not a JSON array, wrap the string in a list
                         List<String> featuresList = new ArrayList<>();
                         featuresList.add(featuresJson);
                         md.put("features", featuresList);
                     }
                 } catch (Exception e) {
-                    try { log.warn("Failed to parse features JSON: {}", e.getMessage()); } catch (Exception ignored) {}
                     // On error, ensure we still set an empty array
-                    if (!md.containsKey("features")) {
-                        md.put("features", new ArrayList<>());
-                    }
-                }
-            } else {
-                // Ensure features is always an array, even if empty
-                if (!md.containsKey("features")) {
                     md.put("features", new ArrayList<>());
                 }
+            } else {
+                md.put("features", new ArrayList<>());
             }
             
-            // Add nutrition to metadata if not present
+            // Add nutrition object for frontend convenience
             Map<String, String> nutrition = new HashMap<>();
             if (p.getNutritionProtein() != null && !p.getNutritionProtein().isBlank()) {
                 nutrition.put("protein", p.getNutritionProtein());
@@ -805,44 +793,11 @@ public class ProductController {
                 md.put("nutrition", nutrition);
             }
             
-            // Add pet-specific and product attribute fields to metadata
-            if (p.getPetType() != null && !p.getPetType().isBlank()) {
-                md.put("petType", p.getPetType());
-            }
-            if (p.getMaterial() != null && !p.getMaterial().isBlank()) {
-                md.put("material", p.getMaterial());
-            }
-            if (p.getScent() != null && !p.getScent().isBlank()) {
-                md.put("scent", p.getScent());
-            }
-            if (p.getSuitableFor() != null && !p.getSuitableFor().isBlank()) {
-                md.put("suitableFor", p.getSuitableFor());
-            }
-            if (p.getTreatType() != null && !p.getTreatType().isBlank()) {
-                md.put("treatType", p.getTreatType());
-            }
-            if (p.getTexture() != null && !p.getTexture().isBlank()) {
-                md.put("texture", p.getTexture());
-            }
-            if (p.getSubcategoryLabel() != null && !p.getSubcategoryLabel().isBlank()) {
-                md.put("subcategoryLabel", p.getSubcategoryLabel());
-            }
-            if (p.getServingSize() != null && !p.getServingSize().isBlank()) {
-                md.put("servingSize", p.getServingSize());
-            }
-            if (p.getPackCount() != null && !p.getPackCount().isBlank()) {
-                md.put("packCount", p.getPackCount());
-            }
-            if (p.getWeightUnit() != null && !p.getWeightUnit().isBlank()) {
-                md.put("weightUnit", p.getWeightUnit());
-            }
-            
-            // Add flavors and colors (parse if JSON array string)
+            // Parse flavors and colors from JSON strings to arrays if needed
             if (p.getFlavors() != null && !p.getFlavors().isBlank()) {
                 try {
                     String flavorsStr = p.getFlavors();
                     if (flavorsStr.startsWith("[") && flavorsStr.endsWith("]")) {
-                        // Parse JSON array
                         List<String> flavorsList = new ArrayList<>();
                         String content = flavorsStr.substring(1, flavorsStr.length() - 1);
                         if (!content.isBlank()) {
@@ -855,11 +810,9 @@ public class ProductController {
                             }
                         }
                         md.put("flavors", flavorsList);
-                    } else {
-                        md.put("flavors", flavorsStr);
                     }
                 } catch (Exception e) {
-                    md.put("flavors", p.getFlavors());
+                    // Keep as string if parsing fails
                 }
             }
             
@@ -867,7 +820,6 @@ public class ProductController {
                 try {
                     String colorsStr = p.getColors();
                     if (colorsStr.startsWith("[") && colorsStr.endsWith("]")) {
-                        // Parse JSON array
                         List<String> colorsList = new ArrayList<>();
                         String content = colorsStr.substring(1, colorsStr.length() - 1);
                         if (!content.isBlank()) {
@@ -880,81 +832,118 @@ public class ProductController {
                             }
                         }
                         md.put("colors", colorsList);
-                    } else {
-                        md.put("colors", colorsStr);
                     }
                 } catch (Exception e) {
-                    md.put("colors", p.getColors());
+                    // Keep as string if parsing fails
                 }
             }
             
-            // Add pharmacy fields to metadata
+            // Add pharmacy object for frontend convenience
             Map<String, Object> pharmacy = new HashMap<>();
             if (p.getPrescriptionRequired() != null) {
                 pharmacy.put("prescriptionRequired", p.getPrescriptionRequired());
-            }
-            if (p.getDosageForm() != null && !p.getDosageForm().isBlank()) {
-                pharmacy.put("dosageForm", p.getDosageForm());
-            }
-            if (p.getStrength() != null && !p.getStrength().isBlank()) {
-                pharmacy.put("strength", p.getStrength());
-            }
-            if (p.getActiveIngredient() != null && !p.getActiveIngredient().isBlank()) {
-                pharmacy.put("activeIngredient", p.getActiveIngredient());
-            }
-            if (p.getManufacturer() != null && !p.getManufacturer().isBlank()) {
-                pharmacy.put("manufacturer", p.getManufacturer());
-            }
-            if (p.getIndications() != null && !p.getIndications().isBlank()) {
-                pharmacy.put("indications", p.getIndications());
-            }
-            if (p.getContraindications() != null && !p.getContraindications().isBlank()) {
-                pharmacy.put("contraindications", p.getContraindications());
-            }
-            if (p.getExpiryDate() != null && !p.getExpiryDate().isBlank()) {
-                pharmacy.put("expiryDate", p.getExpiryDate());
             }
             if (!pharmacy.isEmpty()) {
                 md.put("pharmacy", pharmacy);
             }
             
-            // Ensure variants are present and properly formatted
-            Object variantsObj = md.get("variants");
-            if (variantsObj instanceof List) {
-                List<?> variantsList = (List<?>) variantsObj;
+            // Add filters object for frontend convenience (from extracted columns)
+            Map<String, Object> filters = new HashMap<>();
+            if (p.getBrands() != null && !p.getBrands().isBlank()) {
                 try {
-                    log.debug("Product {} has {} variants in metadata", p.getId(), variantsList.size());
-                    
-                    // Log variant details for debugging
-                    for (int i = 0; i < variantsList.size() && i < 3; i++) {
-                        Object variant = variantsList.get(i);
-                        if (variant instanceof Map) {
-                            Map<?, ?> variantMap = (Map<?, ?>) variant;
-                            log.debug("Variant {}: id={}, weight/size={}/{}, price={}, stock={}", 
-                                i + 1,
-                                variantMap.get("id"),
-                                variantMap.get("weight"),
-                                variantMap.get("size"),
-                                variantMap.get("price"),
-                                variantMap.get("stock"));
+                    // Parse JSON array back to List for frontend
+                    String brandsStr = p.getBrands();
+                    if (brandsStr.startsWith("[") && brandsStr.endsWith("]")) {
+                        List<String> brandsList = new ArrayList<>();
+                        String content = brandsStr.substring(1, brandsStr.length() - 1);
+                        if (!content.isBlank()) {
+                            String[] items = content.split("\",\\s*\"");
+                            for (String item : items) {
+                                String cleaned = item.replace("\"", "").trim();
+                                if (!cleaned.isEmpty()) {
+                                    brandsList.add(cleaned);
+                                }
+                            }
                         }
+                        filters.put("brands", brandsList);
                     }
-                } catch (Exception ignored) {}
-            } else {
-                // No variants found - log warning if stock is > 0
-                if (p.getStockQuantity() != null && p.getStockQuantity() > 0) {
-                    try {
-                        log.warn("Product {} has stock ({}) but no variants in metadata", 
-                            p.getId(), p.getStockQuantity());
-                    } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    // Keep as string if parsing fails
                 }
             }
+            if (p.getProductWeights() != null && !p.getProductWeights().isBlank()) {
+                try {
+                    String weightsStr = p.getProductWeights();
+                    if (weightsStr.startsWith("[") && weightsStr.endsWith("]")) {
+                        List<String> weightsList = new ArrayList<>();
+                        String content = weightsStr.substring(1, weightsStr.length() - 1);
+                        if (!content.isBlank()) {
+                            String[] items = content.split("\",\\s*\"");
+                            for (String item : items) {
+                                String cleaned = item.replace("\"", "").trim();
+                                if (!cleaned.isEmpty()) {
+                                    weightsList.add(cleaned);
+                                }
+                            }
+                        }
+                        filters.put("weights", weightsList);
+                    }
+                } catch (Exception e) {
+                    // Keep as string if parsing fails
+                }
+            }
+            if (p.getPriceRanges() != null && !p.getPriceRanges().isBlank()) {
+                try {
+                    String priceRangesStr = p.getPriceRanges();
+                    if (priceRangesStr.startsWith("[") && priceRangesStr.endsWith("]")) {
+                        List<String> priceRangesList = new ArrayList<>();
+                        String content = priceRangesStr.substring(1, priceRangesStr.length() - 1);
+                        if (!content.isBlank()) {
+                            String[] items = content.split("\",\\s*\"");
+                            for (String item : items) {
+                                String cleaned = item.replace("\"", "").trim();
+                                if (!cleaned.isEmpty()) {
+                                    priceRangesList.add(cleaned);
+                                }
+                            }
+                        }
+                        filters.put("priceRanges", priceRangesList);
+                    }
+                } catch (Exception e) {
+                    // Keep as string if parsing fails
+                }
+            }
+            // Add other filter fields as needed by frontend
+            if (p.getLifeStages() != null && !p.getLifeStages().isBlank()) {
+                try {
+                    String lifeStagesStr = p.getLifeStages();
+                    if (lifeStagesStr.startsWith("[") && lifeStagesStr.endsWith("]")) {
+                        List<String> lifeStagesList = new ArrayList<>(); 
+                        String content = lifeStagesStr.substring(1, lifeStagesStr.length() - 1);
+                        if (!content.isBlank()) {
+                            String[] items = content.split("\",\\s*\"");
+                            for (String item : items) {
+                                String cleaned = item.replace("\"", "").trim();
+                                if (!cleaned.isEmpty()) {
+                                    lifeStagesList.add(cleaned);
+                                }
+                            }
+                        }
+                        filters.put("lifeStages", lifeStagesList);
+                    }
+                } catch (Exception e) {}
+            }
+            if (!filters.isEmpty()) {
+                md.put("filters", filters);
+            }
             
-            // Update metadata
+            // Update metadata back to product
             p.setMetadata(md);
+            
         } catch (Exception e) {
-            try { log.warn("Failed to enrich product metadata for product {}: {}", 
-                p.getId(), e.getMessage()); } catch (Exception ignored) {}
+            try { 
+                log.warn("Failed to enrich product metadata for {}: {}", p.getId(), e.getMessage()); 
+            } catch (Exception ignored) {}
         }
     }
 
@@ -999,6 +988,9 @@ public class ProductController {
     ) throws IOException {
         // Normalize and extract all fields from metadata to separate columns
         normalizeAndExtractFields(p);
+        
+        // Filter out null/empty fields before saving
+        filterNullFields(p);
         // Support both single 'image' (backwards compatibility) and multiple 'images'
         // If UPLOAD_DIR env var is set we prefer local storage for development
         boolean preferLocal = System.getenv("UPLOAD_DIR") != null && !System.getenv("UPLOAD_DIR").isEmpty();
@@ -1093,6 +1085,9 @@ public class ProductController {
         
         // Normalize and extract all fields from metadata to separate columns
         normalizeAndExtractFields(p);
+        
+        // Filter out null/empty fields before saving
+        filterNullFields(p);
         
         if (images != null && images.length > 0) {
             for (MultipartFile m : images) {
@@ -1455,6 +1450,145 @@ public class ProductController {
                 }
             }
             
+            // Extract filter information from metadata.filters to separate columns for efficient querying
+            Object filtersObj = md.get("filters");
+            if (filtersObj instanceof Map) {
+                Map<String, Object> filters = (Map<String, Object>) filtersObj;
+                
+                // Extract brands array
+                Object brandsObj = filters.get("brands");
+                if (brandsObj instanceof List) {
+                    List<?> brandsList = (List<?>) brandsObj;
+                    if (!brandsList.isEmpty()) {
+                        StringBuilder jsonBuilder = new StringBuilder("[");
+                        boolean first = true;
+                        for (Object brand : brandsList) {
+                            if (brand != null && !brand.toString().trim().isEmpty()) {
+                                if (!first) jsonBuilder.append(", ");
+                                jsonBuilder.append("\"").append(brand.toString().replace("\"", "\\\"")).append("\"");
+                                first = false;
+                            }
+                        }
+                        jsonBuilder.append("]");
+                        p.setBrands(jsonBuilder.toString());
+                    }
+                }
+                
+                // Extract lifeStages array
+                Object lifeStagesObj = filters.get("lifeStages");
+                if (lifeStagesObj instanceof List) {
+                    List<?> lifeStagesList = (List<?>) lifeStagesObj;
+                    if (!lifeStagesList.isEmpty()) {
+                        StringBuilder jsonBuilder = new StringBuilder("[");
+                        boolean first = true;
+                        for (Object stage : lifeStagesList) {
+                            if (stage != null && !stage.toString().trim().isEmpty()) {
+                                if (!first) jsonBuilder.append(", ");
+                                jsonBuilder.append("\"").append(stage.toString().replace("\"", "\\\"")).append("\"");
+                                first = false;
+                            }
+                        }
+                        jsonBuilder.append("]");
+                        p.setLifeStages(jsonBuilder.toString());
+                    }
+                }
+                
+                // Extract breedSizes array  
+                Object breedSizesObj = filters.get("breedSizes");
+                if (breedSizesObj instanceof List) {
+                    List<?> breedSizesList = (List<?>) breedSizesObj;
+                    if (!breedSizesList.isEmpty()) {
+                        StringBuilder jsonBuilder = new StringBuilder("[");
+                        boolean first = true;
+                        for (Object size : breedSizesList) {
+                            if (size != null && !size.toString().trim().isEmpty()) {
+                                if (!first) jsonBuilder.append(", ");
+                                jsonBuilder.append("\"").append(size.toString().replace("\"", "\\\"")).append("\"");
+                                first = false;
+                            }
+                        }
+                        jsonBuilder.append("]");
+                        p.setBreedSizes(jsonBuilder.toString());
+                    }
+                }
+                
+                // Extract specialDiets array
+                Object specialDietsObj = filters.get("specialDiets");
+                if (specialDietsObj instanceof List) {
+                    List<?> specialDietsList = (List<?>) specialDietsObj;
+                    if (!specialDietsList.isEmpty()) {
+                        StringBuilder jsonBuilder = new StringBuilder("[");
+                        boolean first = true;
+                        for (Object diet : specialDietsList) {
+                            if (diet != null && !diet.toString().trim().isEmpty()) {
+                                if (!first) jsonBuilder.append(", ");
+                                jsonBuilder.append("\"").append(diet.toString().replace("\"", "\\\"")).append("\"");
+                                first = false;
+                            }
+                        }
+                        jsonBuilder.append("]");
+                        p.setSpecialDiets(jsonBuilder.toString());
+                    }
+                }
+                
+                // Extract proteinSource array
+                Object proteinSourceObj = filters.get("proteinSource");
+                if (proteinSourceObj instanceof List) {
+                    List<?> proteinSourceList = (List<?>) proteinSourceObj;
+                    if (!proteinSourceList.isEmpty()) {
+                        StringBuilder jsonBuilder = new StringBuilder("[");
+                        boolean first = true;
+                        for (Object protein : proteinSourceList) {
+                            if (protein != null && !protein.toString().trim().isEmpty()) {
+                                if (!first) jsonBuilder.append(", ");
+                                jsonBuilder.append("\"").append(protein.toString().replace("\"", "\\\"")).append("\"");
+                                first = false;
+                            }
+                        }
+                        jsonBuilder.append("]");
+                        p.setProteinSources(jsonBuilder.toString());
+                    }
+                }
+                
+                // Extract weights array
+                Object weightsObj = filters.get("weights");
+                if (weightsObj instanceof List) {
+                    List<?> weightsList = (List<?>) weightsObj;
+                    if (!weightsList.isEmpty()) {
+                        StringBuilder jsonBuilder = new StringBuilder("[");
+                        boolean first = true;
+                        for (Object weight : weightsList) {
+                            if (weight != null && !weight.toString().trim().isEmpty()) {
+                                if (!first) jsonBuilder.append(", ");
+                                jsonBuilder.append("\"").append(weight.toString().replace("\"", "\\\"")).append("\"");
+                                first = false;
+                            }
+                        }
+                        jsonBuilder.append("]");
+                        p.setProductWeights(jsonBuilder.toString());
+                    }
+                }
+                
+                // Extract priceRanges array
+                Object priceRangesObj = filters.get("priceRanges");
+                if (priceRangesObj instanceof List) {
+                    List<?> priceRangesList = (List<?>) priceRangesObj;
+                    if (!priceRangesList.isEmpty()) {
+                        StringBuilder jsonBuilder = new StringBuilder("[");
+                        boolean first = true;
+                        for (Object range : priceRangesList) {
+                            if (range != null && !range.toString().trim().isEmpty()) {
+                                if (!first) jsonBuilder.append(", ");
+                                jsonBuilder.append("\"").append(range.toString().replace("\"", "\\\"")).append("\"");
+                                first = false;
+                            }
+                        }
+                        jsonBuilder.append("]");
+                        p.setPriceRanges(jsonBuilder.toString());
+                    }
+                }
+            }
+            
             // Ensure metadata doesn't duplicate data stored in columns - remove redundant entries
             // Keep variants and images in metadata as they are complex structures
             if (p.getFeatures() != null && !p.getFeatures().isBlank()) {
@@ -1501,6 +1635,13 @@ public class ProductController {
                 p.getManufacturer() != null || p.getIndications() != null ||
                 p.getContraindications() != null || p.getExpiryDate() != null) {
                 md.remove("pharmacy");
+            }
+            // Remove filters from metadata after extracting to columns
+            if (p.getBrands() != null || p.getLifeStages() != null || 
+                p.getBreedSizes() != null || p.getSpecialDiets() != null ||
+                p.getProteinSources() != null || p.getProductWeights() != null ||
+                p.getPriceRanges() != null) {
+                md.remove("filters");
             }
             if (p.getNutritionProtein() != null || p.getNutritionFat() != null || 
                 p.getNutritionFiber() != null || p.getNutritionMoisture() != null ||
@@ -1732,5 +1873,72 @@ public class ProductController {
     public ResponseEntity<List<String>> cleanupUploads() {
         List<String> deleted = storageService.sanitizeUploads();
         return ResponseEntity.ok(deleted);
+    }
+    
+    // Filter out null/empty fields to prevent storing unnecessary defaults and null values
+    private void filterNullFields(Product p) {
+        if (p == null) return;
+        
+        try {
+            // Set null for empty strings in main fields
+            if (p.getDescription() != null && p.getDescription().trim().isEmpty()) p.setDescription(null);
+            if (p.getShortDescription() != null && p.getShortDescription().trim().isEmpty()) p.setShortDescription(null);
+            if (p.getBrand() != null && p.getBrand().trim().isEmpty()) p.setBrand(null);
+            if (p.getCategory() != null && p.getCategory().trim().isEmpty()) p.setCategory(null);
+            if (p.getSubcategory() != null && p.getSubcategory().trim().isEmpty()) p.setSubcategory(null);
+            if (p.getIngredients() != null && p.getIngredients().trim().isEmpty()) p.setIngredients(null);
+            if (p.getBenefits() != null && p.getBenefits().trim().isEmpty()) p.setBenefits(null);
+            if (p.getFeatures() != null && p.getFeatures().trim().isEmpty()) p.setFeatures(null);
+            
+            // Clear zero values for price fields (only store actual prices)
+            if (p.getPrice() != null && p.getPrice() == 0.0) p.setPrice(null);
+            if (p.getOriginalPrice() != null && p.getOriginalPrice() == 0.0) p.setOriginalPrice(null);
+            
+            // Clear empty nutrition fields
+            if (p.getNutritionProtein() != null && p.getNutritionProtein().trim().isEmpty()) p.setNutritionProtein(null);
+            if (p.getNutritionFat() != null && p.getNutritionFat().trim().isEmpty()) p.setNutritionFat(null);
+            if (p.getNutritionFiber() != null && p.getNutritionFiber().trim().isEmpty()) p.setNutritionFiber(null);
+            if (p.getNutritionMoisture() != null && p.getNutritionMoisture().trim().isEmpty()) p.setNutritionMoisture(null);
+            if (p.getNutritionAsh() != null && p.getNutritionAsh().trim().isEmpty()) p.setNutritionAsh(null);
+            if (p.getNutritionCalories() != null && p.getNutritionCalories().trim().isEmpty()) p.setNutritionCalories(null);
+            
+            // Clear empty product attribute fields
+            if (p.getFoodType() != null && p.getFoodType().trim().isEmpty()) p.setFoodType(null);
+            if (p.getType() != null && p.getType().trim().isEmpty()) p.setType(null);
+            if (p.getPetType() != null && p.getPetType().trim().isEmpty()) p.setPetType(null);
+            if (p.getMaterial() != null && p.getMaterial().trim().isEmpty()) p.setMaterial(null);
+            if (p.getScent() != null && p.getScent().trim().isEmpty()) p.setScent(null);
+            if (p.getSuitableFor() != null && p.getSuitableFor().trim().isEmpty()) p.setSuitableFor(null);
+            if (p.getTreatType() != null && p.getTreatType().trim().isEmpty()) p.setTreatType(null);
+            if (p.getTexture() != null && p.getTexture().trim().isEmpty()) p.setTexture(null);
+            if (p.getSubcategoryLabel() != null && p.getSubcategoryLabel().trim().isEmpty()) p.setSubcategoryLabel(null);
+            if (p.getServingSize() != null && p.getServingSize().trim().isEmpty()) p.setServingSize(null);
+            if (p.getPackCount() != null && p.getPackCount().trim().isEmpty()) p.setPackCount(null);
+            if (p.getWeightUnit() != null && p.getWeightUnit().trim().isEmpty()) p.setWeightUnit(null);
+            if (p.getFlavors() != null && p.getFlavors().trim().isEmpty()) p.setFlavors(null);
+            if (p.getColors() != null && p.getColors().trim().isEmpty()) p.setColors(null);
+            
+            // Clear empty pharmacy fields
+            if (p.getDosageForm() != null && p.getDosageForm().trim().isEmpty()) p.setDosageForm(null);
+            if (p.getStrength() != null && p.getStrength().trim().isEmpty()) p.setStrength(null);
+            if (p.getActiveIngredient() != null && p.getActiveIngredient().trim().isEmpty()) p.setActiveIngredient(null);
+            if (p.getManufacturer() != null && p.getManufacturer().trim().isEmpty()) p.setManufacturer(null);
+            if (p.getIndications() != null && p.getIndications().trim().isEmpty()) p.setIndications(null);
+            if (p.getContraindications() != null && p.getContraindications().trim().isEmpty()) p.setContraindications(null);
+            if (p.getExpiryDate() != null && p.getExpiryDate().trim().isEmpty()) p.setExpiryDate(null);
+            
+            // Clear empty filter fields
+            if (p.getBrands() != null && p.getBrands().trim().isEmpty()) p.setBrands(null);
+            if (p.getLifeStages() != null && p.getLifeStages().trim().isEmpty()) p.setLifeStages(null);
+            if (p.getBreedSizes() != null && p.getBreedSizes().trim().isEmpty()) p.setBreedSizes(null);
+            if (p.getSpecialDiets() != null && p.getSpecialDiets().trim().isEmpty()) p.setSpecialDiets(null);
+            if (p.getProteinSources() != null && p.getProteinSources().trim().isEmpty()) p.setProteinSources(null);
+            if (p.getProductWeights() != null && p.getProductWeights().trim().isEmpty()) p.setProductWeights(null);
+            if (p.getPriceRanges() != null && p.getPriceRanges().trim().isEmpty()) p.setPriceRanges(null);
+            
+            log.debug("Filtered null/empty fields for product: {}", p.getName());
+        } catch (Exception e) {
+            log.warn("Failed to filter null fields for product: {}", e.getMessage());
+        }
     }
 }
