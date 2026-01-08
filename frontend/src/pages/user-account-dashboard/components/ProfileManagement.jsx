@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
-
+import PincodeChecker from '../../../components/ui/PincodeChecker';
+import deliveryApi from '../../../services/deliveryApi';
 import userApi from '../../../services/userApi';
 
 const ProfileManagement = ({ user, onUpdateProfile }) => {
@@ -13,6 +14,7 @@ const ProfileManagement = ({ user, onUpdateProfile }) => {
     name: user?.name,
     email: user?.email,
     phone: user?.phone,
+    pincode: user?.pincode || '',
     dateOfBirth: user?.dateOfBirth || '',
     gender: user?.gender || ''
   });
@@ -30,6 +32,7 @@ const ProfileManagement = ({ user, onUpdateProfile }) => {
         name: user?.name || '',
         email: user?.email || '',
         phone: user?.phone || '',
+        pincode: user?.pincode || '',
         dateOfBirth: user?.dateOfBirth || '',
         gender: user?.gender || ''
       });
@@ -79,6 +82,15 @@ const ProfileManagement = ({ user, onUpdateProfile }) => {
       newErrors.phone = 'Phone number is required';
     } else if (!/^(?:\+91|0)?[6-9]\d{9}$/.test(formData?.phone?.replace(/\s|[-()]/g, ''))) {
       newErrors.phone = 'Please enter a valid Indian phone number (10 digits, optional +91 or leading 0)';
+    }
+    
+    if (formData?.pincode && formData.pincode.trim()) {
+      const pincode = formData.pincode.trim();
+      if (!/^\d{6}$/.test(pincode)) {
+        newErrors.pincode = 'Please enter a valid 6-digit pincode';
+      } else if (!pincode.startsWith('560')) {
+        newErrors.pincode = 'We only deliver to Bangalore area. Please enter a pincode starting with 560';
+      }
     }
 
     setErrors(newErrors);
@@ -144,6 +156,7 @@ const ProfileManagement = ({ user, onUpdateProfile }) => {
       name: user?.name || '',
       email: user?.email || '',
       phone: user?.phone || '',
+      pincode: user?.pincode || '',
       dateOfBirth: user?.dateOfBirth || '',
       gender: user?.gender || ''
     });
@@ -222,6 +235,80 @@ const ProfileManagement = ({ user, onUpdateProfile }) => {
             error={errors?.phone}
             required
           />
+
+          {/* Custom Pincode Section */}
+          <div className="md:col-span-2">
+            <label className="block font-body font-medium text-foreground mb-2">
+              Delivery Pincode
+            </label>
+            
+            {isEditing ? (
+              <Input
+                type="text"
+                value={formData?.pincode}
+                onChange={(e) => handleInputChange('pincode', e?.target?.value.replace(/\D/g, '').slice(0, 6))}
+                error={errors?.pincode}
+                placeholder="6-digit pincode for delivery"
+                maxLength={6}
+                description="Enter your pincode to check delivery availability (560xxx for Bangalore)"
+              />
+            ) : (
+              <div className="border border-border rounded-lg p-4 bg-background">
+                {user?.pincode ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2">
+                          <Icon name="MapPin" size={18} className="text-primary" />
+                          <span className="font-data text-lg font-semibold text-foreground">
+                            {user.pincode}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          {user.pincode.startsWith('560') ? (
+                            <>
+                              <Icon name="CheckCircle" size={16} className="text-success" />
+                              <span className="text-sm text-success font-medium">Delivery Available</span>
+                            </>
+                          ) : (
+                            <>
+                              <Icon name="XCircle" size={16} className="text-destructive" />
+                              <span className="text-sm text-destructive font-medium">No Delivery</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {user.pincode.startsWith('560') 
+                        ? 'Great! We deliver to your area (Bangalore)' 
+                        : 'Sorry, we only deliver to Bangalore area (560xxx)'}
+                    </p>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Icon name="MapPin" size={18} className="text-muted-foreground" />
+                      <div>
+                        <span className="text-foreground font-medium">Check pincode now</span>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Add your pincode to check delivery availability
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditing(true)}
+                      iconName="Edit"
+                    >
+                      Add Pincode
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           <Input
             label="Date of Birth"

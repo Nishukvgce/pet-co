@@ -8,6 +8,7 @@ public class ProfileDTO {
   public String name;
   public String email;
   public String phone;
+  public String pincode;
   public LocalDate dateOfBirth;
   public String gender;
   public LocalDate memberSince;

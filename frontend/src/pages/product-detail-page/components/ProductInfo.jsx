@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
+import PincodeChecker from '../../../components/ui/PincodeChecker';
 
 const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) => {
   const [selectedVariant, setSelectedVariant] = useState(product?.variants?.[0]);
@@ -215,6 +216,10 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
           </div>
         )}
       </div>
+
+      {/* Pincode Checker - Delivery Availability */}
+      <PincodeChecker className="" />
+
       {/* Variant Selection */}
       <div className="bg-card rounded-lg border border-border p-4 space-y-4">
         <h3 className="font-heading font-semibold text-lg text-foreground">Select Options</h3>

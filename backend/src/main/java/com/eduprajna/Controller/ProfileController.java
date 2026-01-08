@@ -1,8 +1,10 @@
 package com.eduprajna.Controller;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.eduprajna.dto.PasswordUpdateRequest;
 import com.eduprajna.dto.ProfileDTO;
 import com.eduprajna.entity.User;
+import com.eduprajna.service.DeliveryService;
 import com.eduprajna.service.UserService;
 
 import jakarta.validation.Valid;
@@ -24,7 +27,12 @@ import jakarta.validation.Valid;
 @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "https://nishmitha-pet-co.vercel.app"}, allowCredentials = "true")
 public class ProfileController {
     private final UserService userService;
-    public ProfileController(UserService userService) { this.userService = userService; }
+    private final DeliveryService deliveryService;
+    
+    public ProfileController(UserService userService, DeliveryService deliveryService) { 
+        this.userService = userService;
+        this.deliveryService = deliveryService;
+    }
 
     // In a real app, derive email/userId from JWT. Here we accept email param for simplicity.
     @GetMapping("/profile")
@@ -35,6 +43,7 @@ public class ProfileController {
     }
 
     @PutMapping("/profile")
+    @Transactional
     public ResponseEntity<?> updateProfile(@RequestParam("email") String email,
                                           @RequestBody Map<String, Object> profileData) {
         try {
@@ -60,6 +69,29 @@ public class ProfileController {
                 else user.setPhone(rawPhone);
             }
             
+            if (profileData.containsKey("pincode") && profileData.get("pincode") != null) {
+                String pincode = profileData.get("pincode").toString().trim();
+                System.out.println("DEBUG: ProfileController - Processing pincode: [" + pincode + "]");
+                
+                if (pincode.isEmpty()) {
+                    System.out.println("DEBUG: ProfileController - Setting pincode to null (empty)");
+                    user.setPincode(null);
+                } else if (pincode.matches("\\d{6}")) {
+                    // Validate pincode format and delivery area
+                    if (deliveryService.isDeliveryAvailable(pincode)) {
+                        System.out.println("DEBUG: ProfileController - Valid Bangalore pincode: " + pincode);
+                        user.setPincode(pincode);
+                        System.out.println("DEBUG: ProfileController - User pincode after setting: " + user.getPincode());
+                    } else {
+                        System.out.println("DEBUG: ProfileController - Invalid delivery area pincode: " + pincode);
+                        return ResponseEntity.status(400).body(Map.of("message", "Sorry, we only deliver to Bangalore area (pincodes starting with 560). Please enter a valid Bangalore pincode."));
+                    }
+                } else {
+                    System.out.println("DEBUG: ProfileController - Invalid pincode format: " + pincode);
+                    return ResponseEntity.status(400).body(Map.of("message", "Invalid pincode format. Please enter a valid 6-digit pincode."));
+                }
+            }
+            
             if (profileData.containsKey("dateOfBirth") && profileData.get("dateOfBirth") != null) {
                 String dateStr = profileData.get("dateOfBirth").toString();
                 if (!dateStr.isEmpty()) {
@@ -80,10 +112,27 @@ public class ProfileController {
             }
             
             // Save updated user
-            User updatedUser = userService.save(user);
-            
-            // Return updated profile data
-            return ResponseEntity.ok(toProfileDTO(updatedUser));
+            System.out.println("DEBUG: ProfileController - About to save user with pincode: " + user.getPincode());
+            try {
+                User updatedUser = userService.save(user);
+                System.out.println("DEBUG: ProfileController - User saved successfully with pincode: " + updatedUser.getPincode());
+                
+                // Verify save by re-fetching the user
+                Optional<User> verifyUser = userService.findById(updatedUser.getId());
+                if (verifyUser.isPresent()) {
+                    System.out.println("DEBUG: ProfileController - Verification: User ID " + updatedUser.getId() + " has pincode: " + verifyUser.get().getPincode());
+                }
+                
+                // Return updated profile data
+                ProfileDTO responseDto = toProfileDTO(updatedUser);
+                System.out.println("DEBUG: ProfileController - Returning DTO with pincode: " + responseDto.pincode);
+                return ResponseEntity.ok(responseDto);
+                
+            } catch (Exception saveException) {
+                System.err.println("ERROR: ProfileController - Failed to save user: " + saveException.getMessage());
+                saveException.printStackTrace();
+                return ResponseEntity.status(500).body(Map.of("message", "Failed to save profile changes: " + saveException.getMessage()));
+            }
             
         } catch (Exception e) {
             return ResponseEntity.status(400).body(Map.of("message", "Invalid profile data: " + e.getMessage()));
@@ -135,6 +184,7 @@ public class ProfileController {
         dto.name = u.getName();
         dto.email = u.getEmail();
         dto.phone = u.getPhone();
+        dto.pincode = u.getPincode();
         dto.dateOfBirth = u.getDateOfBirth();
         dto.gender = u.getGender();
         dto.memberSince = u.getMemberSince();

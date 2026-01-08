@@ -1,9 +1,12 @@
 package com.eduprajna.service;
 
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.eduprajna.entity.User;
 import com.eduprajna.repository.UserRepository;
-import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -12,6 +15,12 @@ public class UserService {
 
     public Optional<User> findByEmail(String email) { return userRepository.findByEmail(email); }
     public Optional<User> findById(Long id) { return userRepository.findById(id); }
-    public User save(User user) { return userRepository.save(user); }
+    @Transactional
+    public User save(User user) { 
+        System.out.println("DEBUG: UserService - Saving user with pincode: " + user.getPincode());
+        User savedUser = userRepository.save(user); 
+        System.out.println("DEBUG: UserService - User saved with ID: " + savedUser.getId() + " and pincode: " + savedUser.getPincode());
+        return savedUser;
+    }
     public long count() { return userRepository.count(); }
 }

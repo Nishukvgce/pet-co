@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.eduprajna.entity.Product;
-import com.eduprajna.entity.User;
-import com.eduprajna.service.ProductService;
-import com.eduprajna.service.UserService;
-import com.eduprajna.service.CartService;
-import com.eduprajna.repository.CartItemRepository;
-import com.eduprajna.repository.OrderRepository;
 import com.eduprajna.entity.CartItem;
 import com.eduprajna.entity.Order;
 import com.eduprajna.entity.OrderItem;
+import com.eduprajna.entity.Product;
+import com.eduprajna.entity.User;
+import com.eduprajna.repository.CartItemRepository;
+import com.eduprajna.repository.OrderRepository;
+import com.eduprajna.service.CartService;
+import com.eduprajna.service.ProductService;
+import com.eduprajna.service.UserService;
 
 /**
  * Development controller for seeding the database with sample data
@@ -237,6 +237,34 @@ public class DevController {
                                         "message", e.getMessage()));
                 }
         }
+
+    /**
+     * Add pincode column to users table if it doesn't exist.
+     * WARNING: Development use only.
+     */
+    @PostMapping("/add-pincode-column")
+    public ResponseEntity<?> addPincodeColumn() {
+        try {
+            // Check if pincode column exists by trying to query it
+            userService.findByEmail("admin@petco.com").ifPresent(user -> {
+                // Try to access pincode field to ensure column exists
+                String pincode = user.getPincode();
+                logger.info("Pincode column already exists. Current admin pincode: {}", pincode);
+            });
+            
+            return ResponseEntity.ok(Map.of(
+                    "message", "Pincode column already exists",
+                    "note", "No migration needed"));
+                    
+        } catch (Exception e) {
+            // If accessing pincode fails, column might not exist
+            logger.error("Pincode column might not exist or other database error: {}", e.getMessage());
+            return ResponseEntity.status(500).body(Map.of(
+                    "error", "Database error when checking pincode column",
+                    "message", e.getMessage(),
+                    "solution", "Please run SQL migration: ALTER TABLE users ADD COLUMN pincode VARCHAR(6);"));
+        }
+    }
 
     private void createSampleProduct(Long id, String name, String description, Double price, Integer stockQuantity,
             Boolean inStock) {

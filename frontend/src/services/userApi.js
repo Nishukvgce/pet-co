@@ -115,8 +115,12 @@ const userApi = {
       }
       
       console.log('UserAPI: Updating profile for user:', email);
+      console.log('UserAPI: Profile data being sent:', profileData);
+      console.log('UserAPI: Pincode in request:', profileData?.pincode);
       const res = await apiClient.put('/auth/profile', profileData, { params: { email } });
       console.log('UserAPI: Successfully updated profile for user:', email);
+      console.log('UserAPI: Response data:', res.data);
+      console.log('UserAPI: Pincode in response:', res.data?.pincode);
       return res.data;
     } catch (error) {
       console.error('UserAPI: Failed to update profile for user:', email, {

@@ -96,6 +96,7 @@ const UserAccountDashboard = () => {
           name: profile?.name || authUser?.name || authUser?.email,
           email: profile?.email || authUser?.email,
           phone: profile?.phone,
+          pincode: profile?.pincode,
           dateOfBirth: profile?.dateOfBirth,
           gender: profile?.gender,
           memberSince: profile?.memberSince,
@@ -559,15 +560,28 @@ const UserAccountDashboard = () => {
   const handleUpdateProfile = async (updatedData) => {
     try {
       console.log('Updating profile with data:', updatedData);
+      console.log('DEBUG: Pincode being sent:', updatedData.pincode);
       
       // Save to database via API
       const updatedProfile = await userApi.updateProfile(authUser.email, updatedData);
+      console.log('DEBUG: Profile updated response:', updatedProfile);
       
-      // Update local state with the response from server
-      setUser(prev => ({
-        ...prev,
-        ...updatedProfile
-      }));
+      // Force refresh user data from database to ensure we have latest values
+      try {
+        const freshUserData = await userApi.getProfile(authUser.email);
+        console.log('DEBUG: Fresh user data from database:', freshUserData);
+        setUser(prev => ({
+          ...prev,
+          ...freshUserData
+        }));
+      } catch (refreshError) {
+        console.warn('Could not refresh user data:', refreshError);
+        // Fallback to using the response data
+        setUser(prev => ({
+          ...prev,
+          ...updatedProfile
+        }));
+      }
       
       console.log('Profile updated successfully:', updatedProfile);
       
