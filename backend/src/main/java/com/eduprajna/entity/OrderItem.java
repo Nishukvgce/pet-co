@@ -33,6 +33,9 @@ public class OrderItem {
     @Column(length = 100)
     private String variantId; // Store which variant was ordered
 
+    @Column(length = 150)
+    private String variantLabel; // Human readable variant (eg. "500g", "1 kg", "Medium")
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Order getOrder() { return order; }
@@ -45,6 +48,8 @@ public class OrderItem {
     public void setPrice(Double price) { this.price = price; }
     public String getVariantId() { return variantId; }
     public void setVariantId(String variantId) { this.variantId = variantId; }
+    public String getVariantLabel() { return variantLabel; }
+    public void setVariantLabel(String variantLabel) { this.variantLabel = variantLabel; }
 }
 
 

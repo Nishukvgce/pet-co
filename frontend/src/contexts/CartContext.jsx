@@ -90,12 +90,44 @@ export const CartProvider = ({ children }) => {
             const variants = Array.isArray(p?.variants) && p.variants.length > 0
               ? p.variants
               : (Array.isArray(p?.metadata?.variants) ? p.metadata.variants : []);
+
+            const buildLabelFromVariant = (v) => {
+              if (!v) return null;
+              // Prefer an explicit label
+              if (v.label && `${v.label}`.trim() !== '') return `${v.label}`;
+
+              // Weight-based variants (e.g. 500 + g or 1 + kg)
+              const weightVal = v.weight || v.weightValue || v.weight_in_grams || v.weight_in_ml || '';
+              const weightUnit = v.weightUnit || v.weight_unit || v.weightunit || v.sizeUnit || v.size_unit || '';
+              if (weightVal) {
+                const unit = weightUnit ? `${weightUnit}`.trim() : '';
+                return `${weightVal}${unit ? unit : ''}`;
+              }
+
+              // Size-based variants (e.g. Medium, 6ft)
+              const sizeVal = v.size || v.sizeValue || '';
+              const sizeUnit = v.sizeUnit || v.size_unit || '';
+              if (sizeVal) return `${sizeVal}${sizeUnit ? sizeUnit : ''}`;
+
+              return null;
+            };
+
             if (vid && variants.length > 0) {
               const match = variants.find(v => (v?.id || v?.variantId || v?.code) === vid);
-              if (match) return match.label || match.weight || match.size || null;
+              const label = buildLabelFromVariant(match);
+              if (label) return label;
             }
-            // fallback for default/no variant
-            return p?.weight || p?.size || null;
+
+            // fallback for default/no variant - prefer product-level weight/size
+            if (p?.weight) {
+              // If weight already contains unit, return as-is, else try to append unit if available
+              return `${p.weight}${p.weightUnit ? p.weightUnit : ''}`;
+            }
+            if (p?.size) {
+              return `${p.size}${p.sizeUnit ? p.sizeUnit : ''}`;
+            }
+
+            return null;
           };
 
           setCartItems(
@@ -108,7 +140,7 @@ export const CartProvider = ({ children }) => {
               originalPrice: ci.originalPrice || ci.price,
               quantity: ci.quantity,
               variantId: ci.variantId || null,
-              variant: resolveVariantLabel(ci.productId, ci.variantId) || 'Default',
+              variant: ci.variantLabel || resolveVariantLabel(ci.productId, ci.variantId) || 'Default',
             }))
           );
         } catch {

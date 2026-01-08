@@ -35,7 +35,26 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, onSaveForLater }) => {
                 {item?.name}
               </h3>
               <p className="font-body text-sm text-muted-foreground">
-                {item?.variant}
+                {(() => {
+                  const raw = item?.variant;
+                  if (!raw) return '';
+                  const asStr = `${raw}`.trim();
+
+                  // If variant looks purely numeric, try to infer unit from specifications
+                  if (/^\d+(?:\.\d+)?$/.test(asStr)) {
+                    const specs = item?.specifications || {};
+                    const keys = Object.keys(specs || {});
+                    for (const k of keys) {
+                      if (/weight|size|volume/i.test(k)) {
+                        const v = `${specs[k]}`;
+                        const m = v.match(/(kg|g|gram|grams|ml|l|lit|ltr)s?\b/i);
+                        if (m) return `${asStr}${m[1]}`;
+                      }
+                    }
+                  }
+
+                  return asStr;
+                })()}
               </p>
               {item?.badges && item?.badges?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1">

@@ -17,6 +17,12 @@ import com.eduprajna.entity.Product;
 import com.eduprajna.entity.User;
 import com.eduprajna.service.ProductService;
 import com.eduprajna.service.UserService;
+import com.eduprajna.service.CartService;
+import com.eduprajna.repository.CartItemRepository;
+import com.eduprajna.repository.OrderRepository;
+import com.eduprajna.entity.CartItem;
+import com.eduprajna.entity.Order;
+import com.eduprajna.entity.OrderItem;
 
 /**
  * Development controller for seeding the database with sample data
@@ -32,11 +38,18 @@ public class DevController {
 
     private final UserService userService;
     private final ProductService productService;
+        private final CartService cartService;
+        private final CartItemRepository cartItemRepo;
+        private final OrderRepository orderRepo;
 
-    public DevController(UserService userService, ProductService productService) {
-        this.userService = userService;
-        this.productService = productService;
-    }
+        public DevController(UserService userService, ProductService productService, CartService cartService,
+                        CartItemRepository cartItemRepo, OrderRepository orderRepo) {
+                this.userService = userService;
+                this.productService = productService;
+                this.cartService = cartService;
+                this.cartItemRepo = cartItemRepo;
+                this.orderRepo = orderRepo;
+        }
 
     /**
      * Seed the database with sample users from the original MySQL dump
@@ -172,6 +185,58 @@ public class DevController {
                     "message", e.getMessage()));
         }
     }
+
+        /**
+         * Fix and populate variant_label for existing cart_items and order_items.
+         * This derives sanitized labels from product/variant metadata and saves updates.
+         * WARNING: Intended for development or one-time maintenance use.
+         */
+        @PostMapping("/fix-variant-labels")
+        public ResponseEntity<?> fixVariantLabels() {
+                try {
+                        int cartUpdated = 0;
+                        int orderItemsUpdated = 0;
+
+                        for (CartItem ci : cartItemRepo.findAll()) {
+                                String derived = null;
+                                try {
+                                        derived = cartService.deriveVariantLabel(ci.getProduct(), ci.getVariantId());
+                                } catch (Exception ignored) { }
+                                if (derived != null && !derived.equals(ci.getVariantLabel())) {
+                                        ci.setVariantLabel(derived);
+                                        cartItemRepo.save(ci);
+                                        cartUpdated++;
+                                }
+                        }
+
+                        for (Order order : orderRepo.findAll()) {
+                                boolean changed = false;
+                                for (OrderItem oi : order.getItems()) {
+                                        String derived = null;
+                                        try {
+                                                derived = cartService.deriveVariantLabel(oi.getProduct(), oi.getVariantId());
+                                        } catch (Exception ignored) { }
+                                        if (derived != null && !derived.equals(oi.getVariantLabel())) {
+                                                oi.setVariantLabel(derived);
+                                                changed = true;
+                                                orderItemsUpdated++;
+                                        }
+                                }
+                                if (changed) {
+                                        orderRepo.save(order);
+                                }
+                        }
+
+                        return ResponseEntity.ok(Map.of(
+                                        "cart_items_updated", cartUpdated,
+                                        "order_items_updated", orderItemsUpdated));
+                } catch (Exception e) {
+                        logger.error("Error fixing variant labels", e);
+                        return ResponseEntity.status(500).body(Map.of(
+                                        "error", "Failed to fix variant labels",
+                                        "message", e.getMessage()));
+                }
+        }
 
     private void createSampleProduct(Long id, String name, String description, Double price, Integer stockQuantity,
             Boolean inStock) {

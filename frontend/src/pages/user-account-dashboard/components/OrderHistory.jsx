@@ -74,7 +74,9 @@ const OrderHistory = () => {
           ...order,
           items: (order?.items || []).map((item) => {
             const resolved = resolveImageUrl(item?.productImage || item?.image || item?.imageUrl || '');
-            return { ...item, productImage: resolved };
+            // Normalize variant display: prefer backend-provided variantLabel, fall back to legacy fields
+            const variantDisplay = item?.variantLabel || item?.variant || item?.size || '';
+            return { ...item, productImage: resolved, variant: variantDisplay };
           }),
         }));
         setOrders(normalized);

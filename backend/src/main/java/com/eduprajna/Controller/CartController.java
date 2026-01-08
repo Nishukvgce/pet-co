@@ -49,6 +49,7 @@ public class CartController {
         dto.quantity = ci.getQuantity();
         dto.price = ci.getPriceAtAdd();
         dto.variantId = ci.getVariantId();
+        dto.variantLabel = ci.getVariantLabel();
         dto.lineTotal = (ci.getPriceAtAdd() != null ? ci.getPriceAtAdd() : 0.0) * ci.getQuantity();
         return dto;
     }

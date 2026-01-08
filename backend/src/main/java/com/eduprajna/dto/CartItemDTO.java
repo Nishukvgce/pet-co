@@ -9,6 +9,7 @@ public class CartItemDTO {
   public Double price;
   public Double lineTotal;
   public String variantId;
+  public String variantLabel;
 }
 
 

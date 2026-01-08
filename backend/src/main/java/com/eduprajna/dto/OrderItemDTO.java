@@ -15,6 +15,8 @@ public class OrderItemDTO {
     private Double productPrice;
     private Integer quantity;
     private Double price; // Price at time of order
+    private String variantId;
+    private String variantLabel;
 
     // Default constructor
     public OrderItemDTO() {}
@@ -33,6 +35,9 @@ public class OrderItemDTO {
             this.productImage = product.getImageUrl();
             this.productPrice = product.getPrice() != null ? product.getPrice().doubleValue() : 0.0;
         }
+        // Variant information (if present)
+        this.variantId = orderItem.getVariantId();
+        this.variantLabel = (orderItem.getVariantLabel() != null) ? orderItem.getVariantLabel() : null;
     }
 
     // Getters and Setters
@@ -56,4 +61,8 @@ public class OrderItemDTO {
     
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
+    public String getVariantId() { return variantId; }
+    public void setVariantId(String variantId) { this.variantId = variantId; }
+    public String getVariantLabel() { return variantLabel; }
+    public void setVariantLabel(String variantLabel) { this.variantLabel = variantLabel; }
 }

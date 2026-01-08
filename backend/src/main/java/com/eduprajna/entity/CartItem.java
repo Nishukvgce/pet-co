@@ -33,6 +33,9 @@ public class CartItem {
 
     @Column(length = 100)
     private String variantId; // Store which variant was selected
+    
+    @Column(length = 150)
+    private String variantLabel; // Human readable label for selected variant (eg. "500g")
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -46,6 +49,8 @@ public class CartItem {
     public void setPriceAtAdd(Double priceAtAdd) { this.priceAtAdd = priceAtAdd; }
     public String getVariantId() { return variantId; }
     public void setVariantId(String variantId) { this.variantId = variantId; }
+    public String getVariantLabel() { return variantLabel; }
+    public void setVariantLabel(String variantLabel) { this.variantLabel = variantLabel; }
 }
 
  

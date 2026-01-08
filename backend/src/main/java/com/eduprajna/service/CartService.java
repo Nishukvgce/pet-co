@@ -67,6 +67,9 @@ public class CartService {
             ci.setUser(user);
             ci.setProduct(product);
             ci.setVariantId(variantId); // Store variant ID
+            // Compute sanitized variant label and store snapshot
+            String vLabel = deriveVariantLabel(product, variantId);
+            ci.setVariantLabel(vLabel);
             // Determine snapshot price: variant price if available else product price
             Double price = null;
             if (variantId != null && !variantId.isEmpty() && product.hasVariants()) {
@@ -93,6 +96,10 @@ public class CartService {
         // Update variant ID if different (in case user changes variant for existing cart item)
         if (variantId != null && !variantId.equals(item.getVariantId())) {
             item.setVariantId(variantId);
+            // update label when variant changes
+            try {
+                item.setVariantLabel(deriveVariantLabel(product, variantId));
+            } catch (Exception ignored) {}
             // Also update snapshot price to the newly selected variant price
             if (product.hasVariants()) {
                 try {
@@ -129,6 +136,60 @@ public class CartService {
         
         item.setQuantity(Math.max(1, newQty));
         return cartRepo.save(item);
+    }
+
+    // Helper: derive a sanitized, human-readable variant label from product metadata
+    public String deriveVariantLabel(Product product, String variantId) {
+        try {
+            String label = null;
+            if (variantId != null && !variantId.isEmpty() && product.hasVariants()) {
+                java.util.Map<String, Object> variant = product.getVariantById(variantId);
+                if (variant != null) {
+                    Object lbl = variant.get("label");
+                    if (lbl == null) lbl = variant.get("weight");
+                    if (lbl == null) lbl = variant.get("size");
+                    if (lbl != null) label = String.valueOf(lbl).trim();
+
+                    // Append unit if present and not already part of label
+                    Object unit = variant.get("weightUnit");
+                    if (unit == null) unit = variant.get("sizeUnit");
+                    if (unit != null && label != null && !label.toLowerCase().contains(String.valueOf(unit).toLowerCase())) {
+                        label = label + String.valueOf(unit);
+                    }
+                }
+            }
+
+            // sanitize: prefer labels that look like sizes/weights (contain digits or known units)
+            if (label != null && !label.isEmpty()) {
+                if (label.matches(".*\\d.*") || label.toLowerCase().matches(".*(g|kg|ml|l|lit|ltr|cm|in|ft).*")) {
+                    return label;
+                }
+                // Reject labels that are likely categories/collections (words longer than 2 tokens without digits)
+                if (label.split("\\s+").length <= 3 && label.length() <= 40) {
+                    // allow small textual labels like "Medium", "Large"
+                    if (!label.toLowerCase().matches(".*(category|care|antibiotic|antibiotics|oral).*")) {
+                        return label;
+                    }
+                }
+            }
+
+            // fallback to product-level weight/size if sensible
+            if (product.getWeight() != null && product.getWeight().matches(".*\\d.*")) {
+                String pLabel = product.getWeight();
+                if (product.getWeightUnit() != null && !pLabel.toLowerCase().contains(product.getWeightUnit().toLowerCase())) {
+                    pLabel = pLabel + (product.getWeightUnit() != null ? product.getWeightUnit() : "");
+                }
+                return pLabel;
+            }
+
+            if (product.getSubcategoryLabel() != null && product.getSubcategoryLabel().matches(".*\\d.*")) {
+                return product.getSubcategoryLabel();
+            }
+
+        } catch (Exception e) {
+            // ignore and return null
+        }
+        return null;
     }
 
     public CartItem updateQuantity(User user, Long productId, int quantity) {

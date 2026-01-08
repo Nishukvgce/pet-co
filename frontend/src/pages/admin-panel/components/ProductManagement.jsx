@@ -799,16 +799,18 @@ const ProductManagement = () => {
                   <h3 className="font-medium text-sm text-foreground line-clamp-2 leading-tight mb-1">
                     {product.name}
                   </h3>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="text-sm font-bold text-primary">
-                      ₹{product.price?.toFixed(2) || '0.00'}
-                    </span>
-                    {product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-xs text-muted-foreground line-through">
-                        ₹{product.originalPrice?.toFixed(0)}
+                  {!product.hasVariants && (
+                    <div className="flex items-center space-x-1.5">
+                      <span className="text-sm font-bold text-primary">
+                        ₹{product.price?.toFixed(2) || '0.00'}
                       </span>
-                    )}
-                  </div>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="text-xs text-muted-foreground line-through">
+                          ₹{product.originalPrice?.toFixed(0)}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 {product.hasVariants && (
                   <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium ml-2">

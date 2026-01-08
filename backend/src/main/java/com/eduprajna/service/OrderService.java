@@ -188,6 +188,59 @@ public class OrderService {
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(cartItem.getPriceAtAdd());
             orderItem.setVariantId(cartItem.getVariantId()); // Store variant ID
+            // Derive a human readable label for the variant and store it as well to avoid display glitches
+            try {
+                String vLabel = null;
+                String vid = cartItem.getVariantId();
+                if (vid != null && !vid.isEmpty()) {
+                    Map<String, Object> variant = cartItem.getProduct().getVariantById(vid);
+                    if (variant != null) {
+                        Object lbl = variant.get("label");
+                        if (lbl == null) {
+                            // Try common keys
+                            lbl = variant.get("weight");
+                            if (lbl == null) lbl = variant.get("size");
+                        }
+                        if (lbl != null) vLabel = String.valueOf(lbl);
+
+                        // If unit info exists, append (weightUnit/sizeUnit)
+                        if (vLabel != null && !vLabel.isEmpty()) {
+                            Object unit = variant.get("weightUnit");
+                            if (unit == null) unit = variant.get("sizeUnit");
+                            if (unit != null) {
+                                String u = String.valueOf(unit).trim();
+                                if (!u.isEmpty() && !vLabel.toLowerCase().contains(u.toLowerCase())) {
+                                    vLabel = vLabel + (u.startsWith(" ") ? "" : "") + u;
+                                }
+                            }
+                        }
+                    }
+                }
+                // Sanitize and fallback: prefer numeric weight/size or small textual labels
+                if (vLabel != null && !vLabel.isEmpty()) {
+                    String low = vLabel.toLowerCase();
+                    boolean looksLikeSize = vLabel.matches(".*\\d.*") || low.matches(".*(g|kg|ml|l|lit|ltr|cm|in|ft).*");
+                    boolean disallowed = low.matches(".*(category|care|antibiotic|antibiotics|oral|medicine|medical).*");
+                    if (!looksLikeSize && disallowed) {
+                        vLabel = null;
+                    } else if (!looksLikeSize) {
+                        // allow short textual labels like 'Medium', 'Large'
+                        if (vLabel.split("\\s+").length > 3 || vLabel.length() > 40) vLabel = null;
+                    }
+                }
+
+                if (vLabel == null || vLabel.isEmpty()) {
+                    Product p = cartItem.getProduct();
+                    if (p.getWeight() != null && p.getWeight().matches(".*\\d.*")) {
+                        vLabel = p.getWeight();
+                        if (p.getWeightUnit() != null && !p.getWeightUnit().isEmpty() && !vLabel.toLowerCase().contains(p.getWeightUnit().toLowerCase())) vLabel = vLabel + p.getWeightUnit();
+                    }
+                }
+
+                orderItem.setVariantLabel(vLabel);
+            } catch (Exception e) {
+                // don't fail order creation for label extraction
+            }
             
             // Decrement stock for the purchased product (variant-aware)
             Product product = cartItem.getProduct();
@@ -344,6 +397,43 @@ public class OrderService {
                 orderItem.setProduct(cartItem.getProduct());
                 orderItem.setQuantity(cartItem.getQuantity());
                 orderItem.setPrice(cartItem.getPriceAtAdd());
+                orderItem.setVariantId(cartItem.getVariantId());
+                // derive variant label similarly to placeOrder
+                try {
+                    String vLabel = null;
+                    String vid = cartItem.getVariantId();
+                    if (vid != null && !vid.isEmpty()) {
+                        Map<String, Object> variant = cartItem.getProduct().getVariantById(vid);
+                        if (variant != null) {
+                            Object lbl = variant.get("label");
+                            if (lbl == null) {
+                                lbl = variant.get("weight");
+                                if (lbl == null) lbl = variant.get("size");
+                            }
+                            if (lbl != null) vLabel = String.valueOf(lbl);
+                            if (vLabel != null && !vLabel.isEmpty()) {
+                                Object unit = variant.get("weightUnit");
+                                if (unit == null) unit = variant.get("sizeUnit");
+                                if (unit != null) {
+                                    String u = String.valueOf(unit).trim();
+                                    if (!u.isEmpty() && !vLabel.toLowerCase().contains(u.toLowerCase())) {
+                                        vLabel = vLabel + (u.startsWith(" ") ? "" : "") + u;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (vLabel == null || vLabel.isEmpty()) {
+                        Product p = cartItem.getProduct();
+                        if (p.getWeight() != null && p.getWeight().matches(".*\\d.*")) {
+                            vLabel = p.getWeight();
+                            if (p.getWeightUnit() != null && !p.getWeightUnit().isEmpty()) vLabel = vLabel + p.getWeightUnit();
+                        }
+                    }
+                    orderItem.setVariantLabel(vLabel);
+                } catch (Exception e) {
+                    // ignore
+                }
                 
                 // Decrement stock
                 Product product = cartItem.getProduct();
