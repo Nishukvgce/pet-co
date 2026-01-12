@@ -239,6 +239,7 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           category: item?.category || '',
           subcategory: item?.subcategory || '',
           petType: item?.petType || '',
+          pharmacy: item?.metadata?.pharmacy || null,
           tags: Array.isArray(item?.tags) ? item.tags : []
         })).map(p => {
           // Only ensure a variant exists if the product should have variants
@@ -494,6 +495,9 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           <div className="mt-1 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
             {p.petType && <span className="px-2 py-0.5 bg-gray-100 rounded text-[11px]">{p.petType}</span>}
             {p.subcategory && <span className="px-2 py-0.5 bg-gray-100 rounded text-[11px]">{p.subcategory}</span>}
+            {/* Pharmacy-specific quick info */}
+            {p.pharmacy?.dosageForm && <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[11px]">{p.pharmacy.dosageForm}</span>}
+            {p.pharmacy?.strength && <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[11px]">{p.pharmacy.strength}</span>}
           </div>
 
           {/* Variants */}

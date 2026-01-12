@@ -2,14 +2,26 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 
 const ProductDetails = ({ product }) => {
-  const [activeTab, setActiveTab] = useState('description');
+  // Determine if product is a Pharmacy-type (dedicated pharmacy section)
+  const hasPharmacyMeta = Boolean(product?.metadata?.pharmacy);
+  const isPharmacy = product?.type === 'Pharmacy';
+  const [activeTab, setActiveTab] = useState(isPharmacy ? 'pharmacy' : 'description');
 
-  const tabs = [
-    { id: 'description', label: 'Product Description', icon: 'FileText' },
-    { id: 'details', label: 'Product Details', icon: 'Info' },
-    { id: 'manufacturer', label: 'Manufacturer Details', icon: 'Building' },
-    { id: 'pharmacy', label: 'Pharmacy Info', icon: 'Rx' }
-  ];
+  // If this is a dedicated Pharmacy product, show only the Pharmacy tab.
+  // For other products, keep the normal tabs and append a Pharmacy tab when metadata exists.
+  let tabs = [];
+  if (isPharmacy) {
+    tabs = [{ id: 'pharmacy', label: 'Pharmacy Info', icon: 'Rx' }];
+  } else {
+    tabs = [
+      { id: 'description', label: 'Product Description', icon: 'FileText' },
+      { id: 'details', label: 'Product Details', icon: 'Info' },
+      { id: 'manufacturer', label: 'Manufacturer Details', icon: 'Building' }
+    ];
+    if (hasPharmacyMeta) {
+      tabs.push({ id: 'pharmacy', label: 'Pharmacy Info', icon: 'Rx' });
+    }
+  }
 
   // Extract product details from metadata or direct fields
   const productDetails = {
