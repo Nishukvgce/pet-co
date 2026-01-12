@@ -7,7 +7,8 @@ const ProductDetails = ({ product }) => {
   const tabs = [
     { id: 'description', label: 'Product Description', icon: 'FileText' },
     { id: 'details', label: 'Product Details', icon: 'Info' },
-    { id: 'manufacturer', label: 'Manufacturer Details', icon: 'Building' }
+    { id: 'manufacturer', label: 'Manufacturer Details', icon: 'Building' },
+    { id: 'pharmacy', label: 'Pharmacy Info', icon: 'Rx' }
   ];
 
   // Extract product details from metadata or direct fields
@@ -203,6 +204,77 @@ const ProductDetails = ({ product }) => {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'pharmacy' && (
+          <div className="space-y-6">
+            <div className="bg-card rounded-lg border border-border p-6 space-y-4">
+              <h3 className="font-heading font-semibold text-xl text-foreground flex items-center gap-2">
+                <Icon name="Rx" size={20} className="text-primary" />
+                Pharmacy Information
+              </h3>
+
+              {product?.metadata?.pharmacy ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-foreground mb-1">Prescription Required</h4>
+                    <p className="text-muted-foreground">{product.metadata.pharmacy.prescriptionRequired ? 'Yes' : 'No'}</p>
+                  </div>
+
+                  {product.metadata.pharmacy.dosageForm && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">Dosage Form</h4>
+                      <p className="text-muted-foreground">{product.metadata.pharmacy.dosageForm}</p>
+                    </div>
+                  )}
+
+                  {product.metadata.pharmacy.strength && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">Strength</h4>
+                      <p className="text-muted-foreground">{product.metadata.pharmacy.strength}</p>
+                    </div>
+                  )}
+
+                  {product.metadata.pharmacy.activeIngredient && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">Active Ingredient</h4>
+                      <p className="text-muted-foreground">{product.metadata.pharmacy.activeIngredient}</p>
+                    </div>
+                  )}
+
+                  {product.metadata.pharmacy.manufacturer && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">Manufacturer</h4>
+                      <p className="text-muted-foreground">{product.metadata.pharmacy.manufacturer}</p>
+                    </div>
+                  )}
+
+                  {product.metadata.pharmacy.indications && (
+                    <div className="md:col-span-2">
+                      <h4 className="font-medium text-foreground mb-1">Indications</h4>
+                      <p className="text-muted-foreground">{product.metadata.pharmacy.indications}</p>
+                    </div>
+                  )}
+
+                  {product.metadata.pharmacy.contraindications && (
+                    <div className="md:col-span-2">
+                      <h4 className="font-medium text-foreground mb-1">Contraindications</h4>
+                      <p className="text-muted-foreground">{product.metadata.pharmacy.contraindications}</p>
+                    </div>
+                  )}
+
+                  {product.metadata.pharmacy.expiryDate && (
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">Expiry Date</h4>
+                      <p className="text-muted-foreground">{product.metadata.pharmacy.expiryDate}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-muted-foreground">No pharmacy information available for this product.</div>
+              )}
             </div>
           </div>
         )}

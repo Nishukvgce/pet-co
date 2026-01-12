@@ -838,10 +838,31 @@ public class ProductController {
                 }
             }
             
-            // Add pharmacy object for frontend convenience
+            // Add pharmacy object for frontend convenience (include all stored pharmacy columns)
             Map<String, Object> pharmacy = new HashMap<>();
             if (p.getPrescriptionRequired() != null) {
                 pharmacy.put("prescriptionRequired", p.getPrescriptionRequired());
+            }
+            if (p.getDosageForm() != null && !p.getDosageForm().isBlank()) {
+                pharmacy.put("dosageForm", p.getDosageForm());
+            }
+            if (p.getStrength() != null && !p.getStrength().isBlank()) {
+                pharmacy.put("strength", p.getStrength());
+            }
+            if (p.getActiveIngredient() != null && !p.getActiveIngredient().isBlank()) {
+                pharmacy.put("activeIngredient", p.getActiveIngredient());
+            }
+            if (p.getManufacturer() != null && !p.getManufacturer().isBlank()) {
+                pharmacy.put("manufacturer", p.getManufacturer());
+            }
+            if (p.getIndications() != null && !p.getIndications().isBlank()) {
+                pharmacy.put("indications", p.getIndications());
+            }
+            if (p.getContraindications() != null && !p.getContraindications().isBlank()) {
+                pharmacy.put("contraindications", p.getContraindications());
+            }
+            if (p.getExpiryDate() != null && !p.getExpiryDate().isBlank()) {
+                pharmacy.put("expiryDate", p.getExpiryDate());
             }
             if (!pharmacy.isEmpty()) {
                 md.put("pharmacy", pharmacy);
