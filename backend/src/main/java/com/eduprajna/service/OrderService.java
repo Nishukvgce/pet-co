@@ -38,12 +38,14 @@ public class OrderService {
     private final com.eduprajna.repository.ProductRepository productRepo;
     private final com.eduprajna.roots.coupons.CouponRepository couponRepo;
     private final com.eduprajna.roots.coupons.CouponRedemptionRepository redemptionRepo;
+    private final EmailService emailService;
 
     public OrderService(OrderRepository orderRepo, CartItemRepository cartRepo, 
                        CheckoutSelectionRepository selectionRepo, AddressRepository addressRepo,
                        com.eduprajna.repository.ProductRepository productRepo,
                        com.eduprajna.roots.coupons.CouponRepository couponRepo,
-                       com.eduprajna.roots.coupons.CouponRedemptionRepository redemptionRepo) {
+                       com.eduprajna.roots.coupons.CouponRedemptionRepository redemptionRepo,
+                       EmailService emailService) {
         this.orderRepo = orderRepo;
         this.cartRepo = cartRepo;
         this.selectionRepo = selectionRepo;
@@ -51,6 +53,7 @@ public class OrderService {
         this.productRepo = productRepo;
         this.couponRepo = couponRepo;
         this.redemptionRepo = redemptionRepo;
+        this.emailService = emailService;
     }
 
     /**
@@ -524,6 +527,18 @@ public class OrderService {
         Order updatedOrder = orderRepo.save(order);
         
         logger.info("Order {} status updated from '{}' to '{}'", orderId, oldStatus, status);
+        
+        // Send email notification if status actually changed
+        if (oldStatus == null || !oldStatus.equals(status)) {
+            try {
+                emailService.sendOrderStatusUpdate(updatedOrder, oldStatus, status);
+                logger.info("Email notification sent for order {} status change", orderId);
+            } catch (Exception e) {
+                logger.error("Failed to send email notification for order {} status change: {}", orderId, e.getMessage());
+                // Don't fail the status update if email fails
+            }
+        }
+        
         return updatedOrder;
     }
     

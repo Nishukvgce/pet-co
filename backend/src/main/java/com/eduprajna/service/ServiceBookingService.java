@@ -126,9 +126,8 @@ public class ServiceBookingService {
                     ServiceBooking savedBooking = serviceBookingRepository.save(booking);
                     ServiceBookingDTO dto = convertToDTO(savedBooking);
                     
-                    // Send email notification if status changed to CONFIRMED and customer has email
-                    if ("CONFIRMED".equals(status) && 
-                        !"CONFIRMED".equals(previousStatus)) {
+                    // Send email notification for status changes
+                    if (!status.equals(previousStatus)) {
                         try {
                             // Get email from user account if user is linked
                             String emailAddress = null;
@@ -143,11 +142,19 @@ public class ServiceBookingService {
                             if (emailAddress != null) {
                                 // Temporarily set email in DTO for email template
                                 dto.setEmail(emailAddress);
-                                emailService.sendServiceBookingConfirmation(dto);
+                                
+                                // Send specific email based on status
+                                if ("CONFIRMED".equals(status)) {
+                                    // Use existing confirmation email template
+                                    emailService.sendServiceBookingConfirmation(dto);
+                                } else {
+                                    // Use new status update email template
+                                    emailService.sendServiceStatusUpdate(dto, previousStatus, status);
+                                }
                             }
                         } catch (Exception e) {
                             // Log error but don't fail the status update
-                            System.err.println("Failed to send confirmation email for booking " + id + ": " + e.getMessage());
+                            System.err.println("Failed to send email notification for booking " + id + ": " + e.getMessage());
                         }
                     }
                     

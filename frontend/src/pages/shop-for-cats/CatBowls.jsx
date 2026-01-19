@@ -123,6 +123,55 @@ const CatBowls = ({ initialActive = 'All Cat Bowls' }) => {
   const [selectedFilters, setSelectedFilters] = useState({ brands: [], material: [], sizes: [], purpose: [], priceRanges: [], subCategories: [], sortBy: '' });
   const toggleFilter = (category, value) => setSelectedFilters(prev => ({ ...prev, [category]: prev[category].includes(value) ? prev[category].filter(x=>x!==value) : [...prev[category], value] }));
 
+  // Function to open filter drawer and scroll to specific section
+  const openFilterAndScroll = (filterName) => {
+    setSelectedTopFilter(filterName);
+    setFilterOpen(true);
+    // Wait for drawer to open, then scroll to section
+    setTimeout(() => {
+      const targetSection = sectionRefs.current[filterName];
+      if (targetSection && drawerContentRef.current) {
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Add highlight effect
+        targetSection.classList.add('section-highlight');
+        setTimeout(() => targetSection.classList.remove('section-highlight'), 1200);
+      }
+    }, 100);
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSelectedFilters({ brands: [], material: [], sizes: [], purpose: [], priceRanges: [], subCategories: [], sortBy: '' });
+  };
+
+  // Sort products based on selected criteria
+  const sortProducts = (products, sortBy) => {
+    if (!sortBy) return products;
+    
+    const sorted = [...products];
+    
+    switch (sortBy) {
+      case 'Featured':
+        return sorted; // Default order
+      case 'Best selling':
+        return sorted.sort((a, b) => (b.sold || 0) - (a.sold || 0));
+      case 'Alphabetically, A-Z':
+        return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      case 'Alphabetically, Z-A':
+        return sorted.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+      case 'Price, low to high':
+        return sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+      case 'Price, high to low':
+        return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
+      case 'Date, old to new':
+        return sorted.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+      case 'Date, new to old':
+        return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      default:
+        return sorted;
+    }
+  };
+
   const brands = ['M-Pets','Nibbles','PetSafe','Catit'];
   const material = ['Ceramic','Stainless Steel','Plastic','Silicone'];
   const sizes = ['Small','Medium','Large'];
@@ -206,16 +255,25 @@ const CatBowls = ({ initialActive = 'All Cat Bowls' }) => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlSub = urlParams.get('sub');
     const norm = s => String(s||'').toLowerCase().trim();
+    
+    console.log('Filtering - Total products:', products.length);
+    console.log('Selected filters:', selectedFilters);
 
     let working = products;
     
-    // Step 1: Filter by category (exact match, case-insensitive)
+    // Step 1: Filter by category (more flexible matching)
     working = working.filter(p => {
       const productCategory = norm(p.category || '');
+      const productSubcategory = norm(p.subcategory || '');
+      const productType = norm(p.productType || '');
       const targetCategory = norm(pageCategory);
-      return productCategory === targetCategory || 
-             productCategory.includes(targetCategory) ||
-             targetCategory.includes(productCategory);
+      
+      return productCategory.includes('bowl') || 
+             productSubcategory.includes('bowl') || 
+             productType.includes('bowl') ||
+             productCategory.includes('cat') ||
+             targetCategory.includes(productCategory) ||
+             productCategory.includes(targetCategory);
     });
     
     // Step 2: Filter by subcategory if specified
@@ -224,18 +282,71 @@ const CatBowls = ({ initialActive = 'All Cat Bowls' }) => {
       const targetSub = norm(activeSubcategory);
       working = working.filter(p => {
         const productSub = norm(p.subcategory || '');
-        return productSub === targetSub || 
-               productSub.includes(targetSub) ||
-               targetSub.includes(productSub);
+        const productType = norm(p.productType || '');
+        const productName = norm(p.name || '');
+        
+        return productSub.includes(targetSub) || 
+               productType.includes(targetSub) ||
+               productName.includes(targetSub) ||
+               targetSub.includes(productSub) ||
+               (targetSub.includes('travel') && (productName.includes('travel') || productType.includes('travel'))) ||
+               (targetSub.includes('fountain') && (productName.includes('fountain') || productType.includes('fountain')));
       });
     }
 
-    // simple filters
-    if (selectedFilters.brands?.length>0) working = working.filter(p => selectedFilters.brands.includes(p.brand));
-    if (selectedFilters.subCategories?.length>0) working = working.filter(p => selectedFilters.subCategories.some(sc => (p.subcategory||'').toLowerCase().includes(sc.toLowerCase()) || (p.productType||'').toLowerCase().includes(sc.toLowerCase())));
+    // Apply selected filters
+    if (selectedFilters.brands?.length > 0) {
+      working = working.filter(p => selectedFilters.brands.includes(p.brand));
+    }
+    
+    if (selectedFilters.material?.length > 0) {
+      working = working.filter(p => {
+        const productMaterial = norm(p.name || '') + ' ' + norm(p.tags?.join(' ') || '');
+        return selectedFilters.material.some(mat => productMaterial.includes(norm(mat)));
+      });
+    }
+    
+    if (selectedFilters.sizes?.length > 0) {
+      working = working.filter(p => {
+        const productSize = norm(p.name || '') + ' ' + norm(p.variants?.join(' ') || '') + ' ' + norm(p.weight || '');
+        return selectedFilters.sizes.some(size => productSize.includes(norm(size)));
+      });
+    }
+    
+    if (selectedFilters.purpose?.length > 0) {
+      working = working.filter(p => {
+        const productPurpose = norm(p.name || '') + ' ' + norm(p.tags?.join(' ') || '');
+        return selectedFilters.purpose.some(purpose => productPurpose.includes(norm(purpose)));
+      });
+    }
+    
+    if (selectedFilters.priceRanges?.length > 0) {
+      working = working.filter(p => {
+        const price = p.price || 0;
+        return selectedFilters.priceRanges.some(range => {
+          if (range === 'INR 100 - INR 500') return price >= 100 && price <= 500;
+          if (range === 'INR 501 - INR 1000') return price >= 501 && price <= 1000;
+          if (range === 'INR 1001+') return price >= 1001;
+          return false;
+        });
+      });
+    }
+    
+    if (selectedFilters.subCategories?.length > 0) {
+      working = working.filter(p => {
+        const productInfo = norm(p.subcategory || '') + ' ' + norm(p.productType || '') + ' ' + norm(p.name || '');
+        return selectedFilters.subCategories.some(sc => productInfo.includes(norm(sc)));
+      });
+    }
 
-    setFilteredProducts(working);
-  }, [products, selectedFilters, initialActive]);
+    console.log('Filtered result:', working.length, 'products');
+    
+    // Apply sorting
+    const sortedProducts = sortProducts(working, selectedFilters.sortBy);
+    console.log('Sorted by:', selectedFilters.sortBy);
+    
+    setFilteredProducts(sortedProducts);
+  }, [products, selectedFilters, active]);
 
   const scrollTopLeft = () => { if (topRef.current) topRef.current.scrollBy({ left: -220, behavior: 'smooth' }); };
   const scrollTopRight = () => { if (topRef.current) topRef.current.scrollBy({ left: 220, behavior: 'smooth' }); };
@@ -448,7 +559,15 @@ const CatBowls = ({ initialActive = 'All Cat Bowls' }) => {
             <h4 className="text-sm font-medium mb-3">Sort By</h4>
             <div className="flex flex-wrap gap-2">
               {['Featured','Best selling','Alphabetically, A-Z','Alphabetically, Z-A','Price, low to high','Price, high to low','Date, old to new','Date, new to old'].map(s=> (
-                <button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>
+                <button 
+                  key={s} 
+                  onClick={() => setSelectedFilters(prev => ({ ...prev, sortBy: prev.sortBy === s ? '' : s }))}
+                  className={`text-xs px-3 py-1 border border-border rounded ${
+                    selectedFilters.sortBy === s ? 'bg-orange-500 text-white' : 'bg-white'
+                  }`}
+                >
+                  {s}
+                </button>
               ))}
             </div>
           </section>
@@ -457,50 +576,90 @@ const CatBowls = ({ initialActive = 'All Cat Bowls' }) => {
           <section ref={el => sectionRefs.current['Brand'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Brand</h4>
             <div className="flex flex-wrap gap-2">
-              {brands.map(b=> (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}
+              {brands.map(b=> (
+                <button 
+                  key={b} 
+                  onClick={() => toggleFilter('brands', b)}
+                  className={`text-xs px-3 py-1 border border-border rounded ${
+                    selectedFilters.brands.includes(b) ? 'bg-orange-500 text-white' : 'bg-white'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
             </div>
           </section>
 
-          {/* Dog/cat */}
-          <section ref={el => sectionRefs.current['Dog/Cat'] = el} className="mb-6">
-            <h4 className="text-sm font-medium mb-3">Dog/cat</h4>
-            <div className="flex flex-wrap gap-2">{dogCat.map(d=> (<button key={d} className="text-xs px-3 py-1 border border-border rounded bg-white">{d}</button>))}</div>
+          {/* Material */}
+          <section ref={el => sectionRefs.current['Material'] = el} className="mb-6">
+            <h4 className="text-sm font-medium mb-3">Material</h4>
+            <div className="flex flex-wrap gap-2">
+              {material.map(m=> (
+                <button 
+                  key={m} 
+                  onClick={() => toggleFilter('material', m)}
+                  className={`text-xs px-3 py-1 border border-border rounded ${
+                    selectedFilters.material.includes(m) ? 'bg-orange-500 text-white' : 'bg-white'
+                  }`}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
           </section>
 
-          {/* Life stage */}
-          <section ref={el => sectionRefs.current['Life Stage'] = el} className="mb-6">
-            <h4 className="text-sm font-medium mb-3">Life stage</h4>
-            <div className="flex flex-wrap gap-2">{lifeStages.map(l=> (<button key={l} className="text-xs px-3 py-1 border border-border rounded bg-white">{l}</button>))}</div>
+          {/* Size */}
+          <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
+            <h4 className="text-sm font-medium mb-3">Size</h4>
+            <div className="flex flex-wrap gap-2">
+              {sizes.map(s=> (
+                <button 
+                  key={s} 
+                  onClick={() => toggleFilter('sizes', s)}
+                  className={`text-xs px-3 py-1 border border-border rounded ${
+                    selectedFilters.sizes.includes(s) ? 'bg-orange-500 text-white' : 'bg-white'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
 
-          {/* Breed size */}
-          <section ref={el => sectionRefs.current['Breed Size'] = el} className="mb-6">
-            <h4 className="text-sm font-medium mb-3">Breed size</h4>
-            <div className="flex flex-wrap gap-2">{breedSizes.map(b=> (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}</div>
-          </section>
-
-          {/* Product type */}
-          <section ref={el => sectionRefs.current['Product Type'] = el} className="mb-6">
-            <h4 className="text-sm font-medium mb-3">Product type</h4>
-            <div className="flex flex-wrap gap-2">{productTypes.map(p=> (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
-          </section>
-
-          {/* Special diet */}
-          <section ref={el => sectionRefs.current['Special Diet'] = el} className="mb-6">
-            <h4 className="text-sm font-medium mb-3">Special diet</h4>
-            <div className="flex flex-wrap gap-2">{specialDiets.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
-          </section>
-
-          {/* Protein source */}
-          <section ref={el => sectionRefs.current['Protein Source'] = el} className="mb-6">
-            <h4 className="text-sm font-medium mb-3">Protein source</h4>
-            <div className="flex flex-wrap gap-2">{proteinSource.map(p=> (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+          {/* Purpose */}
+          <section ref={el => sectionRefs.current['Purpose'] = el} className="mb-6">
+            <h4 className="text-sm font-medium mb-3">Purpose</h4>
+            <div className="flex flex-wrap gap-2">
+              {purpose.map(p=> (
+                <button 
+                  key={p} 
+                  onClick={() => toggleFilter('purpose', p)}
+                  className={`text-xs px-3 py-1 border border-border rounded ${
+                    selectedFilters.purpose.includes(p) ? 'bg-orange-500 text-white' : 'bg-white'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Price */}
           <section ref={el => sectionRefs.current['Price'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Price</h4>
-            <div className="flex flex-wrap gap-2">{priceRanges.map(r=> (<button key={r} className="text-xs px-3 py-1 border border-border rounded bg-white">{r}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {priceRanges.map(r=> (
+                <button 
+                  key={r} 
+                  onClick={() => toggleFilter('priceRanges', r)}
+                  className={`text-xs px-3 py-1 border border-border rounded ${
+                    selectedFilters.priceRanges.includes(r) ? 'bg-orange-500 text-white' : 'bg-white'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Weight */}
@@ -509,23 +668,29 @@ const CatBowls = ({ initialActive = 'All Cat Bowls' }) => {
             <div className="flex flex-wrap gap-2">{weights.map(w=> (<button key={w} className="text-xs px-3 py-1 border border-border rounded bg-white">{w}</button>))}</div>
           </section>
 
-          {/* Size */}
-          <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
-            <h4 className="text-sm font-medium mb-3">Size</h4>
-            <div className="flex flex-wrap gap-2">{sizes.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
-          </section>
-
           {/* Sub category */}
           <section ref={el => sectionRefs.current['Sub Category'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Sub category</h4>
-            <div className="flex flex-wrap gap-2">{subCategories.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {subCategories.map(s=> (
+                <button 
+                  key={s} 
+                  onClick={() => toggleFilter('subCategories', s)}
+                  className={`text-xs px-3 py-1 border border-border rounded ${
+                    selectedFilters.subCategories.includes(s) ? 'bg-orange-500 text-white' : 'bg-white'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
         </div>
 
         {/* footer actions */}
         <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
-          <button className="text-sm text-orange-500">Clear All</button>
-          <button className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
+          <button onClick={clearAllFilters} className="text-sm text-orange-500">Clear All</button>
+          <button onClick={() => setFilterOpen(false)} className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
         </div>
       </aside>
     </div>
