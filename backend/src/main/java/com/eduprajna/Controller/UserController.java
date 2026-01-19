@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eduprajna.config.CorsConfig;
 import com.eduprajna.dto.UserSummaryDTO;
 import com.eduprajna.entity.User;
 import com.eduprajna.repository.OrderRepository;
@@ -18,7 +19,7 @@ import com.eduprajna.repository.WishlistItemRepository;
 
 @RestController
 @RequestMapping("/api/admin/users")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "https://nishmitha-pet-co.vercel.app"}, allowCredentials = "true")
+@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW}, allowCredentials = "true")
 public class UserController {
 
     @Autowired

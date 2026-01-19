@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eduprajna.config.CorsConfig;
 import com.eduprajna.entity.Order;
 import com.eduprajna.entity.User;
 import com.eduprajna.repository.OrderRepository;
@@ -23,7 +24,7 @@ import com.eduprajna.service.UserService;
 
 @RestController
 @RequestMapping("/api/payments/razorpay")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000"}, allowCredentials = "true")
+@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW}, allowCredentials = "true")
 public class PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 

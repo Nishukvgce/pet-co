@@ -1,23 +1,32 @@
 package com.eduprajna.Controller;
 
-import com.eduprajna.dto.ProductReviewDTO;
-import com.eduprajna.dto.ReviewStatsDTO;
-import com.eduprajna.entity.Product;
-import com.eduprajna.service.ProductReviewService;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
+import com.eduprajna.config.CorsConfig;
+import com.eduprajna.dto.ProductReviewDTO;
+import com.eduprajna.dto.ReviewStatsDTO;
+import com.eduprajna.entity.Product;
+import com.eduprajna.service.ProductReviewService;
 
 @RestController
 @RequestMapping("/api/reviews")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:3000", "https://nishmitha-pet-co.vercel.app"}, allowCredentials = "true")
+@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW}, allowCredentials = "true")
 public class ProductReviewController {
     
     private static final Logger logger = LoggerFactory.getLogger(ProductReviewController.class);

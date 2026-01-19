@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eduprajna.config.CorsConfig;
 import com.eduprajna.entity.CartItem;
 import com.eduprajna.entity.Order;
 import com.eduprajna.entity.OrderItem;
@@ -30,8 +31,7 @@ import com.eduprajna.service.UserService;
  */
 @RestController
 @RequestMapping("/api/dev")
-@CrossOrigin(origins = { "http://localhost:3000", "http://127.0.0.1:3000",
-        "https://nishmitha-pet-co.vercel.app" }, allowCredentials = "true")
+@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW}, allowCredentials = "true")
 public class DevController {
 
     private static final Logger logger = LoggerFactory.getLogger(DevController.class);

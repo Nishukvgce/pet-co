@@ -11,21 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eduprajna.config.CorsConfig;
 import com.eduprajna.entity.Category;
 import com.eduprajna.repository.CategoryRepository;
 
 @RestController
 @RequestMapping("/api/categories")
 // Allow local dev, Vercel preview and production frontend domains
-@CrossOrigin(origins = {
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://nishmitha-pet-co.vercel.app",
-    "https://pet-cotraditional.in",
-    "https://www.pet-cotraditional.in"
-}, allowCredentials = "true")
+@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_5173, CorsConfig.LOCALHOST_IP_3000, CorsConfig.LOCALHOST_IP_5173, CorsConfig.VERCEL_OLD, CorsConfig.VERCEL_NEW, CorsConfig.PROD_DOMAIN_1, CorsConfig.PROD_DOMAIN_2}, allowCredentials = "true")
 public class CategoryController {
     private final CategoryRepository categoryRepository;
 

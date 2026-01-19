@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import com.eduprajna.config.CorsConfig;
 import com.eduprajna.entity.Order;
 import com.eduprajna.entity.User;
 import com.eduprajna.repository.OrderRepository;
@@ -33,7 +34,7 @@ import com.eduprajna.repository.UserRepository;
  */
 @Controller
 @RequestMapping("/api/admin/export")
-@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "https://nishmitha-pet-co.vercel.app"}, allowCredentials = "true")
+@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW}, allowCredentials = "true")
 public class AdminExportController {
     private static final Logger log = LoggerFactory.getLogger(AdminExportController.class);
 

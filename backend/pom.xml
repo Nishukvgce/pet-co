@@ -84,12 +84,12 @@
 			<artifactId>cloudinary-http44</artifactId>
 			<version>1.33.0</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.7.7</version>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency> -->
 
 		<!-- Razorpay Payment Gateway -->
 		<dependency>
@@ -110,6 +110,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>pet-co</finalName>
 	</build>
 
 	<!-- Production profile: includes cloudinary and postgres runtime dependencies -->
@@ -125,12 +126,12 @@
 					<artifactId>cloudinary-http44</artifactId>
 					<version>1.33.0</version>
 				</dependency>
-				<dependency>
+				<!-- <dependency>
 					<groupId>org.postgresql</groupId>
 					<artifactId>postgresql</artifactId>
 					<version>42.7.7</version>
 					<scope>runtime</scope>
-				</dependency>
+				</dependency> -->
 			</dependencies>
 		</profile>
 	</profiles>
