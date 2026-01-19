@@ -58,6 +58,28 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
       ]
     },
     {
+      key: 'pet-services',
+      label: 'Pet Services',
+      icon: '/assets/images/dog/dg7.webp',
+      children: [
+        { 
+          label: 'Pet Walking', 
+          path: '/pet-walking',
+          icon: '/assets/images/dog/dg2.webp'
+        },
+        { 
+          label: 'Pet Boarding', 
+          path: '/pet-boarding',
+          icon: '/assets/images/dog/dg3.webp'
+        },
+        { 
+          label: 'Pet Grooming', 
+          path: '/pet-services',
+          icon: '/assets/images/dog/dg7.webp'
+        }
+      ]
+    },
+    {
       key: 'pharmacy',
       label: 'Pharmacy',
       icon: '/assets/images/dog/dg7.webp',
@@ -221,14 +243,28 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                                 return { label: s, path };
                               })
                             })}
-                            className="w-full text-left px-2 py-2 hover:bg-muted"
+                            className="w-full flex items-center gap-3 px-2 py-2 hover:bg-muted text-left"
                           >
-                            {it.label} <span className="text-xs text-muted-foreground">▶</span>
+                            {it.icon && <img src={it.icon} alt={it.label} className="w-6 h-6" />}
+                            <span className="text-sm text-foreground">{it.label}</span>
+                            <span className="ml-auto text-xs text-muted-foreground">▶</span>
                           </button>
                         ) : it.path ? (
-                          <button onClick={() => { window.location.href = it.path; closeWithAnimation(); }} className="w-full text-left px-2 py-2 hover:bg-muted">{it.label}</button>
+                          <button 
+                            onClick={() => { window.location.href = it.path; closeWithAnimation(); }} 
+                            className="w-full flex items-center gap-3 px-2 py-2 hover:bg-muted text-left"
+                          >
+                            {it.icon && <img src={it.icon} alt={it.label} className="w-6 h-6" />}
+                            <span className="text-sm text-foreground">{it.label}</span>
+                          </button>
                         ) : (
-                          <button onClick={() => pushMobileView({ title: it.label, items: (it.items || []).map(x => ({ label: x })) })} className="w-full text-left px-2 py-2 hover:bg-muted">{it.label}</button>
+                          <button 
+                            onClick={() => pushMobileView({ title: it.label, items: (it.items || []).map(x => ({ label: x })) })} 
+                            className="w-full flex items-center gap-3 px-2 py-2 hover:bg-muted text-left"
+                          >
+                            {it.icon && <img src={it.icon} alt={it.label} className="w-6 h-6" />}
+                            <span className="text-sm text-foreground">{it.label}</span>
+                          </button>
                         )}
                       </div>
                     ))}
