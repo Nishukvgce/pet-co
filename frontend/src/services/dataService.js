@@ -1,7 +1,7 @@
 // Import database data only as emergency fallback
 import databaseData from '../data/database.json';
 import productApi from './productApi';
-import apiClient from './api';
+import { apiClient } from './api';
 
 // Simulate API delay for development
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -95,9 +95,8 @@ const dataService = {
 
   async getAllUsers() {
     try {
-      const res = await fetch('https://nishmitha-roots-7.onrender.com/api/admin/users');
-      if (!res.ok) throw new Error('Failed to fetch users');
-      return await res.json();
+      const res = await apiClient.get('/admin/users');
+      return res.data;
     } catch (error) {
       console.error('Error fetching users from API, using fallback:', error);
       return users;
