@@ -95,20 +95,37 @@ public class ServiceBookingService {
             
             ServiceBookingDTO result = convertToDTO(savedBooking);
             
+            // Critical debugging for email functionality
+            System.out.println("\n=== EMAIL FUNCTIONALITY DEBUG ===");
+            System.out.println("🔍 Email in DTO: " + result.getEmail());
+            System.out.println("🔍 Email Service Bean: " + (emailService != null ? "INJECTED" : "NULL"));
+            System.out.println("🔍 Pet Name: " + result.getPetName());
+            System.out.println("🔍 Owner Name: " + result.getOwnerName());
+            System.out.println("🔍 Service Type: " + result.getServiceType());
+            
             // Send confirmation email for new booking
             if (result.getEmail() != null && !result.getEmail().trim().isEmpty()) {
                 try {
-                    System.out.println("📧 Sending booking confirmation email...");
+                    System.out.println("📧 ATTEMPTING to send booking confirmation email...");
+                    System.out.println("📮 Email Address: " + result.getEmail());
+                    System.out.println("🎯 Booking ID: " + result.getId());
+                    
                     emailService.sendServiceBookingConfirmation(result);
                     System.out.println("✅ Booking confirmation email sent successfully!");
+                    System.out.println("🎉 Customer should receive confirmation email at: " + result.getEmail());
                 } catch (Exception e) {
                     System.err.println("❌ Failed to send booking confirmation email: " + e.getMessage());
+                    System.err.println("🔧 Email Service Error Details: " + e.getClass().getSimpleName());
+                    e.printStackTrace();
                     logger.error("Failed to send booking confirmation email for booking {}: {}", savedBooking.getId(), e.getMessage(), e);
                     // Don't fail the booking creation if email fails
                 }
             } else {
                 System.out.println("⚠️  No email address provided - skipping confirmation email");
+                System.out.println("🔍 DTO Email field: '" + result.getEmail() + "'");
+                System.out.println("🔍 Original Booking Email: '" + savedBooking.getEmail() + "'");
             }
+            System.out.println("=== END EMAIL DEBUG ===\n");
             
             System.out.println("[DEBUG] Returning DTO with ID: " + result.getId());
             return result;
@@ -162,6 +179,8 @@ public class ServiceBookingService {
                     // Send email notification for status changes
                     if (!status.equals(previousStatus)) {
                         System.out.println("📧 Triggering email notification...");
+                        System.out.println("🔍 Email Service Available: " + (emailService != null));
+                        
                         try {
                             // Get email from user account if user is linked
                             String emailAddress = null;
@@ -173,11 +192,17 @@ public class ServiceBookingService {
                             } else if (dto.getEmail() != null && !dto.getEmail().trim().isEmpty()) {
                                 emailAddress = dto.getEmail(); // Fallback to booking email
                                 System.out.println("📮 Using booking email: " + emailAddress);
+                            } else {
+                                System.out.println("🔍 User email: " + (savedBooking.getUser() != null ? savedBooking.getUser().getEmail() : "No user"));
+                                System.out.println("🔍 DTO email: " + dto.getEmail());
                             }
                             
                             if (emailAddress != null) {
                                 // Temporarily set email in DTO for email template
                                 dto.setEmail(emailAddress);
+                                
+                                System.out.println("🎯 Email Address Found: " + emailAddress);
+                                System.out.println("📧 Ready to send email for status change: " + previousStatus + " → " + status);
                                 
                                 // Send specific email based on status
                                 if ("CONFIRMED".equals(status)) {
@@ -193,12 +218,20 @@ public class ServiceBookingService {
                                 System.out.println("👤 Customer will receive email about " + booking.getServiceType() + " service status change");
                             } else {
                                 System.out.println("⚠️  WARNING: No email address found for booking. Customer will not receive notification.");
+                                System.out.println("🔍 Debugging email sources:");
+                                System.out.println("   - User exists: " + (savedBooking.getUser() != null));
+                                if (savedBooking.getUser() != null) {
+                                    System.out.println("   - User email: '" + savedBooking.getUser().getEmail() + "'");
+                                }
+                                System.out.println("   - DTO email: '" + dto.getEmail() + "'");
                             }
                         } catch (Exception e) {
                             // Log error but don't fail the status update
                             logger.error("Failed to send email notification for booking {} status change from '{}' to '{}': {}", id, previousStatus, status, e.getMessage(), e);
                             System.err.println("❌ EMAIL NOTIFICATION FAILED");
                             System.err.println("💡 Error: " + e.getMessage());
+                            System.err.println("🔧 Error Type: " + e.getClass().getSimpleName());
+                            e.printStackTrace();
                             System.err.println("⚠️  Customer will NOT receive email notification");
                         }
                     } else {
