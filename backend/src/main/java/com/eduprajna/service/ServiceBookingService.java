@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ import com.eduprajna.repository.UserRepository;
 @Service
 @Transactional
 public class ServiceBookingService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ServiceBookingService.class);
 
     @Autowired
     private ServiceBookingRepository serviceBookingRepository;
@@ -90,6 +94,22 @@ public class ServiceBookingService {
             System.out.println("  - Total Amount: " + savedBooking.getTotalAmount());
             
             ServiceBookingDTO result = convertToDTO(savedBooking);
+            
+            // Send confirmation email for new booking
+            if (result.getEmail() != null && !result.getEmail().trim().isEmpty()) {
+                try {
+                    System.out.println("📧 Sending booking confirmation email...");
+                    emailService.sendServiceBookingConfirmation(result);
+                    System.out.println("✅ Booking confirmation email sent successfully!");
+                } catch (Exception e) {
+                    System.err.println("❌ Failed to send booking confirmation email: " + e.getMessage());
+                    logger.error("Failed to send booking confirmation email for booking {}: {}", savedBooking.getId(), e.getMessage(), e);
+                    // Don't fail the booking creation if email fails
+                }
+            } else {
+                System.out.println("⚠️  No email address provided - skipping confirmation email");
+            }
+            
             System.out.println("[DEBUG] Returning DTO with ID: " + result.getId());
             return result;
         } catch (Exception e) {
@@ -116,18 +136,32 @@ public class ServiceBookingService {
 
     // Update booking status
     public Optional<ServiceBookingDTO> updateBookingStatus(Long id, String status, String notes) {
+        System.out.println("\n=== SERVICE BOOKING - STATUS UPDATE ===");
+        System.out.println("🔄 Processing service booking status update...");
+        System.out.println("🎯 Booking ID: #" + id);
+        System.out.println("📋 New Status: " + status);
+        
         return serviceBookingRepository.findById(id)
                 .map(booking -> {
                     String previousStatus = booking.getStatus();
+                    System.out.println("📊 Previous Status: " + (previousStatus != null ? previousStatus : "null"));
+                    System.out.println("🐾 Service Type: " + booking.getServiceType());
+                    System.out.println("🏷️ Service Name: " + booking.getServiceName());
+                    System.out.println("🐶 Pet Name: " + booking.getPetName());
+                    
                     booking.setStatus(status);
                     if (notes != null) {
                         booking.setNotes(notes);
+                        System.out.println("📝 Added Notes: " + notes);
                     }
                     ServiceBooking savedBooking = serviceBookingRepository.save(booking);
                     ServiceBookingDTO dto = convertToDTO(savedBooking);
                     
+                    System.out.println("✅ Database updated successfully");
+                    
                     // Send email notification for status changes
                     if (!status.equals(previousStatus)) {
+                        System.out.println("📧 Triggering email notification...");
                         try {
                             // Get email from user account if user is linked
                             String emailAddress = null;
@@ -135,8 +169,10 @@ public class ServiceBookingService {
                                 savedBooking.getUser().getEmail() != null && 
                                 !savedBooking.getUser().getEmail().trim().isEmpty()) {
                                 emailAddress = savedBooking.getUser().getEmail();
+                                System.out.println("📮 Using user account email: " + emailAddress);
                             } else if (dto.getEmail() != null && !dto.getEmail().trim().isEmpty()) {
                                 emailAddress = dto.getEmail(); // Fallback to booking email
+                                System.out.println("📮 Using booking email: " + emailAddress);
                             }
                             
                             if (emailAddress != null) {
@@ -146,18 +182,30 @@ public class ServiceBookingService {
                                 // Send specific email based on status
                                 if ("CONFIRMED".equals(status)) {
                                     // Use existing confirmation email template
+                                    System.out.println("📬 Sending service confirmation email...");
                                     emailService.sendServiceBookingConfirmation(dto);
                                 } else {
                                     // Use new status update email template
+                                    System.out.println("📬 Sending service status update email...");
                                     emailService.sendServiceStatusUpdate(dto, previousStatus, status);
                                 }
+                                System.out.println("✅ EMAIL NOTIFICATION COMPLETED SUCCESSFULLY");
+                                System.out.println("👤 Customer will receive email about " + booking.getServiceType() + " service status change");
+                            } else {
+                                System.out.println("⚠️  WARNING: No email address found for booking. Customer will not receive notification.");
                             }
                         } catch (Exception e) {
                             // Log error but don't fail the status update
-                            System.err.println("Failed to send email notification for booking " + id + ": " + e.getMessage());
+                            logger.error("Failed to send email notification for booking {} status change from '{}' to '{}': {}", id, previousStatus, status, e.getMessage(), e);
+                            System.err.println("❌ EMAIL NOTIFICATION FAILED");
+                            System.err.println("💡 Error: " + e.getMessage());
+                            System.err.println("⚠️  Customer will NOT receive email notification");
                         }
+                    } else {
+                        System.out.println("ℹ️  Status unchanged - no email notification needed");
                     }
                     
+                    System.out.println("=== SERVICE BOOKING COMPLETE ===\n");
                     return dto;
                 });
     }

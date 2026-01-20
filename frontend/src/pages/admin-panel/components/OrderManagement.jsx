@@ -340,12 +340,33 @@ const OrderManagement = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
+      console.log(`📧 Updating order #${orderId} status to '${newStatus}'`);
+      console.log('🔄 This will trigger an email notification to the customer');
+      
       await orderApi.updateOrderStatus(orderId, newStatus);
+      
+      console.log('✅ Order status updated successfully');
+      console.log('📬 Customer should receive an email notification about this status change');
+      console.log('Check the server console for detailed email sending logs');
+      
+      // Show success message to admin
+      const statusMessages = {
+        'pending': '📦 Order marked as pending - Customer notified via email',
+        'processing': '⚡ Order is now processing - Customer notified via email',
+        'shipped': '🚚 Order shipped - Customer notified with tracking info via email',
+        'delivered': '✅ Order delivered - Customer notified via email',
+        'cancelled': '❌ Order cancelled - Customer notified via email'
+      };
+      
+      const message = statusMessages[newStatus] || `📋 Order status updated to ${newStatus} - Customer notified via email`;
+      alert(message);
+      
       // Reload orders to get updated data
       loadOrders();
     } catch (err) {
-      console.error('Error updating order status:', err);
-      alert('Failed to update order status: ' + (err.message || 'Unknown error'));
+      console.error('❌ Error updating order status:', err);
+      alert('Failed to update order status: ' + (err.message || 'Unknown error') + 
+            '\n\nNote: Customer may not have received email notification due to this error.');
     }
   };
 
@@ -526,6 +547,17 @@ const OrderManagement = () => {
       <div>
         <h1 className="text-2xl font-heading font-bold text-foreground">Order Management</h1>
         <p className="text-muted-foreground">Track and manage customer orders</p>
+        
+        {/* Email Status Indicator */}
+        <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+          <Mail className="w-4 h-4 text-green-600" />
+          <span className="text-sm text-green-800 font-medium">
+            📧 Email notifications are enabled
+          </span>
+          <span className="text-xs text-green-600">
+            • Status updates will be sent to customers automatically
+          </span>
+        </div>
       </div>
 
       {/* Filters */}

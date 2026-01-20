@@ -1,82 +1,219 @@
 package com.eduprajna.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.eduprajna.dto.ServiceBookingDTO;
 import com.eduprajna.entity.Order;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender emailSender;
+    @Value("${sendgrid.api.key:}")
+    private String sendGridApiKey;
 
-    @Value("${app.email.from:PET&CO <noreply@pet-co.com>}")
+    @Value("${app.email.from:PETCO <nishmitha928@gmail.com>}")
     private String fromEmail;
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
-    public void sendServiceBookingConfirmation(ServiceBookingDTO booking) throws MessagingException {
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-        helper.setFrom(fromEmail);
-        helper.setTo(booking.getEmail());
-        helper.setSubject("🎉 Your Pet Grooming Appointment is Confirmed - PET&CO");
-
-        String htmlContent = createBookingConfirmationHtml(booking);
-        helper.setText(htmlContent, true);
-
-        emailSender.send(message);
-    }
-
-    public void sendOrderStatusUpdate(Order order, String oldStatus, String newStatus) throws MessagingException {
-        if (order.getUser() == null || order.getUser().getEmail() == null || order.getUser().getEmail().trim().isEmpty()) {
-            return; // No email to send to
+    public void sendServiceBookingConfirmation(ServiceBookingDTO booking) throws IOException {
+        System.out.println("\n=== EMAIL SERVICE - BOOKING CONFIRMATION ===");
+        System.out.println("📧 Attempting to send booking confirmation email...");
+        System.out.println("📮 To: " + booking.getEmail());
+        System.out.println("🎯 Booking ID: " + booking.getId());
+        
+        if (sendGridApiKey == null || sendGridApiKey.trim().isEmpty()) {
+            System.err.println("❌ ERROR: SendGrid API key not configured. Skipping email.");
+            System.err.println("⚠️  Configure sendgrid.api.key in application properties");
+            return;
         }
 
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-        helper.setFrom(fromEmail);
-        helper.setTo(order.getUser().getEmail());
-        helper.setSubject(getOrderStatusSubject(newStatus) + " - PET&CO Order #" + order.getId());
-
-        String htmlContent = createOrderStatusUpdateHtml(order, oldStatus, newStatus);
-        helper.setText(htmlContent, true);
-
-        emailSender.send(message);
+        Email from = new Email(extractEmail(fromEmail), extractName(fromEmail));
+        Email to = new Email(booking.getEmail());
+        String subject = "🎉 Your Pet Grooming Appointment is Confirmed - PET&CO";
+        Content content = new Content("text/html", createBookingConfirmationHtml(booking));
+        
+        Mail mail = new Mail(from, subject, to, content);
+        
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            
+            int statusCode = response.getStatusCode();
+            if (statusCode == 202) {
+                System.out.println("✅ SUCCESS: Email sent successfully!");
+                System.out.println("📊 SendGrid Status: " + statusCode + " (Accepted)");
+                System.out.println("📬 Email queued for delivery to " + booking.getEmail());
+            } else if (statusCode >= 200 && statusCode < 300) {
+                System.out.println("✅ SUCCESS: Email processed successfully!");
+                System.out.println("📊 SendGrid Status: " + statusCode);
+            } else {
+                System.err.println("⚠️  WARNING: Unexpected status code: " + statusCode);
+                System.err.println("📄 Response: " + response.getBody());
+            }
+        } catch (IOException ex) {
+            System.err.println("❌ ERROR: Failed to send email - " + ex.getMessage());
+            throw ex;
+        }
+        System.out.println("=== END EMAIL SERVICE ===");
     }
 
-    public void sendServiceStatusUpdate(ServiceBookingDTO booking, String oldStatus, String newStatus) throws MessagingException {
+    public void sendOrderStatusUpdate(Order order, String oldStatus, String newStatus) throws IOException {
+        System.out.println("\n=== EMAIL SERVICE - ORDER STATUS UPDATE ===");
+        System.out.println("📧 Attempting to send order status update email...");
+        System.out.println("🆔 Order ID: #" + order.getId());
+        System.out.println("🔄 Status Change: '" + oldStatus + "' → '" + newStatus + "'");
+        
+        if (sendGridApiKey == null || sendGridApiKey.trim().isEmpty()) {
+            System.err.println("❌ ERROR: SendGrid API key not configured. Skipping email.");
+            System.err.println("⚠️  Configure sendgrid.api.key in application properties");
+            return;
+        }
+
+        if (order.getUser() == null || order.getUser().getEmail() == null || order.getUser().getEmail().trim().isEmpty()) {
+            System.out.println("⚠️  WARNING: No user email found for order #" + order.getId() + ". Skipping email.");
+            return; // No email to send to
+        }
+        
+        String userEmail = order.getUser().getEmail();
+        System.out.println("📮 To: " + userEmail);
+        System.out.println("👤 Customer: " + (order.getUser().getName() != null ? order.getUser().getName() : "Unknown"));
+
+        Email from = new Email(extractEmail(fromEmail), extractName(fromEmail));
+        Email to = new Email(userEmail);
+        String subject = getOrderStatusSubject(newStatus) + " - PET&CO Order #" + order.getId();
+        System.out.println("📝 Subject: " + subject);
+        Content content = new Content("text/html", createOrderStatusUpdateHtml(order, oldStatus, newStatus));
+        
+        Mail mail = new Mail(from, subject, to, content);
+        
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        
+        try {
+            System.out.println("📡 Sending email via SendGrid...");
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            
+            int statusCode = response.getStatusCode();
+            if (statusCode == 202) {
+                System.out.println("✅ SUCCESS: Order status email sent successfully!");
+                System.out.println("📊 SendGrid Status: " + statusCode + " (Accepted)");
+                System.out.println("📬 Email queued for delivery to " + userEmail);
+                System.out.println("🎯 Email will notify customer about order status change to '" + newStatus + "'");
+            } else if (statusCode >= 200 && statusCode < 300) {
+                System.out.println("✅ SUCCESS: Order status email processed successfully!");
+                System.out.println("📊 SendGrid Status: " + statusCode);
+            } else {
+                System.err.println("⚠️  WARNING: Unexpected status code: " + statusCode);
+                System.err.println("📄 Response: " + response.getBody());
+            }
+        } catch (IOException ex) {
+            System.err.println("❌ ERROR: Failed to send order status email - " + ex.getMessage());
+            System.err.println("📧 Customer will NOT receive notification about status change");
+            throw ex;
+        }
+        System.out.println("=== END EMAIL SERVICE ===");
+    }
+
+    public void sendServiceStatusUpdate(ServiceBookingDTO booking, String oldStatus, String newStatus) throws IOException {
+        System.out.println("\n=== EMAIL SERVICE - SERVICE STATUS UPDATE ===");
+        System.out.println("📧 Attempting to send service status update email...");
+        System.out.println("🆔 Booking ID: #" + booking.getId());
+        System.out.println("🐶 Pet Name: " + booking.getPetName());
+        System.out.println("🎆 Service Type: " + booking.getServiceType());
+        System.out.println("🚫 Service Name: " + booking.getServiceName());
+        System.out.println("🔄 Status Change: '" + oldStatus + "' → '" + newStatus + "'");
+        
+        if (sendGridApiKey == null || sendGridApiKey.trim().isEmpty()) {
+            System.err.println("❌ ERROR: SendGrid API key not configured. Skipping email.");
+            System.err.println("⚠️  Configure sendgrid.api.key in application properties");
+            return;
+        }
+
         String emailAddress = null;
         if (booking.getEmail() != null && !booking.getEmail().trim().isEmpty()) {
             emailAddress = booking.getEmail();
         }
         
         if (emailAddress == null) {
+            System.out.println("⚠️  WARNING: No email address found for booking #" + booking.getId() + ". Skipping email.");
             return; // No email to send to
         }
+        
+        System.out.println("📮 To: " + emailAddress);
+        System.out.println("👤 Customer: " + (booking.getOwnerName() != null ? booking.getOwnerName() : "Unknown"));
 
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        Email from = new Email(extractEmail(fromEmail), extractName(fromEmail));
+        Email to = new Email(emailAddress);
+        String subject = getServiceStatusSubject(newStatus, booking.getServiceType()) + " - PET&CO Booking #" + booking.getId();
+        System.out.println("📝 Subject: " + subject);
+        Content content = new Content("text/html", createServiceStatusUpdateHtml(booking, oldStatus, newStatus));
+        
+        Mail mail = new Mail(from, subject, to, content);
+        
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        
+        try {
+            System.out.println("📡 Sending service status email via SendGrid...");
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            
+            int statusCode = response.getStatusCode();
+            if (statusCode == 202) {
+                System.out.println("✅ SUCCESS: Service status email sent successfully!");
+                System.out.println("📊 SendGrid Status: " + statusCode + " (Accepted)");
+                System.out.println("📬 Email queued for delivery to " + emailAddress);
+                System.out.println("🎯 Email will notify customer about " + booking.getServiceType() + " service status change to '" + newStatus + "'");
+            } else if (statusCode >= 200 && statusCode < 300) {
+                System.out.println("✅ SUCCESS: Service status email processed successfully!");
+                System.out.println("📊 SendGrid Status: " + statusCode);
+            } else {
+                System.err.println("⚠️  WARNING: Unexpected status code: " + statusCode);
+                System.err.println("📄 Response: " + response.getBody());
+            }
+        } catch (IOException ex) {
+            System.err.println("❌ ERROR: Failed to send service status email - " + ex.getMessage());
+            System.err.println("📧 Customer will NOT receive notification about " + booking.getServiceType() + " service status change");
+            throw ex;
+        }
+        System.out.println("=== END EMAIL SERVICE ===");
+    }
 
-        helper.setFrom(fromEmail);
-        helper.setTo(emailAddress);
-        helper.setSubject(getServiceStatusSubject(newStatus) + " - PET&CO Booking #" + booking.getId());
+    // Helper methods to extract email and name from "Name <email@domain.com>" format
+    private String extractEmail(String fromEmail) {
+        if (fromEmail.contains("<") && fromEmail.contains(">")) {
+            return fromEmail.substring(fromEmail.indexOf("<") + 1, fromEmail.indexOf(">"));
+        }
+        return fromEmail;
+    }
 
-        String htmlContent = createServiceStatusUpdateHtml(booking, oldStatus, newStatus);
-        helper.setText(htmlContent, true);
-
-        emailSender.send(message);
+    private String extractName(String fromEmail) {
+        if (fromEmail.contains("<")) {
+            return fromEmail.substring(0, fromEmail.indexOf("<")).trim();
+        }
+        return "PETCO";
     }
 
     private String getOrderStatusSubject(String status) {
@@ -97,6 +234,31 @@ public class EmailService {
             case "COMPLETED" -> "🎉 Service Completed";
             case "CANCELLED" -> "❌ Service Cancelled";
             default -> "📋 Service Status Update";
+        };
+    }
+    
+    private String getServiceStatusSubject(String status, String serviceType) {
+        String serviceIcon = getServiceTypeIcon(serviceType);
+        return switch (status.toUpperCase()) {
+            case "CONFIRMED" -> serviceIcon + " Service Confirmed";
+            case "IN_PROGRESS" -> serviceIcon + " Service In Progress";
+            case "COMPLETED" -> serviceIcon + " Service Completed";
+            case "CANCELLED" -> "❌ Service Cancelled";
+            default -> serviceIcon + " Service Status Update";
+        };
+    }
+    
+    private String getServiceTypeIcon(String serviceType) {
+        if (serviceType == null) return "🐶";
+        return switch (serviceType.toUpperCase()) {
+            case "GROOMING" -> "✂️";
+            case "WALKING", "PET_WALKING" -> "🚶";
+            case "BOARDING", "PET_BOARDING" -> "🏠";
+            case "TRAINING", "PET_TRAINING" -> "🎯";
+            case "SITTING", "PET_SITTING" -> "🧑‍🐈";
+            case "VETERINARY", "VET" -> "⚕️";
+            case "DAYCARE", "PET_DAYCARE" -> "🏫";
+            default -> "🐶";
         };
     }
 

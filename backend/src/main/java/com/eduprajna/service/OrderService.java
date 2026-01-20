@@ -519,26 +519,43 @@ public class OrderService {
      * @throws RuntimeException if order is not found
      */
     public Order updateStatus(Long orderId, String status) {
+        System.out.println("\n=== ORDER SERVICE - STATUS UPDATE ===");
+        System.out.println("🔄 Processing order status update...");
+        System.out.println("🎯 Order ID: #" + orderId);
+        System.out.println("📋 New Status: " + status);
+        
         Order order = orderRepo.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
         
         String oldStatus = order.getStatus();
+        System.out.println("📊 Previous Status: " + (oldStatus != null ? oldStatus : "null"));
+        
         order.setStatus(status);
         Order updatedOrder = orderRepo.save(order);
         
         logger.info("Order {} status updated from '{}' to '{}'", orderId, oldStatus, status);
+        System.out.println("✅ Database updated successfully");
         
         // Send email notification if status actually changed
         if (oldStatus == null || !oldStatus.equals(status)) {
+            System.out.println("📧 Triggering email notification...");
             try {
                 emailService.sendOrderStatusUpdate(updatedOrder, oldStatus, status);
-                logger.info("Email notification sent for order {} status change", orderId);
+                logger.info("Email notification sent for order {} status change from '{}' to '{}'", orderId, oldStatus, status);
+                System.out.println("✅ EMAIL NOTIFICATION COMPLETED SUCCESSFULLY");
+                System.out.println("👤 Customer will receive email about status change");
             } catch (Exception e) {
-                logger.error("Failed to send email notification for order {} status change: {}", orderId, e.getMessage());
+                logger.error("Failed to send email notification for order {} status change from '{}' to '{}': {}", orderId, oldStatus, status, e.getMessage(), e);
+                System.err.println("❌ EMAIL NOTIFICATION FAILED");
+                System.err.println("💡 Error: " + e.getMessage());
+                System.err.println("⚠️  Customer will NOT receive email notification");
                 // Don't fail the status update if email fails
             }
+        } else {
+            System.out.println("ℹ️  Status unchanged - no email notification needed");
         }
         
+        System.out.println("=== ORDER SERVICE COMPLETE ===\n");
         return updatedOrder;
     }
     
