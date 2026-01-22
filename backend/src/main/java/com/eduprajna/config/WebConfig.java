@@ -28,5 +28,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3600);
+                
+        // Additional mapping for uploads and static resources
+        registry.addMapping("/uploads/**")
+                .allowedOrigins(CorsConfig.ALLOWED_ORIGINS)
+                .allowedMethods("GET", "OPTIONS")
+                .allowedHeaders("*")
+                .maxAge(3600);
     }
 }

@@ -85,7 +85,7 @@ export const SUBCATEGORY_MAPPINGS = {
 
 const dogFoodSections = [
   buildSection('brands', 'Brand', [
-    'Heads Up For Tails',
+    'Pet and Co',
     'Hearty',
     'Royal Canin',
     "Sara's",
@@ -108,7 +108,7 @@ const dogFoodSections = [
 ];
 
 const dogGroomingSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('productTypes', 'Product Type', ['Combo', 'Dry Food', 'Wet Food', 'Food Toppers', 'Treat']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
@@ -132,7 +132,7 @@ const catFoodSections = [
 ];
 
 const catCollarsAccessorySections = [
-  buildSection('brands', 'Brand', ['Heads up for tails', 'FashiCat', 'Paw Couture']),
+  buildSection('brands', 'Brand', ['Pet and Co', 'FashiCat', 'Paw Couture']),
   buildSection('materials', 'Material', ['Leather', 'Nylon', 'Velvet', 'Metal Chain']),
   buildSection('usage', 'Usage', ['Daily Wear', 'Training', 'Personalised', 'Safety Release']),
   buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+']),
@@ -150,7 +150,7 @@ const pharmacyDogSections = [
 ];
 
 const catGroomingSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('productTypes', 'Product Type', ['Combo', 'Dry Food', 'Wet Food', 'Food Toppers', 'Treat']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
@@ -159,7 +159,7 @@ const catGroomingSections = [
 ];
 
 const dogTreatsSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('productTypes', 'Product Type', ['Biscuits', 'Treats']),
   buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+']),
@@ -170,7 +170,7 @@ const dogTreatsSections = [
 ];
 
 const catTreatsSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('productTypes', 'Product Type', ['Biscuits', 'Treats']),
   buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+']),
@@ -181,7 +181,7 @@ const catTreatsSections = [
 ];
 
 const dogWalkSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails', 'Trixie', 'Farmina']),
+  buildSection('brands', 'Brand', ['Pet and Co', 'Trixie', 'Farmina']),
   buildSection('productTypes', 'Product Type', ['Collars', 'Leashes', 'Harness', 'Name Tags', 'Personalised']),
   buildSection('materials', 'Material', ['Nylon', 'Leather', 'Rope', 'Canvas']),
   buildSection('sizes', 'Size', ['XS', 'S', 'M', 'L', 'XL']),
@@ -189,7 +189,7 @@ const dogWalkSections = [
 ];
 
 const catLitterSuppliesSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('productTypes', 'Product Type', ['cat litter']),
   buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+']),
@@ -198,7 +198,7 @@ const catLitterSuppliesSections = [
 ];
 
 const dogToysSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
   buildSection('productTypes', 'Product Type', ['toys']),
@@ -208,7 +208,7 @@ const dogToysSections = [
 ];
 
 const catToysSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
   buildSection('productTypes', 'Product Type', ['toys']),
@@ -218,7 +218,7 @@ const catToysSections = [
 ];
 
 const dogBedsSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
   buildSection('productTypes', 'Product Type', ['beds']),
@@ -227,7 +227,7 @@ const dogBedsSections = [
 ];
 
 const catBedsScratchersSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
   buildSection('productTypes', 'Product Type', ['beds']),
@@ -236,7 +236,7 @@ const catBedsScratchersSections = [
 ];
 
 const dogBowlsSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
   buildSection('productTypes', 'Product Type', ['bowls', 'diners']),
@@ -246,7 +246,7 @@ const dogBowlsSections = [
 ];
 
 const catBowlsSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
   buildSection('productTypes', 'Product Type', ['bowls', 'diners']),
@@ -256,7 +256,7 @@ const catBowlsSections = [
 ];
 
 const dogHealthHygieneSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult', 'Senior']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
   buildSection('productTypes', 'Product Type', ['health', 'hygiene']),
@@ -276,7 +276,7 @@ const dogTravelSections = [
 ];
 
 const dogTrainingSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails']),
+  buildSection('brands', 'Brand', ['Pet and Co']),
   buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult']),
   buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
   buildSection('productTypes', 'Product Type', ['Agility']),
@@ -285,7 +285,7 @@ const dogTrainingSections = [
 ];
 
 const dogClothingSections = [
-  buildSection('brands', 'Brand', ['Heads up for tails', 'Sara\'s', 'FashiDog']),
+  buildSection('brands', 'Brand', ['Pet and Co', 'Sara\'s', 'FashiDog']),
   buildSection('apparelTypes', 'Apparel Type', ['Festive Special', 'T-Shirts & Dresses', 'Sweatshirts', 'Sweaters', 'Bow Ties & Bandanas', 'Raincoats', 'Shoes & Socks', 'Jackets', 'Personalised']),
   buildSection('sizes', 'Size', ['XS', 'S', 'M', 'L', 'XL', 'XXL']),
   buildSection('materials', 'Material', ['Cotton', 'Polyester', 'Wool', 'Nylon', 'Waterproof Coating']),

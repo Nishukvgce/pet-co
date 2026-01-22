@@ -56,7 +56,7 @@ const LoginModal = ({ onClose }) => {
         </button>
 
         <div className="text-center mb-4">
-          <h2 className="text-xl font-bold">HEADS UP FOR TAILS</h2>
+          <h2 className="text-xl font-bold">Pet and Co</h2>
           <p className="text-sm text-gray-400">Register to avail the best deals!</p>
         </div>
 

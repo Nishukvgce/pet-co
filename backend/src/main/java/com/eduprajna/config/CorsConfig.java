@@ -18,6 +18,18 @@ public class CorsConfig {
     public static final String PROD_DOMAIN_1 = "https://pet-cotraditional.in";
     public static final String PROD_DOMAIN_2 = "https://www.pet-cotraditional.in";
     
+    // AWS EC2 origins
+    public static final String AWS_EC2_HTTP = "http://ec2-13-202-136-219.ap-south-1.compute.amazonaws.com";
+    public static final String AWS_EC2_HTTPS = "https://ec2-13-202-136-219.ap-south-1.compute.amazonaws.com";
+    public static final String AWS_IP_HTTP = "http://13.202.136.219";
+    public static final String AWS_IP_HTTPS = "https://13.202.136.219";
+    
+    // AWS S3 static website origins (for when you deploy frontend to S3)
+    public static final String AWS_S3_BUCKET = "http://petco-frontend-static.s3-website.ap-south-1.amazonaws.com";
+    public static final String AWS_S3_BUCKET_HTTPS = "https://petco-frontend-static.s3-website.ap-south-1.amazonaws.com";
+    public static final String AWS_S3_ACTUAL = "http://pet-co.s3-website.ap-south-1.amazonaws.com";
+    public static final String AWS_S3_ACTUAL_HTTPS = "https://pet-co.s3-website.ap-south-1.amazonaws.com";
+    
     /**
      * All allowed origins for CORS configuration
      * Add new origins here when needed
@@ -30,6 +42,14 @@ public class CorsConfig {
         VERCEL_OLD,
         VERCEL_NEW,
         PROD_DOMAIN_1,
-        PROD_DOMAIN_2
+        PROD_DOMAIN_2,
+        AWS_EC2_HTTP,
+        AWS_EC2_HTTPS,
+        AWS_IP_HTTP,
+        AWS_IP_HTTPS,
+        AWS_S3_BUCKET,
+        AWS_S3_BUCKET_HTTPS,
+        AWS_S3_ACTUAL,
+        AWS_S3_ACTUAL_HTTPS
     };
 }
