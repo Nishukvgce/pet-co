@@ -423,8 +423,8 @@ const Header = ({ onSearch = () => { } }) => {
                 )}
               </form>
 
-              {/* optional cart quick action on mobile */}
-              <button onClick={() => setIsCartDrawerOpen(true)} className="p-2">
+              {/* optional cart quick action on mobile - hidden */}
+              <button onClick={() => setIsCartDrawerOpen(true)} className="p-2 hidden">
                 <Icon name="ShoppingCart" size={20} />
               </button>
 

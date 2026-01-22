@@ -71,7 +71,7 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Product Title and Brand */}
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -92,10 +92,10 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
             </span>
           )}
         </div>
-        <h1 className="font-heading font-bold text-2xl lg:text-3xl text-foreground mb-2 flex items-center gap-2">
+        <h1 className="font-heading font-bold text-xl md:text-2xl lg:text-3xl text-foreground mb-2">
           {product?.name}
           {product?.rating && (
-            <span className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-semibold ml-2">
+            <span className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-semibold mt-2 sm:mt-0 sm:ml-2 w-fit">
               <Icon name="Star" size={14} className="text-yellow-400" />
               {product.rating}
             </span>
@@ -169,10 +169,10 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
         ))}
       </div>
       {/* Pricing */}
-      <div className="bg-card rounded-lg border border-border p-4 space-y-3">
-        <h3 className="font-heading font-semibold text-lg text-foreground">Pricing</h3>
-        <div className="flex items-baseline gap-3">
-          <span className="font-heading font-bold text-3xl text-foreground">
+      <div className="bg-card rounded-lg border border-border p-3 md:p-4 space-y-3">
+        <h3 className="font-heading font-semibold text-base md:text-lg text-foreground">Pricing</h3>
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <span className="font-heading font-bold text-2xl md:text-3xl text-foreground">
             ₹{unitPrice.toFixed(2)}
           </span>
           {selectedVariant?.originalPrice > selectedVariant?.price && (
@@ -221,10 +221,10 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
       <PincodeChecker className="" />
 
       {/* Variant Selection */}
-      <div className="bg-card rounded-lg border border-border p-4 space-y-4">
-        <h3 className="font-heading font-semibold text-lg text-foreground">Select Options</h3>
+      <div className="bg-card rounded-lg border border-border p-3 md:p-4 space-y-4">
+        <h3 className="font-heading font-semibold text-base md:text-lg text-foreground">Select Options</h3>
         <p className="text-sm text-muted-foreground">Weight/Size</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
           {product?.variants?.map((variant, i) => {
             const isActive = selectedVariant?.id === variant?.id;
             const variantPrice = parseFloat(variant?.price) || 0;
@@ -291,9 +291,9 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
       </div>
       
       {/* Quantity and Add to Cart */}
-      <div className="bg-card rounded-lg border border-border p-4 space-y-4">
-        <h3 className="font-heading font-semibold text-lg text-foreground">Quantity & Cart</h3>
-        <div className="flex items-center gap-4">
+      <div className="bg-card rounded-lg border border-border p-3 md:p-4 space-y-4">
+        <h3 className="font-heading font-semibold text-base md:text-lg text-foreground">Quantity & Cart</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <span className="font-body font-medium text-foreground">Quantity:</span>
           <div className="flex items-center border border-border rounded-lg shadow-sm">
             <button
@@ -316,13 +316,13 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             variant="default"
             onClick={handleAddToCart}
             iconName="ShoppingCart"
             iconPosition="left"
-            className="flex-1 h-12"
+            className="flex-1 h-12 w-full sm:w-auto"
             disabled={!inStock}
           >
             {`Add to Cart - ₹${((parseFloat(selectedVariant?.price) || 0) * (quantity || 1)).toFixed(2)}`}
@@ -332,7 +332,7 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
             onClick={onAddToWishlist}
             iconName={isInWishlist ? "Heart" : "Heart"}
             size="icon"
-            className={`h-12 w-12 ${isInWishlist ? "text-destructive" : ""}`}
+            className={`h-12 w-12 mx-auto sm:mx-0 ${isInWishlist ? "text-destructive" : ""}`}
           >
           </Button>
         </div>

@@ -277,11 +277,11 @@ const ProductFullPage = () => {
       </section>
 
       {/* Main Product Section */}
-      <section className="container mx-auto px-4 py-8">
+      <section className="container mx-auto px-4 py-6 md:py-8">
         <div className="bg-white rounded-2xl shadow-sm border overflow-hidden mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
             {/* Product Images - Left Side */}
-            <div className="bg-gray-50 p-6 lg:p-8">
+            <div className="bg-gray-50 p-4 md:p-6 lg:p-8">
               <div className="lg:sticky lg:top-24 lg:self-start">
                 <ProductImageGallery 
                   images={product?.images} 
@@ -291,7 +291,7 @@ const ProductFullPage = () => {
             </div>
 
             {/* Product Info - Right Side */}
-            <div className="p-6 lg:p-8 lg:pl-6">
+            <div className="p-4 md:p-6 lg:p-8 lg:pl-6">
               <ProductInfo 
                 product={product} 
                 onAddToCart={handleAddToCart} 
@@ -304,10 +304,10 @@ const ProductFullPage = () => {
       </section>
 
       {/* Product Details & Information Tabs */}
-      <section className="container mx-auto px-4 pb-8">
-        <div className="bg-white rounded-2xl shadow-sm border overflow-hidden mb-8">
-          <div className="p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-4">
+      <section className="container mx-auto px-4 pb-6 md:pb-8">
+        <div className="bg-white rounded-2xl shadow-sm border overflow-hidden mb-6 md:mb-8">
+          <div className="p-4 md:p-6 lg:p-8">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 border-b pb-3 md:pb-4">
               Product Information
             </h2>
             <ProductDetails product={product} />
@@ -316,11 +316,11 @@ const ProductFullPage = () => {
       </section>
 
       {/* Reviews Section */}
-      <section className="container mx-auto px-4 pb-8">
-        <div className="bg-white rounded-2xl shadow-sm border overflow-hidden mb-8">
-          <div className="p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-4 flex items-center gap-3">
-              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <section className="container mx-auto px-4 pb-6 md:pb-8">
+        <div className="bg-white rounded-2xl shadow-sm border overflow-hidden mb-6 md:mb-8">
+          <div className="p-4 md:p-6 lg:p-8">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 border-b pb-3 md:pb-4 flex items-center gap-3">
+              <svg className="w-5 h-5 md:w-6 md:h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
               Customer Reviews
@@ -331,11 +331,11 @@ const ProductFullPage = () => {
       </section>
 
       {/* Related Products Section */}
-      <section className="container mx-auto px-4 pb-12">
+      <section className="container mx-auto px-4 pb-8 md:pb-12">
         <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div className="p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b pb-4 flex items-center gap-3">
-              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-4 md:p-6 lg:p-8">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 border-b pb-3 md:pb-4 flex items-center gap-3">
+              <svg className="w-5 h-5 md:w-6 md:h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
               You Might Also Like
@@ -347,46 +347,46 @@ const ProductFullPage = () => {
 
       {/* Trust Badges Section */}
       <section className="bg-primary/5 border-t">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="container mx-auto px-4 py-8 md:py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <svg className="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Fast Delivery</h3>
-              <p className="text-sm text-gray-600">Quick and reliable shipping</p>
+              <h3 className="font-semibold text-sm md:text-base text-gray-900 mb-1 md:mb-2">Fast Delivery</h3>
+              <p className="text-xs md:text-sm text-gray-600">Quick and reliable shipping</p>
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <svg className="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Quality Guaranteed</h3>
-              <p className="text-sm text-gray-600">Premium pet products</p>
+              <h3 className="font-semibold text-sm md:text-base text-gray-900 mb-1 md:mb-2">Quality Guaranteed</h3>
+              <p className="text-xs md:text-sm text-gray-600">Premium pet products</p>
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <svg className="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">24/7 Support</h3>
-              <p className="text-sm text-gray-600">Always here to help</p>
+              <h3 className="font-semibold text-sm md:text-base text-gray-900 mb-1 md:mb-2">24/7 Support</h3>
+              <p className="text-xs md:text-sm text-gray-600">Always here to help</p>
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                <svg className="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Easy Returns</h3>
-              <p className="text-sm text-gray-600">Hassle-free returns</p>
+              <h3 className="font-semibold text-sm md:text-base text-gray-900 mb-1 md:mb-2">Easy Returns</h3>
+              <p className="text-xs md:text-sm text-gray-600">Hassle-free returns</p>
             </div>
           </div>
         </div>
