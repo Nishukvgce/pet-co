@@ -410,9 +410,33 @@ const CatTreats = ({ initialActive = 'All Cat Treats' }) => {
       <Header cartItemCount={getCartItemCount()} cartItems={cartItems} onSearch={() => {}} />
 
       <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-12 gap-3 md:gap-6">
-        {/* On small screens: give categories a little more room so icon+label are not cramped */}
-        <aside className="col-span-3 lg:col-span-3 xl:col-span-2">
+        {/* Mobile horizontal categories */}
+        <div className="md:hidden mb-6">
+          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+            {categories.map((c, idx) => (
+              <button
+                key={c.id}
+                onClick={() => { setActive(c.label); const p = routeMap[c.label]; if (p) navigate(p); }}
+                className={`flex-shrink-0 flex flex-col items-center gap-2 p-3 min-w-[80px] rounded-lg border ${
+                  active === c.label ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-200'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${
+                  active === c.label ? 'ring-2 ring-orange-400' : ''
+                }`}>
+                  <img src={c.img} alt={c.label} className="w-full h-full object-cover" />
+                </div>
+                <span className="text-xs font-medium text-gray-800 text-center leading-tight">
+                  {c.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-6">
+        {/* Desktop vertical sidebar */}
+        <aside className="hidden md:block md:col-span-3 lg:col-span-3 xl:col-span-2">
           <div
             ref={leftRef}
             onWheel={handleLeftWheel}
@@ -444,7 +468,7 @@ const CatTreats = ({ initialActive = 'All Cat Treats' }) => {
         <main
           ref={rightRef}
           onWheel={handleRightWheel}
-          className="col-span-9 lg:col-span-9 xl:col-span-10"
+          className="col-span-1 md:col-span-9 lg:col-span-9 xl:col-span-10"
           style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}
         >
           {/* top filter bar (simple placeholder matching ref) */}

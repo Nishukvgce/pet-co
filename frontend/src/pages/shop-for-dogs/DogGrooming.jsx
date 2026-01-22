@@ -568,42 +568,72 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
       <Header cartItemCount={getCartItemCount()} cartItems={cartItems} onSearch={() => { }} />
 
       <div className="container mx-auto px-4 py-8 pb-20 lg:pb-0">
-        <div className="grid grid-cols-12 gap-3 md:gap-6">
-          {/* On small screens: give categories a little more room so icon+label are not cramped */}
-          <aside className="col-span-3 lg:col-span-3 xl:col-span-2">
-            <div
-              ref={leftRef}
-              onWheel={handleLeftWheel}
-              className="bg-white rounded border border-border overflow-hidden thin-gold-scroll"
-              style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}
+        {/* Horizontal Category Navigation */}
+        <div className="mb-6">
+          <div className="relative flex items-center">
+            {/* Left scroll button */}
+            <button
+              onClick={scrollTopLeft}
+              aria-label="Scroll left"
+              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow-sm hover:bg-gray-50 mr-3 z-10"
             >
-              <ul className="divide-y">
-                {categories.map((c, idx) => (
-                  <li key={c.id} className={`relative border-b ${active === c.label ? 'bg-[#fff6ee]' : ''}`}>
-                    <button
-                      onClick={() => { setActive(c.label); const p = routeMap[c.label]; if (p) navigate(p); }}
-                      className="w-full text-center flex flex-col items-center gap-1 p-2 md:flex-row md:text-left md:items-center md:gap-3 md:p-4"
-                    >
-                      <div className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center border ${active === c.label ? 'ring-2 ring-orange-400' : 'border-gray-100'}`}>
-                        <img src={c.img} alt={c.label} className="w-full h-full object-cover" />
-                      </div>
-                      <span className="text-xs md:text-sm font-medium text-gray-800 mt-1 md:mt-0">{c.label}</span>
-                    </button>
-                    {/* orange vertical accent on the right when active */}
-                    {active === c.label && (
-                      <div className="absolute right-0 top-0 h-full w-1 bg-orange-400" />
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
 
+            {/* Horizontal scrollable category list */}
+            <div 
+              ref={topRef}
+              className="flex-1 overflow-x-auto hide-scrollbar"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              <div className="flex items-center gap-3 pb-2">
+                {categories.map((c, idx) => (
+                  <button
+                    key={c.id}
+                    onClick={() => { setActive(c.label); const p = routeMap[c.label]; if (p) navigate(p); }}
+                    className={`flex-shrink-0 flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 min-w-[80px] ${
+                      active === c.label 
+                        ? 'bg-orange-50 border-2 border-orange-400 shadow-sm' 
+                        : 'bg-white border border-gray-200 hover:border-orange-200 hover:bg-orange-50/50'
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center ${
+                      active === c.label ? 'ring-2 ring-orange-300' : 'border border-gray-100'
+                    }`}>
+                      <img src={c.img} alt={c.label} className="w-full h-full object-cover" />
+                    </div>
+                    <span className={`text-xs font-medium text-center leading-tight ${
+                      active === c.label ? 'text-orange-700' : 'text-gray-700'
+                    }`}>
+                      {c.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Right scroll button */}
+            <button
+              onClick={scrollTopRight}
+              aria-label="Scroll right"
+              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow-sm hover:bg-gray-50 ml-3 z-10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Main content area - full width now */}
+        <div className="w-full">
           <main
             ref={rightRef}
             onWheel={handleRightWheel}
-            className="col-span-9 lg:col-span-9 xl:col-span-10"
-            style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}
+            className="w-full"
+            style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 280px)' }}
           >
             {/* top filter bar (simple placeholder matching ref) */}
             <div className="mb-4 flex items-center justify-between">
@@ -819,7 +849,7 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
         </aside>
       </div>
 
-      {/* QuickView Modal */}
+    {/* QuickView Modal */}
       <QuickViewModal
         product={quickViewProduct}
         isOpen={isQuickViewOpen}

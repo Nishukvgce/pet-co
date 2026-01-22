@@ -590,7 +590,38 @@ const PharmacyCollectionPage = ({ subLabel }) => {
       <Header cartItemCount={getCartItemCount()} cartItems={cartItems} onSearch={() => { }} />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-[80px_1fr] lg:grid-cols-12 gap-3 md:gap-6">
+        {/* Mobile horizontal categories */}
+        <div className="lg:hidden mb-6">
+          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+            {categories.map((c, idx) => (
+              <button
+                key={c.id}
+                onClick={() => handleCategoryClick(c)}
+                className={`flex-shrink-0 flex flex-col items-center gap-2 p-3 min-w-[80px] rounded-lg border ${
+                  active === c.label ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-200'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${
+                  active === c.label ? 'ring-2 ring-orange-400' : ''
+                }`}>
+                  <img 
+                    src={c.img} 
+                    alt={c.label} 
+                    className="w-8 h-8 object-cover"
+                    onError={(e) => e.target.src = '/assets/images/no_image.png'}
+                  />
+                </div>
+                <span className={`text-xs font-medium text-center leading-tight ${
+                  active === c.label ? 'text-orange-600' : 'text-gray-600'
+                }`}>
+                  {c.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-6">
           {/* Sidebar - Categories */}
           {/* Desktop/Tablet sidebar (hidden on small screens) */}
           <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
@@ -620,20 +651,6 @@ const PharmacyCollectionPage = ({ subLabel }) => {
               </ul>
             </div>
           </aside>
-
-          {/* Mobile vertical category sidebar (left column on small screens) */}
-          <div className="block lg:hidden col-span-1">
-            <div className="w-20">
-              <MobileCategorySidebar
-                categories={categories}
-                active={active}
-                setActive={(label) => {
-                  const cat = categories.find(c => c.label === label);
-                  if (cat) handleCategoryClick(cat);
-                }}
-              />
-            </div>
-          </div>
 
           {/* Main Content */}
           {/* Main Content */}

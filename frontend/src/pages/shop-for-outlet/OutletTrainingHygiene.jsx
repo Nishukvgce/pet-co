@@ -224,13 +224,40 @@ const OutletTrainingHygiene = ({ initialActive = 'All Training & Hygiene' }) => 
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Outlet Training & Hygiene</h1>
           <p className="text-sm text-muted-foreground mt-2">Discounted training aids and hygiene products for your pets</p>
         </div>
-        <div className="flex flex-row gap-6">
-          {/* Mobile vertical category sidebar (top-down) - placed to the left on small screens */}
-          <div className="block lg:hidden w-20">
-            <MobileCategorySidebar categories={categories} active={active} setActive={setActive} />
+        {/* Mobile horizontal categories */}
+        <div className="md:hidden mb-6">
+          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+            {categories.map((c, idx) => (
+              <button
+                key={c.id}
+                onClick={() => setActive(c.label)}
+                className={`flex-shrink-0 flex flex-col items-center gap-2 p-3 min-w-[80px] rounded-lg border ${
+                  active === c.label ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-200'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${
+                  active === c.label ? 'ring-2 ring-orange-400' : ''
+                }`}>
+                  <img 
+                    src={c.img} 
+                    alt={c.label} 
+                    className="w-8 h-8 object-cover"
+                    onError={(e) => e.target.src = '/assets/images/no_image.png'}
+                  />
+                </div>
+                <span className={`text-xs font-medium text-center leading-tight ${
+                  active === c.label ? 'text-orange-600' : 'text-gray-600'
+                }`}>
+                  {c.label}
+                </span>
+              </button>
+            ))}
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Category Sidebar (desktop) */}
-          <div className="hidden lg:block w-64 xl:w-72 space-y-3">
+          <div className="hidden md:block md:col-span-3 space-y-3">
             <h3 className="text-lg font-semibold text-foreground mb-4">Categories</h3>
             {categories.map(c => (
               <button key={c.id} onClick={() => setActive(c.label)}
@@ -263,7 +290,7 @@ const OutletTrainingHygiene = ({ initialActive = 'All Training & Hygiene' }) => 
               </button>
             ))}
           </div>
-          <div className="flex-1">
+          <div className="col-span-1 md:col-span-9">
             <div className="mb-6 bg-white rounded-lg p-4 border border-border">
               <h2 className="text-2xl font-bold text-foreground mb-2">{active}</h2>
               <div className="flex items-center gap-4">
