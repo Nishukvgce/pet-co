@@ -6,8 +6,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -1117,19 +1119,25 @@ public class ProductController {
                     return ResponseEntity.badRequest().build();
                 }
             }
-            List<String> urls = imagesWithUpload(images);
-            if (!urls.isEmpty()) {
-                // Merge new uploads with existing images
+            List<String> newUrls = imagesWithUpload(images);
+            if (!newUrls.isEmpty()) {
+                // Smart merge: combine existing and new, removing ALL duplicates
                 List<String> allImages = new ArrayList<>(existingImages);
-                allImages.addAll(urls);
-                // Remove duplicates while preserving order
-                List<String> uniqueImages = allImages.stream().distinct().collect(java.util.stream.Collectors.toList());
+                allImages.addAll(newUrls);
+                
+                // Remove duplicates by content (not just URL) - more sophisticated deduplication
+                List<String> uniqueImages = removeDuplicateImageUrls(allImages);
+                
                 p.getMetadata().put("images", uniqueImages);
                 p.setImageUrl(uniqueImages.get(0));
+                
+                log.info("Updated product with {} unique images (had {} total before deduplication)", 
+                        uniqueImages.size(), allImages.size());
             } else if (!existingImages.isEmpty()) {
-                // No new images, keep existing ones
-                p.getMetadata().put("images", existingImages);
-                p.setImageUrl(existingImages.get(0));
+                // No new images, but clean up existing duplicates  
+                List<String> uniqueImages = removeDuplicateImageUrls(existingImages);
+                p.getMetadata().put("images", uniqueImages);
+                p.setImageUrl(uniqueImages.get(0));
             }
         } else if (imageFile != null && !imageFile.isEmpty()) {
             if (!storageService.isImage(imageFile)) {
@@ -1776,37 +1784,131 @@ public class ProductController {
         }
     }
 
-    // Helper to upload multiple files and return their URLs
+    // Helper to upload multiple files and return their URLs with content-based deduplication
     private List<String> imagesWithUpload(MultipartFile[] images) {
         List<String> urls = new java.util.ArrayList<>();
+        Set<String> contentHashes = new HashSet<>(); // Track content to prevent duplicates
+        
         for (MultipartFile img : images) {
             try {
                 if (img == null || img.isEmpty()) continue;
-                // Always store locally first so uploads are persisted to UPLOAD_DIR
-                try {
-                    String local = storageService.store(img);
-                    if (local != null) urls.add(local);
-                } catch (Exception le) {
-                    try { log.warn("Local storage failed for image: {}", le.getMessage()); } catch (Exception ignored) {}
+                
+                // Calculate content hash to check for duplicates
+                String contentHash = calculateImageHash(img);
+                if (contentHashes.contains(contentHash)) {
+                    log.info("Skipping duplicate image based on content hash: {}", contentHash);
+                    continue; // Skip if we already processed this image content
                 }
-
-                // Then attempt Cloudinary (best-effort) using the already-saved local file
+                contentHashes.add(contentHash);
+                
+                String finalUrl = null;
+                
+                // Try Cloudinary first (production-preferred)
                 try {
-                    // storageService.store returned an API path like "/admin/products/images/xxxx.jpg"
-                    // use uploadLocal to read that saved file and upload it to Cloudinary
-                    com.eduprajna.service.CloudinaryStorageService.UploadResult res = cloudinaryStorageService.uploadLocal(urls.get(urls.size() - 1));
+                    com.eduprajna.service.CloudinaryStorageService.UploadResult res = cloudinaryStorageService.upload(img);
                     if (res != null && res.getUrl() != null) {
-                        // also add cloud URL to the list for completeness
-                        urls.add(res.getUrl());
+                        finalUrl = res.getUrl();
+                        log.info("Successfully uploaded image to Cloudinary: {}", finalUrl);
                     }
                 } catch (Exception ce) {
-                    try { log.warn("Cloudinary upload failed for one image: {}", ce.getMessage()); } catch (Exception ignored) {}
+                    log.warn("Cloudinary upload failed, falling back to local storage: {}", ce.getMessage());
                 }
+                
+                // Fallback to local storage if Cloudinary fails
+                if (finalUrl == null) {
+                    try {
+                        finalUrl = storageService.store(img);
+                        log.info("Stored image locally as fallback: {}", finalUrl);
+                    } catch (Exception le) {
+                        log.error("Both Cloudinary and local storage failed for image: {}", le.getMessage());
+                        continue; // Skip this image if both fail
+                    }
+                }
+                
+                // Only add ONE URL per unique image
+                if (finalUrl != null) {
+                    urls.add(finalUrl);
+                }
+                
             } catch (Exception ex) {
-                try { log.warn("Failed to process image: {}", ex.getMessage()); } catch (Exception ignored) {}
+                log.warn("Failed to process image: {}", ex.getMessage());
             }
         }
         return urls;
+    }
+    
+    // Calculate content hash for image deduplication
+    private String calculateImageHash(MultipartFile file) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] hashBytes = md.digest(file.getBytes());
+            StringBuilder hashBuilder = new StringBuilder();
+            for (byte b : hashBytes) {
+                hashBuilder.append(String.format("%02x", b));
+            }
+            return hashBuilder.toString();
+        } catch (Exception e) {
+            // Fallback to filename + size if hashing fails
+            return file.getOriginalFilename() + "_" + file.getSize();
+        }
+    }
+    
+    // Remove duplicate image URLs using sophisticated pattern matching
+    private List<String> removeDuplicateImageUrls(List<String> imageUrls) {
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        Set<String> uniqueImages = new HashSet<>();
+        List<String> result = new ArrayList<>();
+        
+        for (String url : imageUrls) {
+            if (url == null || url.trim().isEmpty()) continue;
+            
+            String normalizedUrl = normalizeImageUrl(url);
+            
+            // Only add if we haven't seen this normalized URL before
+            if (uniqueImages.add(normalizedUrl)) {
+                result.add(url); // Keep original URL format
+                log.debug("Added unique image: {} (normalized: {})", url, normalizedUrl);
+            } else {
+                log.debug("Skipped duplicate image: {} (normalized: {})", url, normalizedUrl);
+            }
+        }
+        
+        log.info("Deduplication: {} original URLs -> {} unique URLs", imageUrls.size(), result.size());
+        return result;
+    }
+    
+    // Normalize image URLs to detect duplicates with different formats
+    private String normalizeImageUrl(String url) {
+        if (url == null) return "";
+        
+        String normalized = url.trim().toLowerCase();
+        
+        // Extract filename from both local and cloud URLs
+        String filename = null;
+        
+        if (normalized.contains("/admin/products/images/")) {
+            // Local URL: /admin/products/images/1768898387861_image.jpg
+            filename = normalized.substring(normalized.lastIndexOf('/') + 1);
+        } else if (normalized.contains("cloudinary.com")) {
+            // Cloudinary URL: extract filename from path
+            filename = normalized.substring(normalized.lastIndexOf('/') + 1);
+        } else if (normalized.contains("amazonaws.com")) {
+            // S3 URL: extract filename from path  
+            filename = normalized.substring(normalized.lastIndexOf('/') + 1);
+        } else {
+            // Use full URL as fallback
+            filename = normalized;
+        }
+        
+        // Remove query parameters and fragments
+        if (filename != null && filename.contains("?")) {
+            filename = filename.substring(0, filename.indexOf("?"));
+        }
+        
+        return filename != null ? filename : normalized;
     }
 
     @DeleteMapping("/{id}")
@@ -1895,6 +1997,54 @@ public class ProductController {
     public ResponseEntity<List<String>> cleanupUploads() {
         List<String> deleted = storageService.sanitizeUploads();
         return ResponseEntity.ok(deleted);
+    }
+    
+    // Admin utility: Fix duplicate images in existing products
+    @PostMapping("/fix-duplicate-images")
+    public ResponseEntity<Map<String, Object>> fixDuplicateImages() {
+        List<Product> allProducts = productService.getAll();
+        int fixedCount = 0;
+        int totalDuplicatesRemoved = 0;
+        
+        for (Product product : allProducts) {
+            try {
+                Map<String, Object> metadata = product.getMetadata();
+                if (metadata != null && metadata.get("images") instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<String> images = (List<String>) metadata.get("images");
+                    
+                    if (images.size() > 1) {
+                        int originalSize = images.size();
+                        List<String> uniqueImages = removeDuplicateImageUrls(images);
+                        
+                        if (uniqueImages.size() < originalSize) {
+                            // Update product with deduplicated images
+                            metadata.put("images", uniqueImages);
+                            product.setMetadata(metadata);
+                            product.setImageUrl(uniqueImages.get(0));
+                            
+                            productService.save(product);
+                            
+                            fixedCount++;
+                            totalDuplicatesRemoved += (originalSize - uniqueImages.size());
+                            
+                            log.info("Fixed product {} - reduced from {} to {} images", 
+                                    product.getId(), originalSize, uniqueImages.size());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to fix duplicates for product {}: {}", product.getId(), e.getMessage());
+            }
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("message", "Duplicate image cleanup completed");
+        result.put("productsFixed", fixedCount);
+        result.put("duplicatesRemoved", totalDuplicatesRemoved);
+        result.put("totalProducts", allProducts.size());
+        
+        return ResponseEntity.ok(result);
     }
     
     // Filter out null/empty fields to prevent storing unnecessary defaults and null values

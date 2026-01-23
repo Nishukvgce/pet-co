@@ -6,8 +6,16 @@ const ProductImageGallery = ({ images, productName }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
 
-  // Deduplicate images to ensure each unique image appears only once
-  const uniqueImages = images && images.length > 0 ? [...new Set(images)] : [];
+  // Deduplicate images and filter out any invalid/empty URLs
+  const uniqueImages = images && images.length > 0 
+    ? [...new Set(images.filter(img => img && img.trim() !== ''))]
+    : [];
+
+  console.log('ProductImageGallery received:', {
+    rawImages: images,
+    filteredImages: uniqueImages,
+    count: uniqueImages.length
+  });
 
   // Handle case when no images are available
   if (!uniqueImages || uniqueImages.length === 0) {

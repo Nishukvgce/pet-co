@@ -56,24 +56,7 @@ const ProductDetailsPage = () => {
           name: productData?.name || productData?.title,
           shortDescription: productData?.shortDescription || (productData?.description ? productData.description.substring(0, 100) + '...' : ''),
           description: productData?.description || 'No description available.',
-          images: (() => {
-            let imageUrls = [];
-            
-            if (productData?.images && Array.isArray(productData.images) && productData.images.length > 0) {
-              imageUrls = productData.images.map(resolveImageUrl).filter(Boolean);
-            } else if (productData?.gallery && Array.isArray(productData.gallery) && productData.gallery.length > 0) {
-              imageUrls = productData.gallery.map(resolveImageUrl).filter(Boolean);
-            } else if (productData?.imageUrl && productData.imageUrl.trim() !== '') {
-              imageUrls = [resolveImageUrl(productData.imageUrl)];
-            } else if (productData?.image && productData.image.trim() !== '') {
-              imageUrls = [resolveImageUrl(productData.image)];
-            } else if (productData?.thumbnailUrl && productData.thumbnailUrl.trim() !== '') {
-              imageUrls = [resolveImageUrl(productData.thumbnailUrl)];
-            }
-            
-            // Remove duplicate images using Set to ensure each image appears only once
-            return [...new Set(imageUrls)];
-          })(),
+          images: extractAllProductImages(productData),
           variants: productData?.variants || [{ id: 'default', weight: productData?.weight || 'Default', price: productData?.price || 0, originalPrice: productData?.originalPrice || productData?.mrp || 0, stock: productData?.stock || 10 }],
           badges: productData?.badges || [],
           features: productData?.features || [],

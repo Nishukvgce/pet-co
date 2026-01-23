@@ -7,31 +7,39 @@ export function resolveImageUrl(candidate) {
 
   // If caller passed a product object, try to derive the best image field
   if (typeof candidate === 'object') {
-    // Common fields where image may be stored
+    // First check metadata.images (priority since that's where backend stores images)
+    try {
+      const meta = candidate.metadata || (candidate.data && candidate.data.metadata);
+      if (meta && meta.images && Array.isArray(meta.images) && meta.images.length > 0) {
+        // Return first valid image from metadata.images
+        for (const img of meta.images) {
+          const resolved = resolveImageUrl(img);
+          if (resolved) return resolved;
+        }
+      }
+    } catch (err) { /* ignore */ }
+
+    // Common fields where image may be stored (fallback)
     const tryFields = [
-      'imageUrl', 'image', 'thumbnailUrl', 'thumbnail', 'images', 'metadata', 'image_path', 'originalImage'
+      'images', 'imageUrl', 'image', 'thumbnailUrl', 'thumbnail', 'image_path', 'originalImage'
     ];
 
     for (const key of tryFields) {
       if (candidate[key]) {
         const v = candidate[key];
-        if (Array.isArray(v) && v.length > 0) return resolveImageUrl(v[0]);
+        if (Array.isArray(v) && v.length > 0) {
+          // Return first valid image from array
+          for (const img of v) {
+            const resolved = resolveImageUrl(img);
+            if (resolved) return resolved;
+          }
+        }
         if (typeof v === 'object' && v !== null) {
-          // nested metadata.images
-          if (v.images && Array.isArray(v.images) && v.images.length > 0) return resolveImageUrl(v.images[0]);
-          continue;
+          continue; // Skip nested objects for now
         }
         return resolveImageUrl(String(v));
       }
     }
-
-    // Try metadata.images specifically
-    try {
-      const meta = candidate.metadata || (candidate.data && candidate.data.metadata);
-      if (meta && meta.images && Array.isArray(meta.images) && meta.images.length > 0) {
-        return resolveImageUrl(meta.images[0]);
-      }
-    } catch (err) { /* ignore */ }
 
     return '';
   }

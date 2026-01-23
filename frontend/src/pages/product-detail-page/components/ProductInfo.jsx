@@ -291,65 +291,117 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
       </div>
       
       {/* Quantity and Add to Cart */}
-      <div className="bg-card rounded-lg border border-border p-3 md:p-4 space-y-4">
-        <h3 className="font-heading font-semibold text-base md:text-lg text-foreground">Quantity & Cart</h3>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <span className="font-body font-medium text-foreground">Quantity:</span>
-          <div className="flex items-center border border-border rounded-lg shadow-sm">
-            <button
-              onClick={() => handleQuantityChange(-1)}
-              disabled={quantity <= 1}
-              className="w-10 h-10 flex items-center justify-center hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 rounded-l-lg"
-            >
-              <Icon name="Minus" size={16} />
-            </button>
-            <span className="w-12 text-center font-data font-medium bg-muted/30 h-10 flex items-center justify-center">
-              {quantity}
-            </span>
-            <button
-              onClick={() => handleQuantityChange(1)}
-              disabled={quantity >= availableStock}
-              className="w-10 h-10 flex items-center justify-center hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 rounded-r-lg"
-            >
-              <Icon name="Plus" size={16} />
-            </button>
+      <div className="bg-card rounded-lg border border-border p-4 space-y-4">
+        <h3 className="font-heading font-semibold text-lg text-foreground">Quantity & Cart</h3>
+        
+        {/* Mobile-optimized quantity selector */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-foreground">Quantity:</span>
+            <div className="flex items-center border border-border rounded-lg shadow-sm bg-white">
+              <button
+                onClick={() => handleQuantityChange(-1)}
+                disabled={quantity <= 1}
+                className="w-10 h-10 flex items-center justify-center hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 rounded-l-lg border-r border-border"
+                aria-label="Decrease quantity"
+              >
+                <Icon name="Minus" size={16} />
+              </button>
+              <div className="w-16 text-center font-medium bg-white h-10 flex items-center justify-center text-base">
+                {quantity}
+              </div>
+              <button
+                onClick={() => handleQuantityChange(1)}
+                disabled={quantity >= availableStock}
+                className="w-10 h-10 flex items-center justify-center hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 rounded-r-lg border-l border-border"
+                aria-label="Increase quantity"
+              >
+                <Icon name="Plus" size={16} />
+              </button>
+            </div>
+          </div>
+          
+          {/* Stock indicator */}
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${inStock ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              {inStock ? (
+                <span className="text-green-600 font-medium">
+                  In Stock ({availableStock} available)
+                </span>
+              ) : (
+                <span className="text-red-600 font-medium">
+                  Out of Stock
+                </span>
+              )}
+            </div>
+            {quantity > availableStock && (
+              <span className="text-red-500 text-xs">
+                Exceeds stock limit
+              </span>
+            )}
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            variant="default"
-            onClick={handleAddToCart}
-            iconName="ShoppingCart"
-            iconPosition="left"
-            className="flex-1 h-12 w-full sm:w-auto"
-            disabled={!inStock}
-          >
-            {`Add to Cart - ₹${((parseFloat(selectedVariant?.price) || 0) * (quantity || 1)).toFixed(2)}`}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={onAddToWishlist}
-            iconName={isInWishlist ? "Heart" : "Heart"}
-            size="icon"
-            className={`h-12 w-12 mx-auto sm:mx-0 ${isInWishlist ? "text-destructive" : ""}`}
-          >
-          </Button>
+        <div className="flex flex-col gap-3 w-full">
+          <div className="flex gap-3">
+            <Button
+              variant="default"
+              onClick={handleAddToCart}
+              iconName="ShoppingCart"
+              iconPosition="left"
+              className="flex-[3] h-12 text-sm md:text-base font-medium"
+              disabled={!inStock}
+            >
+              Add to Cart - ₹{((parseFloat(selectedVariant?.price) || 0) * (quantity || 1)).toFixed(0)}
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onAddToWishlist();
+              }}
+              iconName="Heart"
+              className={`flex-1 h-12 px-3 min-w-[60px] font-medium transition-colors duration-200 ${
+                isInWishlist 
+                  ? "text-red-600 bg-red-50 border-red-300 hover:bg-red-100 hover:border-red-400" 
+                  : "text-pink-600 bg-white border-pink-300 hover:bg-pink-50 hover:border-pink-400 hover:text-pink-700"
+              }`}
+              aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+            >
+              <span className="sr-only">
+                {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+              </span>
+            </Button>
+          </div>
+          
+          <div className="w-full">
+            <Button
+              variant="outline"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (navigator.share) {
+                  navigator.share({
+                    title: product?.name,
+                    text: `Check out this ${product?.name}!`,
+                    url: window.location.href,
+                  });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('Link copied to clipboard!');
+                }
+              }}
+              iconName="Share2"
+              iconPosition="left"
+              className="w-full h-12 text-sm md:text-base font-medium bg-white border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+            >
+              Share Product
+            </Button>
+          </div>
         </div>
-      </div>
-      
-      {/* Stock Status */}
-      <div className="flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${inStock ? 'bg-success' : 'bg-destructive'}`}></div>
-        {inStock ? (
-          <span className="font-caption text-sm text-success font-medium">
-            In Stock ({availableStock} units available)
-          </span>
-        ) : (
-          <span className="font-caption text-sm text-destructive font-medium">
-            Out of Stock
-          </span>
-        )}
       </div>
     </div>
   );
