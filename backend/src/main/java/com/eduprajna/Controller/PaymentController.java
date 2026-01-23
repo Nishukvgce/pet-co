@@ -24,7 +24,7 @@ import com.eduprajna.service.UserService;
 
 @RestController
 @RequestMapping("/api/payments/razorpay")
-@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW}, allowCredentials = "true")
+@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW, CorsConfig.AWS_CURRENT_IP_HTTP, CorsConfig.AWS_CURRENT_IP_HTTPS}, allowCredentials = "true")
 public class PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 

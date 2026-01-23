@@ -24,6 +24,10 @@ public class CorsConfig {
     public static final String AWS_IP_HTTP = "http://13.202.136.219";
     public static final String AWS_IP_HTTPS = "https://13.202.136.219";
     
+    // Current AWS deployment IP
+    public static final String AWS_CURRENT_IP_HTTP = "http://13.126.182.89";
+    public static final String AWS_CURRENT_IP_HTTPS = "https://13.126.182.89";
+    
     // AWS S3 static website origins (for when you deploy frontend to S3)
     public static final String AWS_S3_BUCKET = "http://petco-frontend-static.s3-website.ap-south-1.amazonaws.com";
     public static final String AWS_S3_BUCKET_HTTPS = "https://petco-frontend-static.s3-website.ap-south-1.amazonaws.com";
@@ -47,6 +51,8 @@ public class CorsConfig {
         AWS_EC2_HTTPS,
         AWS_IP_HTTP,
         AWS_IP_HTTPS,
+        AWS_CURRENT_IP_HTTP,
+        AWS_CURRENT_IP_HTTPS,
         AWS_S3_BUCKET,
         AWS_S3_BUCKET_HTTPS,
         AWS_S3_ACTUAL,
