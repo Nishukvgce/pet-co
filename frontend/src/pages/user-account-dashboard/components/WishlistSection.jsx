@@ -221,24 +221,6 @@ const WishlistSection = ({ wishlistItems, onRemoveFromWishlist }) => {
           ))}
         </div>
       )}
-      {/* Recommendations */}
-      {wishlistItems?.length > 0 && (
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-heading text-lg font-semibold text-foreground">
-              You might also like
-            </h3>
-            <Link to="/">
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
-            </Link>
-          </div>
-          <p className="font-body text-muted-foreground">
-            Based on your wishlist, we recommend checking out our featured collections and new arrivals.
-          </p>
-        </div>
-      )}
     </div>
   );
 };

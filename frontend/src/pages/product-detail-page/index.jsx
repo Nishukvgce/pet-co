@@ -8,7 +8,6 @@ import ProductInfo from './components/ProductInfo';
 import ProductDetails from './components/ProductDetails';
 import ProductFAQ from './components/ProductFAQ';
 import ProductReviews from './components/ProductReviews';
-import RelatedProducts from './components/RelatedProducts';
 import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
@@ -23,7 +22,6 @@ const ProductDetailPage = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
 
   // Convert relative or bare filenames to absolute URLs under API base
   const resolveImageUrl = (candidate) => {
@@ -225,36 +223,6 @@ const ProductDetailPage = () => {
 
         setProduct(normalizedProduct);
 
-        // Load related products (same category, excluding current)
-        try {
-          const all = await productApi.getAll();
-          const items = Array.isArray(all) ? all : [];
-          const sameCategory = items
-            .filter(p => (p?.category || p?.categoryId) === normalizedProduct.category && p?.id !== normalizedProduct.id)
-            .slice(0, 8);
-
-          // Normalize for RelatedProducts card structure
-          const normalizedRelated = sameCategory.map(p => ({
-            id: p?.id,
-            name: p?.name || p?.title,
-            image: resolveImageUrl(p?.image || p?.imageUrl || p?.thumbnailUrl),
-            rating: p?.rating || 4.5,
-            reviewCount: p?.reviewCount || 0,
-            badges: p?.badges || [],
-            variants: [
-              {
-                id: 'default',
-                weight: p?.weight || 'Default',
-                price: parseFloat(p?.price ?? p?.salePrice ?? 0) || 0,
-                originalPrice: parseFloat(p?.originalPrice ?? p?.price ?? p?.salePrice ?? 0) || 0
-              }
-            ]
-          }));
-          setRelatedProducts(normalizedRelated);
-        } catch (e) {
-          // Non-fatal if related fail; keep empty
-          setRelatedProducts([]);
-        }
       } catch (err) {
         console.error('Error loading product:', err);
         setError(err.message);
@@ -439,14 +407,6 @@ const ProductDetailPage = () => {
         {/* Reviews Section */}
         <div className="mb-12">
           <ProductReviews productId={productId} />
-        </div>
-
-        {/* Related Products */}
-        <div className="mb-12">
-          <RelatedProducts
-            products={relatedProducts}
-            onAddToCart={handleAddToCart}
-          />
         </div>
       </main>
     </div>

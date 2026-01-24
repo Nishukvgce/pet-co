@@ -7,7 +7,6 @@ import Breadcrumb from '../../components/ui/Breadcrumb';
 import CartItem from './components/CartItem';
 import OrderSummary from './components/OrderSummary';
 import EmptyCart from './components/EmptyCart';
-import RelatedProducts from './components/RelatedProducts';
 import SavedItems from './components/SavedItems';
 
 import Button from '../../components/ui/Button';
@@ -86,10 +85,6 @@ const ShoppingCart = () => {
     } else {
       setShippingLocation('other');
     }
-  };
-
-  const handleAddToCart = (product) => {
-    addToCart(product, 1);
   };
 
   const breadcrumbItems = [
@@ -217,9 +212,6 @@ const ShoppingCart = () => {
                   />
                 </div>
               </div>
-
-              {/* Related Products */}
-              <RelatedProducts onAddToCart={handleAddToCart} />
             </>
           )}
         </main>

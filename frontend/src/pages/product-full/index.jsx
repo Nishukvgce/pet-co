@@ -8,7 +8,6 @@ import ProductInfo from '../product-detail-page/components/ProductInfo';
 import ProductDetails from '../product-detail-page/components/ProductDetails';
 import ProductFAQ from '../product-detail-page/components/ProductFAQ';
 import ProductReviews from '../product-detail-page/components/ProductReviews';
-import RelatedProducts from '../product-detail-page/components/RelatedProducts';
 import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
@@ -24,7 +23,6 @@ const ProductFullPage = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
 
   const resolveImageUrl = (candidate) => {
     if (!candidate || typeof candidate !== 'string') return '';
@@ -310,21 +308,6 @@ const ProductFullPage = () => {
               Customer Reviews
             </h2>
             <ProductReviews productId={product.id} />
-          </div>
-        </div>
-      </section>
-
-      {/* Related Products Section */}
-      <section className="container mx-auto px-4 pb-8 md:pb-12">
-        <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div className="p-4 md:p-6 lg:p-8">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 border-b pb-3 md:pb-4 flex items-center gap-3">
-              <svg className="w-5 h-5 md:w-6 md:h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              You Might Also Like
-            </h2>
-            <RelatedProducts productId={product?.id} initial={relatedProducts} />
           </div>
         </div>
       </section>
