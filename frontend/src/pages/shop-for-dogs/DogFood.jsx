@@ -14,6 +14,7 @@ import { normalizeProductFromApi, productMatchesFilterSelections, isDogProduct, 
 
 const categories = [
   { id: 'all', label: 'All Dog Food', img: '/assets/images/essential/all dog food.webp' },
+  { id: 'daily', label: 'Daily Meals', img: '/assets/images/essential/dry food.webp' }, // Using dry food image as fallback
   { id: 'dry', label: 'Dry Food', img: '/assets/images/essential/dry food.webp' },
   { id: 'wet', label: 'Wet Food', img: '/assets/images/essential/wet food.webp' },
   { id: 'grain-free', label: 'Grain Free', img: '/assets/images/essential/grain free.webp' },
@@ -463,6 +464,7 @@ const DogFood = ({ initialActive = 'All Dog Food' }) => {
 
   const routeMap = {
     'All Dog Food': '/shop-for-dogs/dogfood/all-dog-food',
+    'Daily Meals': '/shop-for-dogs/dogfood/daily-meals',
     'Dry Food': '/shop-for-dogs/dogfood/dry-food',
     'Wet Food': '/shop-for-dogs/dogfood/wet-food',
     'Grain Free': '/shop-for-dogs/dogfood/grain-free',

@@ -19,6 +19,9 @@ export default function ShopForDogsIndex() {
   const sub = new URLSearchParams(location.search).get('sub') || '';
   const cat = q.toLowerCase();
 
+  // Debug log to help troubleshoot routing issues
+  console.log('ShopForDogsIndex routing:', { category: q, sub, normalizedCategory: cat });
+
   let Page = DogTreats; // Default fallback
 
   if (cat === 'walk-essentials' || cat === 'walkessentials' || cat === 'walk') {
@@ -30,7 +33,7 @@ export default function ShopForDogsIndex() {
   } else if (cat.includes('train') || cat.includes('training') || cat === 'dog-training' || cat === 'dog-training-essentials') {
     Page = DogTrainingEssentials;
   } else if (cat.includes('food') || cat === 'dogfood' || cat === 'dog-food') {
-    Page = DogFood;
+    Page = () => <DogFood initialActive={sub ? decodeURIComponent(sub) : 'All Dog Food'} />;
   } else if (cat.includes('clothing') || cat === 'dog-clothing') {
     Page = () => <DogClothing initialActive={sub ? decodeURIComponent(sub) : undefined} />;
   } else if (cat.includes('health') || cat === 'dog-health' || cat === 'dog-health-hygiene') {

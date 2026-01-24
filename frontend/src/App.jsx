@@ -192,6 +192,7 @@ function App() {
                 <Route path="/shop-for-dogs/dogtreats/dental-chew" element={<DogTreats initialActive="Dental Chew" />} />
                 <Route path="/shop-for-dogs/dogtreats/grain-free-treat" element={<DogTreats initialActive="Grain Free Treat" />} />
                 {/* dogfood sub-pages (render DogFood with a preselected active category) */}
+                <Route path="/shop-for-dogs/dogfood" element={<DogFood />} />
                 <Route path="/shop-for-dogs/dogfood/all-dog-food" element={<DogFood initialActive="All Dog Food" />} />
                 {/* dog clothing & accessories */}
                 <Route path="/shop-for-dogs/dog-clothing" element={<DogClothing />} />
