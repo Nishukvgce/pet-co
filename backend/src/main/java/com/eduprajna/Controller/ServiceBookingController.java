@@ -497,4 +497,73 @@ public class ServiceBookingController {
             ));
         }
     }
+    
+    /**
+     * Test endpoint to verify service image upload to S3
+     * This endpoint tests the base64 image upload functionality for services
+     */
+    @PostMapping("/test-image-upload")
+    public ResponseEntity<?> testServiceImageUpload(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            String base64Data = (String) request.get("petPhotoBase64");
+            String originalName = (String) request.get("originalFileName");
+            String contentType = (String) request.get("contentType");
+            String petName = (String) request.get("petName");
+            
+            if (base64Data == null || base64Data.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "No base64 image data provided");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Test the same image upload logic used in service bookings
+            ServiceBookingDTO testDTO = new ServiceBookingDTO();
+            testDTO.setPetPhotoBase64(base64Data);
+            testDTO.setPetPhotoOriginalName(originalName != null ? originalName : "test-pet.jpg");
+            testDTO.setPetPhotoContentType(contentType != null ? contentType : "image/jpeg");
+            testDTO.setPetName(petName != null ? petName : "TestPet");
+            
+            // Create a test booking to verify image upload
+            testDTO.setPetType("dog");
+            testDTO.setOwnerName("Test Owner");
+            testDTO.setPhone("1234567890");
+            testDTO.setAddress("Test Address");
+            testDTO.setServiceName("Test Grooming");
+            testDTO.setServiceType("test-grooming");
+            testDTO.setBasePrice(100.0);
+            testDTO.setTotalAmount(100.0);
+            testDTO.setPreferredDate(LocalDate.now().plusDays(1));
+            testDTO.setPreferredTime("10:00 AM");
+            
+            ServiceBookingDTO result = serviceBookingService.createBooking(testDTO);
+            
+            // Delete the test booking but return the image URL
+            if (result.getId() != null) {
+                serviceBookingService.deleteBooking(result.getId());
+            }
+            
+            response.put("success", true);
+            response.put("message", "Service image upload test completed");
+            response.put("imageUrl", result.getPetPhotoPath());
+            response.put("storageType", result.getPetPhotoPath() != null && result.getPetPhotoPath().startsWith("https://") ? "S3" : "Local");
+            response.put("originalFileName", result.getPetPhotoOriginalName());
+            response.put("contentType", result.getPetPhotoContentType());
+            response.put("timestamp", java.time.Instant.now().toString());
+            
+            System.out.println("[DEBUG] Service image test - URL: " + result.getPetPhotoPath());
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Service image upload test failed: " + e.getMessage());
+            response.put("error", e.toString());
+            response.put("timestamp", java.time.Instant.now().toString());
+            
+            System.err.println("[ERROR] Service image upload test failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }

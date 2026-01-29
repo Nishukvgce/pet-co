@@ -55,6 +55,9 @@ public class ProductController {
 
     @Autowired
     private com.eduprajna.service.CloudinaryStorageService cloudinaryStorageService;
+
+    @Autowired(required = false)
+    private com.eduprajna.service.S3ImageService s3ImageService;
     
     // Customer-facing endpoint that filters out-of-stock products
     @GetMapping("/customer")
@@ -1039,39 +1042,47 @@ public class ProductController {
             if (!storageService.isImage(imageFile) && storageService.detectImageExtension(imageFile) == null) {
                 try { log.warn("Ignoring non-image single upload: {}", imageFile.getOriginalFilename()); } catch (Exception ignored) {}
             } else {
-                // Always store locally for development reliability; optionally try Cloudinary but do not block
-                try {
-                    String local = storageService.store(imageFile);
-                    if (local != null) {
-                        p.getMetadata().put("images", java.util.List.of(local));
-                        p.setImageUrl(local);
+                String imageUrl = null;
+                
+                // Try S3 first (primary storage) if available
+                if (s3ImageService != null) {
+                    try {
+                        imageUrl = s3ImageService.uploadProductImage(imageFile);
+                        p.getMetadata().put("images", java.util.List.of(imageUrl));
+                        p.setImageUrl(imageUrl);
+                        log.info("Successfully uploaded single image to S3: {}", imageUrl);
+                    } catch (Exception s3e) {
+                        log.warn("S3 upload failed for single image: {}", s3e.getMessage());
                     }
-                } catch (Exception se) {
-                    try { log.warn("Local storage failed for imageFile: {}", se.getMessage()); } catch (Exception ignored) {}
                 }
-
-                // Attempt Cloudinary upload in background; if successful, update imageUrl/publicId
-                try {
-                    com.eduprajna.service.CloudinaryStorageService.UploadResult cres = null;
-                    if (preferLocal && p.getMetadata().get("images") instanceof java.util.List) {
-                        // try to upload from the local path we just saved
-                        java.util.List<?> imgs = (java.util.List<?>) p.getMetadata().get("images");
-                        if (!imgs.isEmpty()) {
-                            String localPath = imgs.get(0).toString();
-                            cres = cloudinaryStorageService.uploadLocal(localPath);
+                
+                // Fallback to Cloudinary if S3 is not available or failed
+                if (imageUrl == null) {
+                    try {
+                        com.eduprajna.service.CloudinaryStorageService.UploadResult cres = cloudinaryStorageService.upload(imageFile);
+                        if (cres != null && cres.getUrl() != null) {
+                            imageUrl = cres.getUrl();
+                            p.setImageUrl(cres.getUrl());
+                            p.setImagePublicId(cres.getPublicId());
+                            p.getMetadata().put("images", java.util.List.of(cres.getUrl()));
+                            log.info("Successfully uploaded single image to Cloudinary as fallback: {}", imageUrl);
+                        }
+                    } catch (Exception ce) {
+                        log.warn("Cloudinary upload also failed, trying local storage: {}", ce.getMessage());
+                        
+                        // Final fallback to local storage
+                        try {
+                            String local = storageService.store(imageFile);
+                            if (local != null) {
+                                imageUrl = local;
+                                p.getMetadata().put("images", java.util.List.of(local));
+                                p.setImageUrl(local);
+                                log.info("Successfully stored single image locally as final fallback: {}", imageUrl);
+                            }
+                        } catch (Exception se) {
+                            log.error("All storage methods failed for single image: {}", se.getMessage());
                         }
                     }
-                    if (cres == null) {
-                        cres = cloudinaryStorageService.upload(imageFile);
-                    }
-                    if (cres != null && cres.getUrl() != null) {
-                        p.setImageUrl(cres.getUrl());
-                        p.setImagePublicId(cres.getPublicId());
-                        // Replace local path with cloud URL to avoid duplicates
-                        p.getMetadata().put("images", java.util.List.of(cres.getUrl()));
-                    }
-                } catch (Exception ce) {
-                    try { log.warn("Cloudinary upload skipped/failed for imageFile: {}", ce.getMessage()); } catch (Exception ignored) {}
                 }
             }
         }
@@ -1143,37 +1154,48 @@ public class ProductController {
             if (!storageService.isImage(imageFile)) {
                 return ResponseEntity.badRequest().build();
             }
-            // Store locally first
-            try {
-                String local = storageService.store(imageFile);
-                if (local != null) {
-                    p.getMetadata().put("images", java.util.List.of(local));
-                    p.setImageUrl(local);
+            
+            String imageUrl = null;
+            
+            // Try S3 first (primary storage) if available
+            if (s3ImageService != null) {
+                try {
+                    imageUrl = s3ImageService.uploadProductImage(imageFile);
+                    p.getMetadata().put("images", java.util.List.of(imageUrl));
+                    p.setImageUrl(imageUrl);
+                    log.info("Successfully uploaded update image to S3: {}", imageUrl);
+                } catch (Exception s3e) {
+                    log.warn("S3 upload failed for update image: {}", s3e.getMessage());
                 }
-            } catch (Exception se) {
-                try { log.warn("Local storage failed for update imageFile: {}", se.getMessage()); } catch (Exception ignored) {}
             }
-
-            // Attempt Cloudinary upload as well
-            try {
-                com.eduprajna.service.CloudinaryStorageService.UploadResult res = null;
-                // prefer uploading from the saved local copy if present
-                Object existing = p.getMetadata().get("images");
-                if (existing instanceof java.util.List && !((java.util.List<?>) existing).isEmpty()) {
-                    String localPath = ((java.util.List<?>) existing).get(0).toString();
-                    res = cloudinaryStorageService.uploadLocal(localPath);
+            
+            // Fallback to Cloudinary if S3 is not available or failed
+            if (imageUrl == null) {
+                try {
+                    com.eduprajna.service.CloudinaryStorageService.UploadResult res = cloudinaryStorageService.upload(imageFile);
+                    if (res != null) {
+                        imageUrl = res.getUrl();
+                        p.setImageUrl(res.getUrl());
+                        p.setImagePublicId(res.getPublicId());
+                        p.getMetadata().put("images", java.util.List.of(res.getUrl()));
+                        log.info("Successfully uploaded update image to Cloudinary as fallback: {}", imageUrl);
+                    }
+                } catch (Exception ce) {
+                    log.warn("Cloudinary upload also failed, trying local storage: {}", ce.getMessage());
+                    
+                    // Final fallback to local storage
+                    try {
+                        String local = storageService.store(imageFile);
+                        if (local != null) {
+                            imageUrl = local;
+                            p.getMetadata().put("images", java.util.List.of(local));
+                            p.setImageUrl(local);
+                            log.info("Successfully stored update image locally as final fallback: {}", imageUrl);
+                        }
+                    } catch (Exception se) {
+                        log.error("All storage methods failed for update image: {}", se.getMessage());
+                    }
                 }
-                if (res == null) {
-                    res = cloudinaryStorageService.upload(imageFile);
-                }
-                if (res != null) {
-                    p.setImageUrl(res.getUrl());
-                    p.setImagePublicId(res.getPublicId());
-                    // Replace local path with cloud URL to avoid duplicates
-                    p.getMetadata().put("images", java.util.List.of(res.getUrl()));
-                }
-            } catch (Exception ce) {
-                try { log.warn("Cloudinary upload skipped/failed for update imageFile: {}", ce.getMessage()); } catch (Exception ignored) {}
             }
         } else if (!existingImages.isEmpty()) {
             // No new images uploaded, preserve existing images
@@ -1803,25 +1825,35 @@ public class ProductController {
                 
                 String finalUrl = null;
                 
-                // Try Cloudinary first (production-preferred)
-                try {
-                    com.eduprajna.service.CloudinaryStorageService.UploadResult res = cloudinaryStorageService.upload(img);
-                    if (res != null && res.getUrl() != null) {
-                        finalUrl = res.getUrl();
-                        log.info("Successfully uploaded image to Cloudinary: {}", finalUrl);
+                // Try S3 first (primary storage for production) if available
+                if (s3ImageService != null) {
+                    try {
+                        finalUrl = s3ImageService.uploadProductImage(img);
+                        log.info("Successfully uploaded image to S3: {}", finalUrl);
+                    } catch (Exception s3e) {
+                        log.warn("S3 upload failed: {}", s3e.getMessage());
                     }
-                } catch (Exception ce) {
-                    log.warn("Cloudinary upload failed, falling back to local storage: {}", ce.getMessage());
                 }
                 
-                // Fallback to local storage if Cloudinary fails
+                // Fallback to Cloudinary if S3 is not available or failed
                 if (finalUrl == null) {
                     try {
-                        finalUrl = storageService.store(img);
-                        log.info("Stored image locally as fallback: {}", finalUrl);
-                    } catch (Exception le) {
-                        log.error("Both Cloudinary and local storage failed for image: {}", le.getMessage());
-                        continue; // Skip this image if both fail
+                        com.eduprajna.service.CloudinaryStorageService.UploadResult res = cloudinaryStorageService.upload(img);
+                        if (res != null && res.getUrl() != null) {
+                            finalUrl = res.getUrl();
+                            log.info("Successfully uploaded image to Cloudinary as fallback: {}", finalUrl);
+                        }
+                    } catch (Exception ce) {
+                        log.warn("Cloudinary upload also failed, trying local storage: {}", ce.getMessage());
+                        
+                        // Final fallback to local storage
+                        try {
+                            finalUrl = storageService.store(img);
+                            log.info("Stored image locally as final fallback: {}", finalUrl);
+                        } catch (Exception le) {
+                            log.error("All storage methods failed for image: S3, Cloudinary, and local storage all failed");
+                            continue; // Skip this image if all methods fail
+                        }
                     }
                 }
                 

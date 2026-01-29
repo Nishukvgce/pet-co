@@ -549,15 +549,15 @@ const OrderManagement = () => {
         <p className="text-muted-foreground">Track and manage customer orders</p>
         
         {/* Email Status Indicator */}
-        <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+        {/* <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
           <Mail className="w-4 h-4 text-green-600" />
-          <span className="text-sm text-green-800 font-medium">
+          {/* <span className="text-sm text-green-800 font-medium">
             📧 Email notifications are enabled
           </span>
           <span className="text-xs text-green-600">
             • Status updates will be sent to customers automatically
-          </span>
-        </div>
+          </span> */}
+      
       </div>
 
       {/* Filters */}

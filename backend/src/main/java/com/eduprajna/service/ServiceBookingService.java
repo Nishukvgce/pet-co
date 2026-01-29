@@ -37,6 +37,9 @@ public class ServiceBookingService {
     @Autowired
     private FileUploadService fileUploadService;
 
+    @Autowired(required = false)
+    private S3ImageService s3ImageService;
+
     // Create a new service booking
     public ServiceBookingDTO createBooking(ServiceBookingDTO bookingDTO) {
         try {
@@ -405,21 +408,48 @@ public class ServiceBookingService {
         booking.setPetGender(dto.getPetGender() != null ? dto.getPetGender().trim() : null);
         booking.setPetDateOfBirth(dto.getPetDateOfBirth() != null ? dto.getPetDateOfBirth().trim() : null);
         
-        // Handle pet photo upload
+        // Handle pet photo upload to S3 (if available) or local storage
         if (dto.getPetPhotoBase64() != null && !dto.getPetPhotoBase64().trim().isEmpty()) {
             try {
-                String photoPath = fileUploadService.saveBase64Image(
-                    dto.getPetPhotoBase64(),
-                    dto.getPetPhotoOriginalName(),
-                    dto.getPetPhotoContentType(),
-                    dto.getPetName()
-                );
-                booking.setPetPhotoPath(photoPath);
-                booking.setPetPhotoOriginalName(dto.getPetPhotoOriginalName());
-                booking.setPetPhotoContentType(dto.getPetPhotoContentType());
-                System.out.println("[DEBUG] Saved pet photo at: " + photoPath);
+                String imageUrl = null;
+                
+                // Try S3 first if S3ImageService is available
+                if (s3ImageService != null) {
+                    try {
+                        imageUrl = uploadBase64ImageToS3(
+                            dto.getPetPhotoBase64(),
+                            dto.getPetPhotoOriginalName(),
+                            dto.getPetPhotoContentType(),
+                            dto.getPetName()
+                        );
+                        if (imageUrl != null) {
+                            System.out.println("[DEBUG] Saved service pet photo to S3: " + imageUrl);
+                        }
+                    } catch (Exception s3e) {
+                        System.err.println("[WARNING] S3 upload failed: " + s3e.getMessage());
+                    }
+                }
+                
+                // Fallback to local storage if S3 is not available or failed
+                if (imageUrl == null) {
+                    imageUrl = fileUploadService.saveBase64Image(
+                        dto.getPetPhotoBase64(),
+                        dto.getPetPhotoOriginalName(),
+                        dto.getPetPhotoContentType(),
+                        dto.getPetName()
+                    );
+                    System.out.println("[DEBUG] Saved service pet photo locally: " + imageUrl);
+                }
+                
+                // Set the image URL (either S3 or local)
+                if (imageUrl != null) {
+                    booking.setPetPhotoPath(imageUrl);
+                    booking.setPetPhotoOriginalName(dto.getPetPhotoOriginalName());
+                    booking.setPetPhotoContentType(dto.getPetPhotoContentType());
+                }
+                
             } catch (Exception e) {
-                System.err.println("[WARNING] Failed to save pet photo: " + e.getMessage());
+                System.err.println("[ERROR] Failed to save pet photo: " + e.getMessage());
                 // Don't fail the booking if photo save fails
             }
         }
@@ -532,6 +562,112 @@ public class ServiceBookingService {
         Long count = serviceBookingRepository.countPetWalkingBookings();
         System.out.println("[DEBUG] Total pet walking bookings in database: " + count);
         return count;
+    }
+    
+    /**
+     * Helper method to upload base64 image data to S3
+     * Converts base64 data and uploads directly to S3
+     */
+    private String uploadBase64ImageToS3(String base64Data, String originalFileName, String mimeType, String petName) {
+        try {
+            if (base64Data == null || base64Data.isEmpty()) {
+                return null;
+            }
+            
+            if (s3ImageService == null) {
+                System.out.println("[DEBUG] S3ImageService not available, skipping S3 upload");
+                return null;
+            }
+            
+            // Remove data URL prefix if present (data:image/jpeg;base64,)
+            String cleanBase64 = base64Data;
+            if (base64Data.contains(",")) {
+                cleanBase64 = base64Data.split(",")[1];
+            }
+            
+            // Decode base64 data
+            byte[] imageBytes = java.util.Base64.getDecoder().decode(cleanBase64);
+            
+            // Generate unique filename for S3
+            String fileExtension = getFileExtension(originalFileName, mimeType);
+            String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String uniqueId = java.util.UUID.randomUUID().toString().substring(0, 8);
+            String sanitizedPetName = sanitizeFilename(petName);
+            String fileName = String.format("services/%s_%s_%s.%s", sanitizedPetName, timestamp, uniqueId, fileExtension);
+            
+            // Upload directly to S3 using the S3Client
+            software.amazon.awssdk.core.sync.RequestBody requestBody = software.amazon.awssdk.core.sync.RequestBody.fromBytes(imageBytes);
+            software.amazon.awssdk.services.s3.model.PutObjectRequest putObjectRequest = software.amazon.awssdk.services.s3.model.PutObjectRequest.builder()
+                    .bucket(s3ImageService.getBucketName())
+                    .key(fileName)
+                    .contentType(mimeType != null ? mimeType : "image/jpeg")
+                    .contentLength((long) imageBytes.length)
+                    .build();
+            
+            // Get S3Client from S3ImageService's constructor parameter or use reflection to access it
+            // For now, let's create the URL manually after uploading
+            software.amazon.awssdk.services.s3.S3Client s3Client = getS3Client();
+            s3Client.putObject(putObjectRequest, requestBody);
+            
+            // Generate S3 URL
+            String s3Url = String.format("https://%s.s3.ap-south-1.amazonaws.com/%s", 
+                                       s3ImageService.getBucketName(), fileName);
+            
+            System.out.println("[DEBUG] Successfully uploaded service pet photo to S3: " + s3Url);
+            return s3Url;
+            
+        } catch (Exception e) {
+            System.err.println("[ERROR] Failed to upload base64 image to S3: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    /**
+     * Get file extension from filename or mime type
+     */
+    private String getFileExtension(String originalFileName, String mimeType) {
+        if (originalFileName != null && originalFileName.contains(".")) {
+            return originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
+        }
+        
+        // Fallback to mime type
+        if (mimeType != null) {
+            switch (mimeType.toLowerCase()) {
+                case "image/jpeg":
+                case "image/jpg":
+                    return "jpg";
+                case "image/png":
+                    return "png";
+                case "image/gif":
+                    return "gif";
+                case "image/webp":
+                    return "webp";
+                default:
+                    return "jpg";
+            }
+        }
+        return "jpg";
+    }
+    
+    /**
+     * Sanitize filename for safe storage
+     */
+    private String sanitizeFilename(String filename) {
+        if (filename == null || filename.isEmpty()) {
+            return "pet";
+        }
+        return filename.replaceAll("[^a-zA-Z0-9\\-_]", "").toLowerCase();
+    }
+    
+    /**
+     * Get S3Client - this is a simple approach, 
+     * ideally we would inject S3Client directly but this works for now
+     */
+    private software.amazon.awssdk.services.s3.S3Client getS3Client() {
+        return software.amazon.awssdk.services.s3.S3Client.builder()
+                .region(software.amazon.awssdk.regions.Region.AP_SOUTH_1)
+                .build();
     }
 
     // Inner class for booking statistics

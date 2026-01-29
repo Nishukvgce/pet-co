@@ -222,15 +222,7 @@ const ServicePackages = ({ petType, onBookService }) => {
               >
                 Book Now
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full lg:w-auto text-primary hover:text-primary/80"
-                iconName="Info"
-                iconPosition="left"
-              >
-                Learn More
-              </Button>
+             
             </div>
           </div>
         </div>

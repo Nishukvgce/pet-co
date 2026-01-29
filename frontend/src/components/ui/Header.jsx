@@ -4,6 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import pawLottie from '../../assets/paw-lottie.json';
 import { useAuth } from '../../contexts/AuthContext';
+import { performSmartSearch, getSearchSuggestions } from '../../utils/smartSearch';
+import productApi from '../../services/productApi';
 
 import Input from './Input';
 import AnnouncementBar from './AnnouncementBar';
@@ -46,11 +48,34 @@ const Header = ({ onSearch = () => { } }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
 
 
   const location = useLocation();
 
   const lastScrollY = useRef(0);
+
+  // Preload products for enhanced search functionality
+  useEffect(() => {
+    const loadProducts = async () => {
+      if (products.length === 0 && !loadingProducts) {
+        setLoadingProducts(true);
+        try {
+          const productsData = await productApi.getCustomerProducts({ limit: 200 });
+          setProducts(productsData || []);
+        } catch (error) {
+          console.warn('Could not preload products for search:', error);
+        } finally {
+          setLoadingProducts(false);
+        }
+      }
+    };
+
+    // Load products after a short delay to not block initial render
+    const timer = setTimeout(loadProducts, 1000);
+    return () => clearTimeout(timer);
+  }, [products.length, loadingProducts]);
 
   useEffect(() => {
     setIsMegaMenuOpen(false);
@@ -333,13 +358,83 @@ const Header = ({ onSearch = () => { } }) => {
     return () => { ignore = true; };
   }, []);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e?.preventDefault();
-    const params = new URLSearchParams();
-    if (searchQuery?.trim()) params.set('search', searchQuery.trim());
-    const target = `/shop-for-dogs${params.toString() ? `?${params.toString()}` : ''}`;
-    navigate(target);
-    if (searchQuery?.trim() && onSearch) onSearch(searchQuery.trim());
+    if (!searchQuery?.trim()) return;
+    
+    console.log('Performing search for:', searchQuery.trim());
+    
+    try {
+      // Use enhanced smart search with product data
+      await performSmartSearch(searchQuery.trim(), navigate, onSearch);
+      
+      // Close search and reset
+      setIsSearchOpen(false);
+      setSuggestionsOpen(false);
+      setSearchQuery('');
+    } catch (error) {
+      console.error('Search error:', error);
+      // Fallback to simple navigation
+      navigate(`/shop-for-dogs?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSuggestionsOpen(false);
+      setSearchQuery('');
+    }
+  };
+
+  // Handle search input changes with enhanced suggestions
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    console.log('🔍 Search input changed:', value);
+    
+    // Generate enhanced smart suggestions including products
+    if (value.trim().length >= 2) {
+      try {
+        const smartSuggestions = getSearchSuggestions(value.trim(), products);
+        console.log('📝 Generated suggestions for "' + value.trim() + '":', smartSuggestions);
+        
+        // Debug: log the first few suggestions with routes
+        smartSuggestions.slice(0, 3).forEach((suggestion, i) => {
+          console.log(`   ${i+1}. ${suggestion.text} -> ${suggestion.route} (${suggestion.type})`);
+        });
+        
+        setSuggestions(smartSuggestions);
+        setSuggestionsOpen(smartSuggestions.length > 0);
+      } catch (error) {
+        console.error('❌ Error generating suggestions:', error);
+        setSuggestions([]);
+        setSuggestionsOpen(false);
+      }
+    } else {
+      setSuggestions([]);
+      setSuggestionsOpen(false);
+    }
+  };
+
+  // Handle suggestion selection with enhanced routing
+  const handleSuggestionSelect = (suggestion) => {
+    console.log('Suggestion selected:', suggestion);
+    
+    setSuggestionsOpen(false);
+    setSearchQuery('');
+    setIsSearchOpen(false);
+    
+    if (suggestion.route) {
+      console.log('Navigating to:', suggestion.route);
+      navigate(suggestion.route);
+      if (onSearch) {
+        onSearch(suggestion.text, { type: suggestion.type, route: suggestion.route });
+      }
+    } else {
+      // Fallback to smart search for complex suggestions
+      console.log('Using smart search for:', suggestion.text);
+      performSmartSearch(suggestion.text, navigate, onSearch).catch(error => {
+        console.error('Smart search error:', error);
+        navigate(`/shop-for-dogs?search=${encodeURIComponent(suggestion.text)}`);
+      });
+    }
   };
 
   const navigationItems = [
@@ -387,7 +482,13 @@ const Header = ({ onSearch = () => { } }) => {
                     type="search"
                     placeholder="Search"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e?.target?.value)}
+                    onChange={handleSearchInputChange}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSearch(e);
+                      }
+                    }}
                     onFocus={() => setIsSearchFocused(true)}
                     onBlur={() => setIsSearchFocused(false)}
                     className="flex-1 border-0 focus:ring-0 text-sm"
@@ -397,28 +498,43 @@ const Header = ({ onSearch = () => { } }) => {
                 {/* mobile suggestions */}
                 {suggestionsOpen && suggestions.length > 0 && (
                   <div className="absolute left-0 right-0 mt-2 bg-card border border-border rounded-md shadow-warm z-50 overflow-hidden">
-                    {suggestions.map(item => (
+                    {suggestions.map((suggestion, index) => (
                       <button
-                        key={item.id}
-                        onClick={() => navigate(`/product-details/${item.id}`)}
+                        key={index}
+                        onMouseDown={() => handleSuggestionSelect(suggestion)}
                         className="w-full flex items-center gap-3 p-3 hover:bg-muted/40 text-left"
                       >
-                        <img src={item.image || '/assets/images/no_image.png'} alt={item.name} className="w-10 h-10 object-cover rounded" />
-                        <div className="flex-1">
-                          <div className="text-sm text-foreground line-clamp-1">{item.name}</div>
-                          <div className="text-xs text-muted-foreground">₹{(item.price || 0).toFixed(2)}</div>
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                          <Icon 
+                            name={suggestion.type === 'product' ? 'Package' : suggestion.type === 'brand' ? 'Star' : suggestion.type === 'subcategory' ? 'Grid3x3' : suggestion.type === 'category' ? 'Package' : 'Search'} 
+                            size={14} 
+                            className="text-primary" 
+                          />
                         </div>
-                        <Icon name="ChevronRight" size={16} className="text-muted-foreground" />
+                        <div className="flex-1">
+                          <div className="text-sm text-foreground font-medium">{suggestion.text}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {suggestion.type === 'subcategory' ? '📂 Subcategory' : 
+                             suggestion.type === 'product' ? '📦 Product' : 
+                             suggestion.type === 'category' ? '📋 Category' : 
+                             suggestion.type === 'brand' ? '⭐ Brand' : '🔍 Search'} 
+                            {suggestion.category && ` • ${suggestion.category.replace(/-/g, ' ')}`}
+                          </div>
+                        </div>
+                        <Icon name="ArrowRight" size={14} className="text-muted-foreground" />
                       </button>
                     ))}
-                    <div className="border-t border-border">
-                      <button
-                        onClick={handleSearch}
-                        className="w-full text-left p-3 text-sm hover:bg-muted/40"
-                      >
-                        View all results
-                      </button>
-                    </div>
+                    {searchQuery.trim() && (
+                      <div className="border-t border-border">
+                        <button
+                          onMouseDown={handleSearch}
+                          className="w-full text-left p-3 text-sm hover:bg-muted/40 flex items-center gap-2"
+                        >
+                          <Icon name="Search" size={14} className="text-muted-foreground" />
+                          Search for "{searchQuery.trim()}"
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </form>
@@ -487,7 +603,13 @@ const Header = ({ onSearch = () => { } }) => {
                       type="search"
                       placeholder=""
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e?.target?.value)}
+                      onChange={handleSearchInputChange}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSearch(e);
+                        }
+                      }}
                       onFocus={() => setIsSearchFocused(true)}
                       onBlur={() => setIsSearchFocused(false)}
                       className="flex-1 border-0 focus:ring-0 placeholder-gray-400 text-xs"
@@ -508,31 +630,46 @@ const Header = ({ onSearch = () => { } }) => {
                     )}
 
                   </div>
-                  {/* Suggestions dropdown preserved */}
+                  {/* Smart suggestions dropdown */}
                   {suggestionsOpen && suggestions.length > 0 && (
                     <div className="absolute left-0 right-0 mt-2 bg-card border border-border rounded-md shadow-warm z-50 overflow-hidden">
-                      {suggestions.map(item => (
+                      {suggestions.map((suggestion, index) => (
                         <button
-                          key={item.id}
-                          onClick={() => navigate(`/product-details/${item.id}`)}
+                          key={index}
+                          onMouseDown={() => handleSuggestionSelect(suggestion)}
                           className="w-full flex items-center gap-3 p-3 hover:bg-muted/40 text-left"
                         >
-                          <img src={item.image || '/assets/images/no_image.png'} alt={item.name} className="w-10 h-10 object-cover rounded" />
-                          <div className="flex-1">
-                            <div className="text-sm text-foreground line-clamp-1">{item.name}</div>
-                            <div className="text-xs text-muted-foreground">₹{(item.price || 0).toFixed(2)}</div>
+                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                            <Icon 
+                              name={suggestion.type === 'product' ? 'Package' : suggestion.type === 'brand' ? 'Star' : suggestion.type === 'subcategory' ? 'Grid3x3' : suggestion.type === 'category' ? 'Package' : 'Search'} 
+                              size={14} 
+                              className="text-primary" 
+                            />
                           </div>
-                          <Icon name="ChevronRight" size={16} className="text-muted-foreground" />
+                          <div className="flex-1">
+                            <div className="text-sm text-foreground font-medium">{suggestion.text}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {suggestion.type === 'subcategory' ? '📂 Subcategory' : 
+                               suggestion.type === 'product' ? '📦 Product' : 
+                               suggestion.type === 'category' ? '📋 Category' : 
+                               suggestion.type === 'brand' ? '⭐ Brand' : '🔍 Search'} 
+                              {suggestion.category && ` • ${suggestion.category.replace(/-/g, ' ')}`}
+                            </div>
+                          </div>
+                          <Icon name="ArrowRight" size={14} className="text-muted-foreground" />
                         </button>
                       ))}
-                      <div className="border-t border-border">
-                        <button
-                          onClick={handleSearch}
-                          className="w-full text-left p-3 text-sm hover:bg-muted/40"
-                        >
-                          View all results
-                        </button>
-                      </div>
+                      {searchQuery.trim() && (
+                        <div className="border-t border-border">
+                          <button
+                            onMouseDown={handleSearch}
+                            className="w-full text-left p-3 text-sm hover:bg-muted/40 flex items-center gap-2"
+                          >
+                            <Icon name="Search" size={14} className="text-muted-foreground" />
+                            Search for "{searchQuery.trim()}"
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </form>
