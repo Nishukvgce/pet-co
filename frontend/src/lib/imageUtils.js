@@ -53,6 +53,11 @@ export function resolveImageUrl(candidate) {
     return trimmed;
   }
 
+  // Handle frontend static assets - don't modify these paths
+  if (trimmed.startsWith('/assets/')) {
+    return trimmed;
+  }
+
   // Normalize Windows backslashes and unsafe prefixes
   let path = trimmed.replace(/\\/g, '/');
 

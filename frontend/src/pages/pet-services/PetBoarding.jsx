@@ -54,7 +54,7 @@ const PetBoardingPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <BoardingPlanCard
               title="Dog Boarding Plans"
-              imageSrc="/assets/images/dog/dg1.webp"
+              imageSrc="/assets/images/boarding/dogborading.jpg"
               petType="dog"
               plans={[
                 { name: 'Hourly', subtitle: 'Upto 4 hours', price: 599, petType: 'dog', duration: 'Up to 4 hours' },
@@ -75,7 +75,7 @@ const PetBoardingPage = () => {
 
             <BoardingPlanCard
               title="Cat Boarding Plans"
-              imageSrc="/assets/images/cat/ct1.webp"
+              imageSrc="/assets/images/boarding/catborading.webp"
               petType="cat"
               plans={[
                 { name: 'Hourly', subtitle: 'Upto 4 hours', price: 499, petType: 'cat', duration: 'Up to 4 hours' },
@@ -105,7 +105,7 @@ const PetBoardingPage = () => {
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="rounded-3xl overflow-hidden border border-border">
               <AppImage
-                src="/assets/images/cat/cl2.webp"
+                src="/assets/images/boarding/homepethorading.jpg"
                 alt="Home pet boarding, cosy and cage-free"
                 className="w-full h-[380px] object-cover"
               />
@@ -198,7 +198,7 @@ const PetBoardingPage = () => {
             {/* Image */}
             <div className="rounded-2xl overflow-hidden border border-border">
               <AppImage
-                src="/assets/images/dog/db2.webp"
+                src="/assets/images/boarding/pet borading.jpeg"
                 alt="Home pet boarding comfort"
                 className="w-full h-[340px] object-cover"
               />

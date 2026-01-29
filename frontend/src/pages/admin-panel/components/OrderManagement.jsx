@@ -545,8 +545,8 @@ const OrderManagement = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-heading font-bold text-foreground">Order Management</h1>
-        <p className="text-muted-foreground">Track and manage customer orders</p>
+        <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground">Order Management</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Track and manage customer orders</p>
         
         {/* Email Status Indicator */}
         {/* <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
@@ -561,24 +561,24 @@ const OrderManagement = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-card border border-border rounded-lg p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="bg-card border border-border rounded-lg p-3 sm:p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
               <Input
                 placeholder="Search by order ID or customer name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-9 sm:h-10 text-sm"
               />
             </div>
           </div>
-          <div className="sm:w-48">
+          <div className="w-full sm:w-48">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground"
+              className="w-full h-9 sm:h-10 px-3 rounded-md border border-border bg-background text-foreground text-sm"
             >
               <option value="">All Status</option>
               <option value="pending">Pending</option>
@@ -598,12 +598,12 @@ const OrderManagement = () => {
           return (
             <div key={order.id} className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
               {/* Order Header - Always Visible */}
-              <div className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+              <div className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                  <div className="flex items-start space-x-3 flex-1">
                     <button
                       onClick={() => toggleOrderExpansion(order.id)}
-                      className="p-1 hover:bg-muted rounded-md transition-colors"
+                      className="p-1 hover:bg-muted rounded-md transition-colors mt-1"
                     >
                       {isExpanded ? (
                         <ChevronUp className="w-5 h-5 text-muted-foreground" />
@@ -612,27 +612,27 @@ const OrderManagement = () => {
                       )}
                     </button>
                     
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground">#{order.orderNumber || order.id}</h3>
-                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">#{order.orderNumber || order.id}</h3>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
                         <span>{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}</span>
-                        <span>•</span>
-                        <span>{order.shipping?.name || order.user?.name || 'N/A'}</span>
-                        <span>•</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="truncate">{order.shipping?.name || order.user?.name || 'N/A'}</span>
+                        <span className="hidden sm:inline">•</span>
                         <span>{getTotalUnits(order)} unit(s)</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-4">
-                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                    <div className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(order.status)}`}>
                       {getStatusIcon(order.status)}
                       <span className="ml-1 capitalize">{order.status}</span>
                     </div>
                     
                     <div className="text-right">
-                      <div className="text-lg font-bold text-foreground">₹{order.total?.toFixed(2) || '0.00'}</div>
-                      <div className="text-sm text-muted-foreground capitalize">{order.paymentMethod || 'N/A'}</div>
+                      <div className="text-base sm:text-lg font-bold text-foreground">₹{order.total?.toFixed(2) || '0.00'}</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground capitalize">{order.paymentMethod || 'N/A'}</div>
                     </div>
                   </div>
                 </div>
@@ -641,22 +641,22 @@ const OrderManagement = () => {
               {/* Expandable Order Details */}
               {isExpanded && (
                 <div className="border-t border-border bg-muted/10">
-                  <div className="p-4 space-y-6">
+                  <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
                     {/* Customer Info & Shipping Address */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
                       <div>
                         <h4 className="text-sm font-medium text-foreground mb-3">Customer Information</h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex items-center">
-                            <User className="w-4 h-4 text-muted-foreground mr-2" />
-                            <span className="font-medium">{order.shipping?.name || order.user?.name || 'N/A'}</span>
+                            <User className="w-4 h-4 text-muted-foreground mr-2 flex-shrink-0" />
+                            <span className="font-medium truncate">{order.shipping?.name || order.user?.name || 'N/A'}</span>
                           </div>
                           <div className="flex items-center">
-                            <Mail className="w-4 h-4 text-muted-foreground mr-2" />
-                            <span>{order.user?.email || 'N/A'}</span>
+                            <Mail className="w-4 h-4 text-muted-foreground mr-2 flex-shrink-0" />
+                            <span className="truncate">{order.user?.email || 'N/A'}</span>
                           </div>
                           <div className="flex items-center">
-                            <Phone className="w-4 h-4 text-muted-foreground mr-2" />
+                            <Phone className="w-4 h-4 text-muted-foreground mr-2 flex-shrink-0" />
                             <span>{order.user?.phone || order.shipping?.phone || 'N/A'}</span>
                           </div>
                         </div>
@@ -665,7 +665,7 @@ const OrderManagement = () => {
                       <div>
                         <h4 className="text-sm font-medium text-foreground mb-3">Shipping Address</h4>
                         <div className="text-sm text-muted-foreground">
-                          <div>{order.shipping?.street || 'Address not provided'}</div>
+                          <div className="break-words">{order.shipping?.street || 'Address not provided'}</div>
                           <div>{order.shipping?.city || 'N/A'}, {order.shipping?.state || 'N/A'} - {order.shipping?.pincode || 'N/A'}</div>
                         </div>
                       </div>
@@ -677,20 +677,20 @@ const OrderManagement = () => {
                         <h4 className="text-sm font-medium text-foreground mb-3">Order Items</h4>
                         <div className="space-y-3">
                           {order.items.map((item) => (
-                            <div key={item.id} className="flex items-center space-x-4 p-3 bg-background rounded-lg border border-border/50">
+                            <div key={item.id} className="flex items-center space-x-3 sm:space-x-4 p-3 bg-background rounded-lg border border-border/50">
                               {item.productImage && (
                                 <img 
                                   src={item.productImage} 
                                   alt={item.productName}
-                                  className="w-12 h-12 object-cover rounded-md"
+                                  className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-md flex-shrink-0"
                                   onError={(e) => {
                                     e.target.src = 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=200&h=200&fit=crop&crop=center';
                                   }}
                                 />
                               )}
-                              <div className="flex-1">
-                                <div className="font-medium text-foreground">{item.productName}</div>
-                                <div className="text-sm text-muted-foreground">
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-foreground text-sm sm:text-base truncate">{item.productName}</div>
+                                <div className="text-xs sm:text-sm text-muted-foreground">
                                   {item.brand ? `${item.brand} • ` : ''}{item.variant ? `${item.variant} • ` : ''}Qty: {parseInt(item.quantity) || 1}
                                 </div>
                                 <div className="text-sm text-primary font-medium">₹{item.price?.toFixed(2) || '0.00'}</div>
@@ -702,12 +702,13 @@ const OrderManagement = () => {
                     )}
 
                     {/* Order Actions & Summary */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-border">
-                      <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                    <div className="flex flex-col gap-4 pt-4 border-t border-border">
+                      {/* Actions */}
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                         <select
                           value={order.status}
                           onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          className="px-3 py-2 rounded border border-border bg-background text-foreground"
+                          className="px-3 py-2 rounded border border-border bg-background text-foreground text-sm flex-1 sm:flex-none"
                         >
                           <option value="pending">Pending</option>
                           <option value="processing">Processing</option>
@@ -716,44 +717,47 @@ const OrderManagement = () => {
                           <option value="cancelled">Cancelled</option>
                         </select>
                         
-                        <button
-                          onClick={() => handleDownloadInvoice(order)}
-                          disabled={processingInvoice === `download-${order.id}`}
-                          className={`flex items-center space-x-1 px-3 py-2 rounded transition-colors ${
-                            processingInvoice === `download-${order.id}`
-                              ? 'text-muted-foreground cursor-not-allowed'
-                              : 'text-primary hover:text-primary/80 hover:bg-primary/5 border border-primary/20'
-                          }`}
-                          title="Download Invoice"
-                        >
-                          {processingInvoice === `download-${order.id}` ? (
-                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                          ) : (
-                            <Download className="w-4 h-4" />
-                          )}
-                          <span>Invoice</span>
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDownloadInvoice(order)}
+                            disabled={processingInvoice === `download-${order.id}`}
+                            className={`flex items-center justify-center space-x-1 px-3 py-2 rounded transition-colors text-sm flex-1 sm:flex-none ${
+                              processingInvoice === `download-${order.id}`
+                                ? 'text-muted-foreground cursor-not-allowed'
+                                : 'text-primary hover:text-primary/80 hover:bg-primary/5 border border-primary/20'
+                            }`}
+                            title="Download Invoice"
+                          >
+                            {processingInvoice === `download-${order.id}` ? (
+                              <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                            ) : (
+                              <Download className="w-4 h-4" />
+                            )}
+                            <span className="hidden sm:inline">Invoice</span>
+                          </button>
 
-                        <button
-                          onClick={() => handlePrintInvoice(order)}
-                          disabled={processingInvoice === `print-${order.id}`}
-                          className={`flex items-center space-x-1 px-3 py-2 rounded transition-colors ${
-                            processingInvoice === `print-${order.id}`
-                              ? 'text-muted-foreground cursor-not-allowed'
-                              : 'text-primary hover:text-primary/80 hover:bg-primary/5 border border-primary/20'
-                          }`}
-                          title="Print Invoice"
-                        >
-                          {processingInvoice === `print-${order.id}` ? (
-                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                          ) : (
-                            <Printer className="w-4 h-4" />
-                          )}
-                          <span>Print</span>
-                        </button>
+                          <button
+                            onClick={() => handlePrintInvoice(order)}
+                            disabled={processingInvoice === `print-${order.id}`}
+                            className={`flex items-center justify-center space-x-1 px-3 py-2 rounded transition-colors text-sm flex-1 sm:flex-none ${
+                              processingInvoice === `print-${order.id}`
+                                ? 'text-muted-foreground cursor-not-allowed'
+                                : 'text-primary hover:text-primary/80 hover:bg-primary/5 border border-primary/20'
+                            }`}
+                            title="Print Invoice"
+                          >
+                            {processingInvoice === `print-${order.id}` ? (
+                              <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                            ) : (
+                              <Printer className="w-4 h-4" />
+                            )}
+                            <span className="hidden sm:inline">Print</span>
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="text-right">
+                      {/* Summary */}
+                      <div className="bg-muted/30 rounded-lg p-3">
                         <div className="space-y-1 text-sm">
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Subtotal:</span>

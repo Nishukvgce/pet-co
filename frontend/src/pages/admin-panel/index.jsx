@@ -83,7 +83,7 @@ const AdminPanel = () => {
           onClose={() => setIsSidebarOpen(false)}
         />
         
-        <main className="flex-1 lg:ml-64 p-6">
+        <main className="flex-1 lg:ml-64 p-3 sm:p-6">
           <div className="max-w-7xl mx-auto">
             {renderActiveSection()}
           </div>

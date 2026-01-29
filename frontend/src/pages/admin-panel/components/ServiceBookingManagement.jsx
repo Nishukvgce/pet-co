@@ -148,13 +148,14 @@ const ServiceBookingManagement = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-heading font-bold text-foreground">Service Booking Management</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-heading font-bold text-foreground">Service Booking Management</h1>
         <Button
           onClick={loadBookings}
           iconName="RefreshCw"
           iconPosition="left"
           variant="outline"
+          className="w-full sm:w-auto"
         >
           Refresh
         </Button>
@@ -168,30 +169,30 @@ const ServiceBookingManagement = () => {
 
       {/* Statistics */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="text-2xl font-bold text-primary">{stats.total}</div>
-            <div className="text-sm text-muted-foreground">Total</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          <div className="bg-card border border-border rounded-lg p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold text-primary">{stats.total}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Total</div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-            <div className="text-sm text-muted-foreground">Pending</div>
+          <div className="bg-card border border-border rounded-lg p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Pending</div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.confirmed}</div>
-            <div className="text-sm text-muted-foreground">Confirmed</div>
+          <div className="bg-card border border-border rounded-lg p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600">{stats.confirmed}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Confirmed</div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="text-2xl font-bold text-purple-600">{stats.inProgress}</div>
-            <div className="text-sm text-muted-foreground">In Progress</div>
+          <div className="bg-card border border-border rounded-lg p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold text-purple-600">{stats.inProgress}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">In Progress</div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-            <div className="text-sm text-muted-foreground">Completed</div>
+          <div className="bg-card border border-border rounded-lg p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold text-green-600">{stats.completed}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Completed</div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="text-2xl font-bold text-red-600">{stats.cancelled}</div>
-            <div className="text-sm text-muted-foreground">Cancelled</div>
+          <div className="bg-card border border-border rounded-lg p-3 sm:p-4">
+            <div className="text-xl sm:text-2xl font-bold text-red-600">{stats.cancelled}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Cancelled</div>
           </div>
         </div>
       )}
@@ -214,102 +215,183 @@ const ServiceBookingManagement = () => {
         </div>
       </div>
 
-      {/* Bookings Table */}
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Booking Details</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Service</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Appointment</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredBookings.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                    {bookings.length === 0 ? 'No bookings found' : 'No bookings match your filters'}
-                  </td>
-                </tr>
-              ) : (
-                filteredBookings.map((booking) => {
-                  // Add null safety checks
-                  if (!booking) return null;
-                  
-                  return (
-                  <tr key={booking.id} className="hover:bg-muted/20">
-                    <td className="px-4 py-4">
-                      <div>
-                        <div className="font-medium text-foreground">{booking.ownerName || 'N/A'}</div>
-                        <div className="text-sm text-muted-foreground">{booking.phone || 'N/A'}</div>
-                        <div className="text-sm text-muted-foreground">
+      {/* Bookings List */}
+      <div className="space-y-4">
+        {filteredBookings.length === 0 ? (
+          <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground">
+            {bookings.length === 0 ? 'No bookings found' : 'No bookings match your filters'}
+          </div>
+        ) : (
+          <>            
+            {/* Desktop Table View */}
+            <div className="hidden lg:block bg-card border border-border rounded-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Booking Details</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Service</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Appointment</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Status</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredBookings.map((booking) => {
+                      if (!booking) return null;
+                      return (
+                        <tr key={booking.id} className="hover:bg-muted/20">
+                          <td className="px-4 py-4">
+                            <div>
+                              <div className="font-medium text-foreground">{booking.ownerName || 'N/A'}</div>
+                              <div className="text-sm text-muted-foreground">{booking.phone || 'N/A'}</div>
+                              <div className="text-sm text-muted-foreground">
+                                Pet: {booking.petName || 'N/A'} ({booking.petType || 'N/A'})
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Booked: {booking.createdAt ? formatDateTime(booking.createdAt) : 'N/A'}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div>
+                              <div className="font-medium text-foreground">{booking.serviceName || 'N/A'}</div>
+                              <div className="text-sm text-muted-foreground">₹{booking.totalAmount || 0}</div>
+                              {booking.addOns && Object.keys(booking.addOns).length > 0 && (
+                                <div className="text-xs text-muted-foreground">
+                                  +{Object.keys(booking.addOns).length} add-ons
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div>
+                              <div className="font-medium text-foreground">{booking.preferredDate ? formatDate(booking.preferredDate) : 'N/A'}</div>
+                              <div className="text-sm text-muted-foreground">{booking.preferredTime || 'N/A'}</div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${statusColors[booking.status] || statusColors.PENDING}`}>
+                              {booking.status || 'PENDING'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setSelectedBooking(booking);
+                                  setShowBookingModal(true);
+                                }}
+                                iconName="Eye"
+                              >
+                                View
+                              </Button>
+                              <Select
+                                value={booking.status || 'PENDING'}
+                                onChange={(newStatus) => handleStatusUpdate(booking.id, newStatus)}
+                                options={statusOptions.filter(opt => opt.value !== 'ALL')}
+                                className="text-xs"
+                              />
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                      onClick={() => handleDeleteBooking(booking.id)}
+                                iconName="Trash2"
+                                className="text-red-600 hover:text-red-700"
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    }).filter(Boolean)
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="lg:hidden space-y-3">
+              {filteredBookings.map((booking) => {
+                if (!booking) return null;
+                return (
+                  <div key={booking.id} className="bg-card border border-border rounded-lg p-4 space-y-4">
+                    {/* Booking Header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-medium text-foreground">{booking.ownerName || 'N/A'}</h3>
+                        <p className="text-sm text-muted-foreground">{booking.phone || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground">
                           Pet: {booking.petName || 'N/A'} ({booking.petType || 'N/A'})
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Booked: {booking.createdAt ? formatDateTime(booking.createdAt) : 'N/A'}
-                        </div>
+                        </p>
                       </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div>
-                        <div className="font-medium text-foreground">{booking.serviceName || 'N/A'}</div>
-                        <div className="text-sm text-muted-foreground">₹{booking.totalAmount || 0}</div>
-                        {booking.addOns && Object.keys(booking.addOns).length > 0 && (
-                          <div className="text-xs text-muted-foreground">
-                            +{Object.keys(booking.addOns).length} add-ons
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div>
-                        <div className="font-medium text-foreground">{booking.preferredDate ? formatDate(booking.preferredDate) : 'N/A'}</div>
-                        <div className="text-sm text-muted-foreground">{booking.preferredTime || 'N/A'}</div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${statusColors[booking.status] || statusColors.PENDING}`}>
                         {booking.status || 'PENDING'}
                       </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setSelectedBooking(booking);
-                            setShowBookingModal(true);
-                          }}
-                          iconName="Eye"
-                        >
-                          View
-                        </Button>
-                        <Select
-                          value={booking.status || 'PENDING'}
-                          onChange={(newStatus) => handleStatusUpdate(booking.id, newStatus)}
-                          options={statusOptions.filter(opt => opt.value !== 'ALL')}
-                          className="text-xs"
-                        />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDeleteBooking(booking.id)}
-                          iconName="Trash2"
-                          className="text-red-600 hover:text-red-700"
-                        />
+                    </div>
+
+                    {/* Service Details */}
+                    <div className="grid grid-cols-2 gap-4 py-3 border-t border-border">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Service</p>
+                        <p className="font-medium text-sm">{booking.serviceName || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground">₹{booking.totalAmount || 0}</p>
+                        {booking.addOns && Object.keys(booking.addOns).length > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            +{Object.keys(booking.addOns).length} add-ons
+                          </p>
+                        )}
                       </div>
-                    </td>
-                  </tr>
-                  );
-                }).filter(Boolean)
-              )}
-            </tbody>
-          </table>
-        </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">Appointment</p>
+                        <p className="font-medium text-sm">{booking.preferredDate ? formatDate(booking.preferredDate) : 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground">{booking.preferredTime || 'N/A'}</p>
+                      </div>
+                    </div>
+
+                    {/* Booking Date */}
+                    <div className="text-xs text-muted-foreground">
+                      Booked: {booking.createdAt ? formatDateTime(booking.createdAt) : 'N/A'}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-border">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedBooking(booking);
+                          setShowBookingModal(true);
+                        }}
+                        iconName="Eye"
+                        className="flex-1"
+                      >
+                        View Details
+                      </Button>
+                      <Select
+                        value={booking.status || 'PENDING'}
+                        onChange={(newStatus) => handleStatusUpdate(booking.id, newStatus)}
+                        options={statusOptions.filter(opt => opt.value !== 'ALL')}
+                        className="flex-1"
+                      />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteBooking(booking.id)}
+                        iconName="Trash2"
+                        className="text-red-600 hover:text-red-700 sm:flex-none"
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                );
+              }).filter(Boolean)}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Booking Details Modal */}
@@ -353,11 +435,11 @@ const BookingDetailModal = ({ booking, onClose, onStatusUpdate }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-card border-b border-border p-6">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-card rounded-lg max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-card border-b border-border p-4 sm:p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-heading font-bold text-foreground">
+            <h2 className="text-lg sm:text-xl font-heading font-bold text-foreground pr-2">
               Booking Details #{booking.id || 'Unknown'}
             </h2>
             <button 
@@ -369,7 +451,7 @@ const BookingDetailModal = ({ booking, onClose, onStatusUpdate }) => {
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Pet & Owner Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">

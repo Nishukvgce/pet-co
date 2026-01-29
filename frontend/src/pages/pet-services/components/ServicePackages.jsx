@@ -239,7 +239,7 @@ const ServicePackages = ({ petType, onBookService }) => {
           <div>Sunday: 10:00am - 10:30pm</div>
           <div className="flex items-center gap-2 mt-2">
             <Icon name="Phone" size={14} />
-            <span>Contact: 9008003996</span>
+            <span>Contact: 90080 03096⁩</span>
           </div>
         </div>
       </div>

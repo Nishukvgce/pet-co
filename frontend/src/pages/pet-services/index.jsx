@@ -129,7 +129,7 @@ const PetServicesPage = () => {
                   <Icon name="Phone" size={24} className="text-primary" />
                 </div>
                 <h4 className="font-heading font-semibold text-foreground mb-2">Easy Booking</h4>
-                <p className="text-sm text-muted-foreground">Call 9008003996 or book online</p>
+                <p className="text-sm text-muted-foreground">Call 90080 03096⁩ or book online</p>
               </div>
             </div>
           </div>
@@ -144,11 +144,11 @@ const PetServicesPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a 
-                href="tel:9008003996"
+                href="tel:90080 03096⁩"
                 className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
               >
                 <Icon name="Phone" size={18} />
-                Call 9008003996
+                Call 90080 03096⁩
               </a>
               <button 
                 onClick={() => setShowBookingForm(true)}

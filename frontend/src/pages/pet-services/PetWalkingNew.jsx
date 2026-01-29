@@ -111,7 +111,7 @@ const PetWalkingPage = () => {
                   {/* Main card */}
                   <div className="bg-white rounded-3xl shadow-2xl p-8 transform rotate-2 group-hover:rotate-0 transition-all duration-700 hover:shadow-3xl">
                     <AppImage
-                      src="/assets/images/dog/db1.webp"
+                      src="/assets/images/petwalking/petwalking.jpg"
                       alt="Professional pet walking service"
                       className="w-full h-96 object-cover rounded-2xl"
                     />

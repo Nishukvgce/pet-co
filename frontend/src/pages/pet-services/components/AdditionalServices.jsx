@@ -92,10 +92,10 @@ const AdditionalServices = ({ onBookService }) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-foreground"><Icon name="MapPin" size={18} /><span>123 PET&CO Street, Your City</span></div>
             <div className="flex items-center gap-2 text-foreground"><Icon name="Clock" size={18} /><span>Mon-Fri: 9:30am-10pm, Sun: 10am-10:30pm</span></div>
-            <div className="flex items-center gap-2 text-foreground"><Icon name="Phone" size={18} /><span>Call: 9008003996</span></div>
+            <div className="flex items-center gap-2 text-foreground"><Icon name="Phone" size={18} /><span>Call: 90080 03096⁩</span></div>
           </div>
           <div className="md:col-span-2 flex gap-3 md:justify-end">
-            <a href="tel:9008003996" className="inline-flex items-center gap-2 border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary/10">
+            <a href="tel:90080 03096⁩" className="inline-flex items-center gap-2 border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary/10">
               <Icon name="Phone" size={18} /> Call Now
             </a>
             <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90">
