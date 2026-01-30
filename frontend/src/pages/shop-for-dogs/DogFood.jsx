@@ -290,6 +290,18 @@ const DogFood = ({ initialActive = 'All Dog Food' }) => {
     ? filterConfig.topFilters
     : ['Brand', 'Dog/Cat', 'Life Stage', 'Breed Size', 'Product Type', 'Special Diet', 'Protein Source', 'Price', 'Weight', 'Size', 'Sub Category'];
   const [selectedTopFilter, setSelectedTopFilter] = useState(topFilters[0]);
+  // Helpers to show applied filter state on top pills (map label -> section.id)
+  const hasFilterSelections = (label) => {
+    const sec = filterSections.find(s => s.label === label);
+    if (!sec) return false;
+    return (activeFilters[sec.id] || []).length > 0;
+  };
+
+  const getFilterCount = (label) => {
+    const sec = filterSections.find(s => s.label === label);
+    if (!sec) return 0;
+    return (activeFilters[sec.id] || []).length;
+  };
   const topRef = useRef(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const drawerContentRef = useRef(null);
@@ -643,7 +655,7 @@ const DogFood = ({ initialActive = 'All Dog Food' }) => {
                       <button
                         key={t}
                         onClick={() => openFilterAndScroll(t)}
-                        className={`flex items-center gap-2 text-sm px-3 py-1 border border-border rounded-full bg-white ${selectedTopFilter === t ? 'ring-1 ring-orange-300' : ''}`}
+                        className={`flex items-center gap-2 text-sm px-3 py-1 border border-border rounded-full bg-white ${selectedTopFilter === t ? 'ring-1 ring-orange-300' : (hasFilterSelections(t) ? 'ring-1 ring-orange-200 bg-orange-50' : '')}`}
                         style={{ whiteSpace: 'nowrap' }}
                       >
                         {selectedTopFilter === t ? (
@@ -654,6 +666,9 @@ const DogFood = ({ initialActive = 'All Dog Food' }) => {
                           <span className="inline-flex items-center justify-center w-4 h-4 bg-transparent rounded-sm" />
                         )}
                         <span>{t}</span>
+                        {getFilterCount(t) > 0 && (
+                          <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-orange-500 rounded-full ml-2">{getFilterCount(t)}</span>
+                        )}
                       </button>
                     ))}
                   </div>
