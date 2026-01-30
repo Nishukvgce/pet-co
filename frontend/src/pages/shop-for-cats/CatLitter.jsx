@@ -11,11 +11,11 @@ import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
 
 const categories = [
-  { id: 'all', label: 'All Litter & Supplies', img: '/assets/images/cat/cl1.avif' },
-  { id: 'litter', label: 'Litter', img: '/assets/images/cat/cl2.webp' },
-  { id: 'trays', label: 'Litter Trays', img: '/assets/images/cat/cl3.webp' },
+  { id: 'all', label: 'All Litter & Supplies', img: '/assets/images/cat/Fil_littertrays.webp' },
+  { id: 'litter', label: 'Litter', img: '/assets/images/cat/cat-litter.webp' },
+  { id: 'trays', label: 'Litter Trays', img: '/assets/images/cat/Fil_littertrays.webp' },
   { id: 'scooper', label: 'Scooper', img: '/assets/images/cat/cl4.webp' },
-  { id : 'stain-odour', label: 'Stain & Odour', img: '/assets/images/cat/cl5.webp' }
+  { id : 'stain-odour', label: 'Stain & Odour', img: '/assets/images/cat/Fil_stainodour.webp' }
 
 ];
 

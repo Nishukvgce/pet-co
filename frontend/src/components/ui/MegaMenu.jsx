@@ -31,7 +31,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
       label: 'Shop for Cats',
       icon: '/assets/images/cat/ct1.webp',
       children: [
-        { label: 'Cat Food', path: '/cats/cat-food', subs: ['Dry Food','Wet Food','Grain Free Food','Kitten Food','Veterinary Food','Supplements','All Cat Food'] },
+        { label: 'Cat Food', path: '/cats/cat-food', subs: ['Dry Food','Wet Food','Grain Free Food','Kitten Food','Hypoallergenic','Gravy' ,'Veterinary Food','Supplements','Mousse','Pate','All Cat Food'] },
         { label: 'Cat Treats', path: '/cats/cat-treats', subs: ['Crunchy Treats','Creamy Treats','Grain Free Treats','Chew Treats','All Cat Treats'] },
         { label: 'Cat Litter & Supplies', path: '/cats/cat-litter', subs: ['Litter','Litter Trays','Scooper','Stain & Odour','All Litter & Supplies'] },
         { label: 'Cat Toys', path: '/cats/cat-toys', subs: ['Catnip Toys','Interactive Toys','Plush Toys','Teaser & Wands','All Toys'] },

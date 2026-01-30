@@ -14,12 +14,12 @@ import { normalizeProductFromApi, productMatchesFilterSelections, isDogProduct, 
 
 const categories = [
   { id: 'all-cat-food', label: 'All Cat Food', img: '/assets/images/cat/cf1.webp' },
-  { id: 'dry-food', label: 'Dry Food', img: '/assets/images/cat/cf2.webp' },
-  { id: 'wet-food', label: 'Wet Food', img: '/assets/images/cat/cf3.webp' },
-  { id: 'grain-free', label: 'Grain Free Food', img: '/assets/images/cat/cf4.webp' },
-  { id: 'kitten-food', label: 'Kitten Food', img: '/assets/images/cat/cf5.webp' },
-  { id: 'veterinary-food', label: 'Veterinary Food', img: '/assets/images/cat/cf7.webp' },
-  { id: 'supplements', label: 'Supplements', img: '/assets/images/cat/cf8.webp' }
+  { id: 'dry-food', label: 'Dry Food', img: '/assets/images/cat/cat-pate.webp' },
+  { id: 'wet-food', label: 'Wet Food', img: '/assets/images/cat/cat-gravy.webp' },
+  { id: 'grain-free', label: 'Grain Free Food', img: '/assets/images/cat/cat-hypoallergenic.webp' },
+  { id: 'kitten-food', label: 'Kitten Food', img: '/assets/images/cat/kittenfood.webp' },
+  { id: 'veterinary-food', label: 'Veterinary Food', img: '/assets/images/cat/veterinaryfood.webp' },
+  { id: 'supplements', label: 'Supplements', img: '/assets/images/cat/cat-supplements.webp' }
 ];
 
 // reuse sampleProducts from DogFood layout but with cat-centric names/images

@@ -10,9 +10,9 @@ import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 
 const categories = [
-  { id: 'all', label: 'All Cat Bowls', img: '/assets/images/cat/cf1.webp' },
-  { id: 'bowls', label: 'Bowls', img: '/assets/images/cat/cf2.webp' },
-  { id: 'travel', label: 'Travel & Fountain', img: '/assets/images/cat/cf3.webp' }
+  { id: 'all', label: 'All Cat Bowls', img: '/assets/images/cat/Fil_bowls.webp' },
+  { id: 'bowls', label: 'Bowls', img: '/assets/images/cat/Fil_bowls.webp' },
+  { id: 'travel', label: 'Travel & Fountain', img: '/assets/images/cat/Fil_travelfountain.webp' }
 ];
 
 // Sample products removed; page now renders live products from API

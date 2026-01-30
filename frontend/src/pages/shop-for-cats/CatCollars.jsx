@@ -11,11 +11,11 @@ import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
 
 const categories = [
-  { id: 'all', label: 'All Collars & Accessories', img: '/assets/images/cat/cf1.webp' },
-  { id: 'collars', label: 'Collars', img: '/assets/images/cat/cf2.webp' },
-  { id: 'leash', label: 'Leash & Harness Set', img: '/assets/images/cat/cf3.webp' },
-  { id: 'nametags', label: 'Name Tags', img: '/assets/images/cat/cf4.webp' },
-  { id: 'ties', label: 'Bow Ties & Badanas', img: '/assets/images/cat/cf5.webp' },
+  { id: 'all', label: 'All Collars & Accessories', img: '/assets/images/cat/Fil_collarsscarfs.webp' },
+  { id: 'collars', label: 'Collars', img: '/assets/images/cat/Fil_collarsscarfs.webp' },
+  { id: 'leash', label: 'Leash & Harness Set', img: '/assets/images/cat/Fil_harnessleash.webp' },
+  { id: 'nametags', label: 'Name Tags', img: '/assets/images/cat/Fil_nametags.webp' },
+  { id: 'ties', label: 'Bow Ties & Badanas', img: '/assets/images/cat/Fil_bowtiesbandanas.webp' },
 ];
 
 const sampleProducts = [];

@@ -11,13 +11,13 @@ import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
 
 const categories = [
-  { id: 'all', label: 'All Grooming', img: '/assets/images/cat/cf1.webp' },
-  { id: 'brushes', label: 'Brushes & Combs', img: '/assets/images/cat/cf2.webp' },
-  { id: 'dry-bath', label: 'Dry Bath, Wipes & Perfume', img: '/assets/images/cat/cf3.webp' },
-  { id: 'ear', label: 'Ear,Eye, & PawCare', img: '/assets/images/cat/cf4.webp' },
-  { id: 'oral', label: 'Oral Care', img: '/assets/images/cat/cf5.webp' },
-  { id: 'shampoo', label: 'Shampoo & Conditioner', img: '/assets/images/cat/cf6.webp' },
-  { id: 'tick ', label: 'Tick & Flea Control', img: '/assets/images/cat/cl1.avif' }
+  { id: 'all', label: 'All Grooming', img: '/assets/images/cat/Fil_shampooconditioner.webp' },
+  { id: 'brushes', label: 'Brushes & Combs', img: '/assets/images/cat/Fil_brushescombs.webp' },
+  { id: 'dry-bath', label: 'Dry Bath, Wipes & Perfume', img: '/assets/images/cat/Fil_drybathwipesperfume.webp' },
+  { id: 'ear', label: 'Ear,Eye, & PawCare', img: '/assets/images/cat/Fil_eareyepawcare.webp' },
+  { id: 'oral', label: 'Oral Care', img: '/assets/images/cat/Fil_oralcare.webp' },
+  { id: 'shampoo', label: 'Shampoo & Conditioner', img: '/assets/images/cat/Fil_shampooconditioner.webp' },
+  { id: 'tick ', label: 'Tick & Flea Control', img: '/assets/images/cat/Fil_tickfleacontrol.webp' }
 ];
 
 const sampleProducts = [];

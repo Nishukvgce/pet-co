@@ -11,12 +11,12 @@ import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
 
 const categories = [
-  { id: 'all-cat-toys', label: 'All Cat Toys', img: '/assets/images/cat/ct1.webp' },
-  { id: 'catnip-toys', label: 'Catnip Toys', img: '/assets/images/cat/ct2.webp' },
-  { id: 'interactive-toys', label: 'Interactive Toys', img: '/assets/images/cat/ct3.webp' },
-  { id: 'plush-toys', label: 'Plush Toys', img: '/assets/images/cat/ct4.webp' },
-  { id: 'teaser-wands', label: 'Teaser & Wands', img: '/assets/images/cat/ct5.webp' },
-  { id: 'all-toys', label: 'All Toys', img: '/assets/images/cat/ct6.webp' }
+  { id: 'all-cat-toys', label: 'All Cat Toys', img: '/assets/images/cat/Fil_plushtoys.webp' },
+  { id: 'catnip-toys', label: 'Catnip Toys', img: '/assets/images/cat/Fil_catniptoys.webp' },
+  { id: 'interactive-toys', label: 'Interactive Toys', img: '/assets/images/cat/Fil_interactivetoys.webp' },
+  { id: 'plush-toys', label: 'Plush Toys', img: '/assets/images/cat/Fil_plushtoys.webp' },
+  { id: 'teaser-wands', label: 'Teaser & Wands', img: '/assets/images/cat/Fil_teaserwandtoys.webp' },
+  { id: 'all-toys', label: 'All Toys', img: '/assets/images/cat/Fil_catniptoys.webp' }
 ];
 
 const sampleProducts = [

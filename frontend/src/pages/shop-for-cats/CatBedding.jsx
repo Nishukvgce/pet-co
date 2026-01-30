@@ -10,13 +10,13 @@ import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 
 const categories = [
-  { id: 'all', label: 'All Beds & Scratchers', img: '/assets/images/cat/ctt1.webp' },
-  { id: 'beds', label: 'Beds', img: '/assets/images/cat/ctt2.webp' },
-  { id: 'mats', label: 'Mats', img: '/assets/images/cat/ctt3.webp' },
-  { id: 'tents', label: 'Tents', img: '/assets/images/cat/ctt4.webp' },
-  { id: 'blankets', label: 'Blankets & Cushions', img: '/assets/images/cat/ctt5.webp' },
-  { id: 'trees', label: 'Trees and Scratchers', img: '/assets/images/cat/ctt6.webp' },
-  { id: 'personalised', label: 'Personalised', img: '/assets/images/cat/ctt7.webp' }
+  { id: 'all', label: 'All Beds & Scratchers', img: '/assets/images/cat/Fil_beds.webp' },
+  { id: 'beds', label: 'Beds', img: '/assets/images/cat/Fil_beds.webp' },
+  { id: 'mats', label: 'Mats', img: '/assets/images/cat/Fil_mats.webp' },
+  { id: 'tents', label: 'Tents', img: '/assets/images/cat/Fil_tents.webp' },
+  { id: 'blankets', label: 'Blankets & Cushions', img: '/assets/images/cat/Fil_blanketscushions.webp' },
+  { id: 'trees', label: 'Trees and Scratchers', img: '/assets/images/cat/Fil_cattrees.webp' },
+  { id: 'personalised', label: 'Personalised', img: '/assets/images/cat/Fil_personalisedbed.webp' }
 ];
 
 const sampleProducts = [];

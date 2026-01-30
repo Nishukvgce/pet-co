@@ -11,12 +11,11 @@ import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
 
 const categories = [
-  { id: 'all', label: 'All Cat Treats', img: '/assets/images/cat/ctt1.webp' },
-  { id: 'crunchy', label: 'Crunchy Treats', img: '/assets/images/cat/ctt2.webp' },
-  { id: 'creamy', label: 'Creamy Treats', img: '/assets/images/cat/ctt3.webp' },
-  { id: 'grain-free', label: 'Grain Free Treats', img: '/assets/images/cat/ctt4.webp' }
+  { id: 'all', label: 'All Cat Treats', img: '/assets/images/cat/Fil_crunchytreats.webp' },
+  { id: 'crunchy', label: 'Crunchy Treats', img: '/assets/images/cat/Fil_crunchytreats.webp' },
+  { id: 'creamy', label: 'Creamy Treats', img: '/assets/images/cat/Fil_creamytreats.webp' },
+  { id: 'grain-free', label: 'Grain Free Treats', img: '/assets/images/cat/Fil_grainfreetreats.webp' }
 
-  
 ];
 
 const sampleProducts = [];
