@@ -310,7 +310,7 @@ export default function DogClothing({ initialActive = 'All Dog Clothing' }) {
   const priceRanges = ['INR 10 - INR 300','INR 301 - INR 500','INR 501 - INR 1000','INR 1000 - INR 2000','INR 2000+'];
   const weights = ['200 g','300 g','500 g'];
   const sizes = ['Pack of 1','Pack of 2','Pack of 3','Pack of 5'];
-  const subCategories = ['Festive Special','T-Shirts & Dresses','Jackets'];
+  const subCategories = ['Festive Special','T-Shirts & Dresses','Sweatshirts','Sweaters','Bow Ties & Bandanas','Raincoats','Shoes & Socks','Jackets','Personalised','All Dog Clothing'];
 
   // selected filters: key -> Set(values)
   const [selectedFilters, setSelectedFilters] = useState(() => ({}));
@@ -380,6 +380,38 @@ export default function DogClothing({ initialActive = 'All Dog Clothing' }) {
     <div className="overflow-x-hidden pb-20 lg:pb-0">
       <Helmet>
         <title>{`Shop for Dogs — ${active} | PET&CO`}</title>
+        <style>{`
+          /* Hide scrollbars visually but keep scrolling functionality */
+          .thin-gold-scroll {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+          }
+          .thin-gold-scroll::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+            width: 0;
+            height: 0;
+          }
+          
+          /* Hide scrollbars for filter drawer */
+          .hide-scrollbar {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+          }
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+          }
+          
+          /* Also hide global scrollbars */
+          html, body, #root {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+          }
+          html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+          }
+        `}</style>
       </Helmet>
       <Header cartItemCount={getCartItemCount()} cartItems={cartItems} onSearch={() => {}} />
 
@@ -547,7 +579,7 @@ export default function DogClothing({ initialActive = 'All Dog Clothing' }) {
         <div className="flex items-center justify-between p-4 border-b">
           <div>
             <div className="text-sm font-semibold">Filter</div>
-            <div className="text-xs text-muted-foreground">250 products</div>
+            <div className="text-xs text-muted-foreground">{displayedProducts.length} products</div>
           </div>
           <div>
             <button onClick={() => setFilterOpen(false)} className="p-2">
@@ -574,75 +606,237 @@ export default function DogClothing({ initialActive = 'All Dog Clothing' }) {
           <section ref={el => sectionRefs.current['Brand'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Brand</h4>
             <div className="flex flex-wrap gap-2">
-              {brands.map(b=> (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}
+              {brands.map(b=> (
+                <button 
+                  key={b} 
+                  onClick={() => toggleFilter('Brand', b)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Brand']?.includes(b) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
             </div>
           </section>
 
           {/* Dog/cat */}
           <section ref={el => sectionRefs.current['Dog/Cat'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Dog/cat</h4>
-            <div className="flex flex-wrap gap-2">{dogCat.map(d=> (<button key={d} className="text-xs px-3 py-1 border border-border rounded bg-white">{d}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {dogCat.map(d=> (
+                <button 
+                  key={d} 
+                  onClick={() => toggleFilter('Dog/Cat', d)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Dog/Cat']?.includes(d) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Life stage */}
           <section ref={el => sectionRefs.current['Life Stage'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Life stage</h4>
-            <div className="flex flex-wrap gap-2">{lifeStages.map(l=> (<button key={l} className="text-xs px-3 py-1 border border-border rounded bg-white">{l}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {lifeStages.map(l=> (
+                <button 
+                  key={l} 
+                  onClick={() => toggleFilter('Life Stage', l)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Life Stage']?.includes(l) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Breed size */}
           <section ref={el => sectionRefs.current['Breed Size'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Breed size</h4>
-            <div className="flex flex-wrap gap-2">{breedSizes.map(b=> (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {breedSizes.map(b=> (
+                <button 
+                  key={b} 
+                  onClick={() => toggleFilter('Breed Size', b)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Breed Size']?.includes(b) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Product type */}
           <section ref={el => sectionRefs.current['Product Type'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Product type</h4>
-            <div className="flex flex-wrap gap-2">{productTypes.map(p=> (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {productTypes.map(p=> (
+                <button 
+                  key={p} 
+                  onClick={() => toggleFilter('Product Type', p)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Product Type']?.includes(p) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Special diet */}
           <section ref={el => sectionRefs.current['Special Diet'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Special diet</h4>
-            <div className="flex flex-wrap gap-2">{specialDiets.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {specialDiets.map(s=> (
+                <button 
+                  key={s} 
+                  onClick={() => toggleFilter('Special Diet', s)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Special Diet']?.includes(s) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Protein source */}
           <section ref={el => sectionRefs.current['Protein Source'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Protein source</h4>
-            <div className="flex flex-wrap gap-2">{proteinSource.map(p=> (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {proteinSource.map(p=> (
+                <button 
+                  key={p} 
+                  onClick={() => toggleFilter('Protein Source', p)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Protein Source']?.includes(p) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Price */}
           <section ref={el => sectionRefs.current['Price'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Price</h4>
-            <div className="flex flex-wrap gap-2">{priceRanges.map(r=> (<button key={r} className="text-xs px-3 py-1 border border-border rounded bg-white">{r}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {priceRanges.map(r=> (
+                <button 
+                  key={r} 
+                  onClick={() => toggleFilter('Price', r)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Price']?.includes(r) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Weight */}
           <section ref={el => sectionRefs.current['Weight'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Weight</h4>
-            <div className="flex flex-wrap gap-2">{weights.map(w=> (<button key={w} className="text-xs px-3 py-1 border border-border rounded bg-white">{w}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {weights.map(w=> (
+                <button 
+                  key={w} 
+                  onClick={() => toggleFilter('Weight', w)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Weight']?.includes(w) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {w}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Size */}
           <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Size</h4>
-            <div className="flex flex-wrap gap-2">{sizes.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {sizes.map(s=> (
+                <button 
+                  key={s} 
+                  onClick={() => toggleFilter('Size', s)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Size']?.includes(s) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Sub category */}
           <section ref={el => sectionRefs.current['Sub Category'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Sub category</h4>
-            <div className="flex flex-wrap gap-2">{subCategories.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {subCategories.map(s=> (
+                <button 
+                  key={s} 
+                  onClick={() => toggleFilter('Sub Category', s)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Sub Category']?.includes(s) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
         </div>
 
         {/* footer actions */}
         <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
-          <button className="text-sm text-orange-500">Clear All</button>
-          <button className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
+          <button 
+            onClick={clearFilters}
+            className="text-sm text-orange-500 hover:text-orange-600 transition-colors"
+          >
+            Clear All
+          </button>
+          <button 
+            onClick={() => setFilterOpen(false)}
+            className="bg-orange-500 text-white px-5 py-2 rounded hover:bg-orange-600 transition-colors"
+          >
+            Continue
+          </button>
         </div>
       </aside>
     </div>

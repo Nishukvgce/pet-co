@@ -202,6 +202,8 @@ function App() {
                 <Route path="/shop-for-dogs/dog-clothing/sweatshirts" element={<DogClothing initialActive="Sweatshirts" />} />
                 <Route path="/shop-for-dogs/dog-clothing/sweaters" element={<DogClothing initialActive="Sweaters" />} />
                 <Route path="/shop-for-dogs/dog-clothing/bow-ties-bandanas" element={<DogClothing initialActive="Bow Ties & Bandanas" />} />
+                {/* Handle malformed URL for backward compatibility */}
+                <Route path="/shop-for-dogs/dog-clothing/bow-ties-&-bandanas" element={<Navigate to="/shop-for-dogs/dog-clothing/bow-ties-bandanas" replace />} />
                 <Route path="/shop-for-dogs/dog-clothing/raincoats" element={<DogClothing initialActive="Raincoats" />} />
                 <Route path="/shop-for-dogs/dog-clothing/shoes-socks" element={<DogClothing initialActive="Shoes & Socks" />} />
                 <Route path="/shop-for-dogs/dog-clothing/jackets" element={<DogClothing initialActive="Jackets" />} />

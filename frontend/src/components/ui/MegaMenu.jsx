@@ -384,14 +384,14 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                 <h4 className="text-sm font-semibold text-foreground mb-1">DOG TOYS</h4>
                 <ul className="space-y-0.5">
                   {['Balls','Chew Toys','Crinkle Toys','Fetch Toys','Interactive Toys','Plush Toys','Rope Toys','Squeaker Toys','All Dog Toys'].map((t,i)=> (
-                    <li key={i}><Link to={`/shop-for-dogs/dog-toys/${t.toLowerCase().split(' ').join('-')}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
+                    <li key={i}><Link to={`/shop-for-dogs/dog-toys/${slugify(t)}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
                   ))}
                 </ul>
                 <hr className="my-1" />
                 <h4 className="text-sm font-semibold text-foreground mt-3 mb-1">DOG BEDDING</h4>
                 <ul className="space-y-0.5">
                   {['Beds','Blankets & Cushions','Mats','Personalised Bedding','Tents','All Dog Bedding'].map((t,i)=> (
-                    <li key={i}><Link to={`/shop-for-dogs/dog-bedding/${t.toLowerCase().split(' ').join('-')}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
+                    <li key={i}><Link to={`/shop-for-dogs/dog-bedding/${slugify(t)}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
                   ))}
                 </ul>
               </div>
@@ -400,7 +400,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                 <h4 className="text-sm font-semibold text-foreground mb-1">DOG CLOTHING & ACCESSORIES</h4>
                 <ul className="space-y-0.5">
                   {['Festive Special','T-Shirts & Dresses','Sweatshirts','Sweaters','Bow Ties & Bandanas','Raincoats','Shoes & Socks','Jackets','Personalised','All Dog Clothing'].map((t,i)=> (
-                    <li key={i}><Link to={`/shop-for-dogs/dog-clothing/${t.toLowerCase().split(' ').join('-')}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
+                    <li key={i}><Link to={`/shop-for-dogs/dog-clothing/${slugify(t)}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
                   ))}
                 </ul>
                 <hr className="my-1" />

@@ -8,6 +8,7 @@ import ProductInfo from '../product-detail-page/components/ProductInfo';
 import ProductDetails from '../product-detail-page/components/ProductDetails';
 import ProductFAQ from '../product-detail-page/components/ProductFAQ';
 import ProductReviews from '../product-detail-page/components/ProductReviews';
+import RelatedProducts from '../product-detail-page/components/RelatedProducts';
 import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
@@ -21,6 +22,7 @@ const ProductFullPage = () => {
   const { cartItems, addToCart, addToWishlist, removeFromWishlist, isInWishlist, getCartItemCount } = useCart();
 
   const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -68,6 +70,9 @@ const ProductFullPage = () => {
                 weight: variant?.weight || variant?.size || `Option ${index + 1}`,
                 size: variant?.size || variant?.weight || `Option ${index + 1}`,
                 label: variant?.label || variant?.weight || variant?.size || `Option ${index + 1}`,
+                weightUnit: variant?.weightUnit || '',
+                sizeUnit: variant?.sizeUnit || '', 
+                sizeCategory: variant?.sizeCategory || null,
                 price: parseFloat(variant?.price || productData?.price || 0),
                 originalPrice: parseFloat(variant?.originalPrice || variant?.mrp || productData?.originalPrice || productData?.mrp || variant?.price || productData?.price || 0),
                 stock: variant?.stock || productData?.stock || productData?.stockQuantity || 10,
@@ -83,6 +88,9 @@ const ProductFullPage = () => {
                 weight: variant?.weight || variant?.size || `Option ${index + 1}`,
                 size: variant?.size || variant?.weight || `Option ${index + 1}`,
                 label: variant?.label || variant?.weight || variant?.size || `Option ${index + 1}`,
+                weightUnit: variant?.weightUnit || 'g',
+                sizeUnit: variant?.sizeUnit || 'cm',
+                sizeCategory: variant?.sizeCategory || null,
                 price: parseFloat(variant?.price || productData?.price || 0),
                 originalPrice: parseFloat(variant?.originalPrice || variant?.mrp || productData?.originalPrice || productData?.mrp || variant?.price || productData?.price || 0),
                 stock: variant?.stock || productData?.stock || productData?.stockQuantity || 10,
@@ -98,6 +106,9 @@ const ProductFullPage = () => {
                 weight: productData?.weight || "Default",
                 size: productData?.size || "Default", 
                 label: productData?.weight || productData?.size || "Default",
+                weightUnit: productData?.weightUnit || 'g',
+                sizeUnit: productData?.sizeUnit || 'cm',
+                sizeCategory: productData?.sizeCategory || null,
                 price: parseFloat(productData?.price || productData?.salePrice || 0),
                 originalPrice: parseFloat(productData?.originalPrice || productData?.mrp || productData?.price || productData?.salePrice || 0),
                 stock: productData?.stock || productData?.stockQuantity || 10,
@@ -132,7 +143,14 @@ const ProductFullPage = () => {
             rating: p?.rating || 4.5,
             reviewCount: p?.reviewCount || 0,
             badges: p?.badges || [],
-            variants: [{ id: 'default', weight: p?.weight || 'Default', price: parseFloat(p?.price ?? p?.salePrice ?? 0) || 0, originalPrice: parseFloat(p?.originalPrice ?? p?.price ?? p?.salePrice ?? 0) || 0 }]
+            variants: [{
+              id: 'default', 
+              weight: p?.weight || 'Default', 
+              weightUnit: p?.weightUnit || 'g',
+              sizeUnit: p?.sizeUnit || 'cm',
+              price: parseFloat(p?.price ?? p?.salePrice ?? 0) || 0, 
+              originalPrice: parseFloat(p?.originalPrice ?? p?.price ?? p?.salePrice ?? 0) || 0
+            }]
           }));
           setRelatedProducts(normalizedRelated);
         } catch (e) {
@@ -311,6 +329,23 @@ const ProductFullPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Related Products Section */}
+      {relatedProducts && relatedProducts.length > 0 && (
+        <section className="container mx-auto px-4 pb-6 md:pb-8">
+          <div className="bg-white rounded-2xl shadow-sm border overflow-hidden mb-6 md:mb-8">
+            <div className="p-4 md:p-6 lg:p-8">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 border-b pb-3 md:pb-4 flex items-center gap-3">
+                <svg className="w-5 h-5 md:w-6 md:h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                Related Products
+              </h2>
+              <RelatedProducts products={relatedProducts} onAddToCart={handleAddToCart} />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Trust Badges Section */}
       <section className="bg-primary/5 border-t">

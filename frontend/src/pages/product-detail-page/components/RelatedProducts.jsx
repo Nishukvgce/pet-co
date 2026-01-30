@@ -71,7 +71,24 @@ const RelatedProducts = ({ products, onAddToCart }) => {
                     </Link>
                   </div>
                   <p className="font-caption text-sm text-muted-foreground mt-1">
-                    {product?.variants?.[0]?.weight}
+                    {(() => {
+                      const variant = product?.variants?.[0];
+                      if (!variant) return '';
+                      
+                      if (variant.weight && variant.weight.toString().trim()) {
+                        const weight = variant.weight.toString().trim();
+                        const unit = variant.weightUnit?.toString().trim() || '';
+                        return unit ? `${weight}${unit}` : weight;
+                      }
+                      
+                      if (variant.size && variant.size.toString().trim()) {
+                        const size = variant.size.toString().trim();
+                        const unit = variant.sizeUnit?.toString().trim() || '';
+                        return unit ? `${size}${unit}` : size;
+                      }
+                      
+                      return variant.weight || 'Default';
+                    })()}
                   </p>
                 </div>
 

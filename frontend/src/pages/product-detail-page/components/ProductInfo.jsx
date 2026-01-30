@@ -250,9 +250,33 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
                 )}
                 
                 <div className="p-3 pt-4">
-                  {/* Weight/Size Label */}
+                  {/* Weight/Size Label with Units */}
                   <div className="text-xs text-muted-foreground mb-2 font-medium">
-                    {variant?.weight || variant?.size || variant?.label || 'Default'}
+                    {(() => {
+                      // Build display label with proper units from database
+                      if (variant?.label && variant.label !== variant?.weight && variant.label !== variant?.size) {
+                        return variant.label;
+                      }
+                      
+                      if (variant?.weight && variant.weight.toString().trim()) {
+                        const weight = variant.weight.toString().trim();
+                        const unit = variant?.weightUnit?.toString().trim() || '';
+                        return unit ? `${weight}${unit}` : weight;
+                      }
+                      
+                      if (variant?.size && variant.size.toString().trim()) {
+                        const size = variant.size.toString().trim();
+                        if (variant?.sizeCategory && variant.sizeCategory !== size) {
+                          const unit = variant?.sizeUnit?.toString().trim() || '';
+                          const measurement = unit ? `${size}${unit}` : size;
+                          return `${variant.sizeCategory} (${measurement})`;
+                        }
+                        const unit = variant?.sizeUnit?.toString().trim() || '';
+                        return unit ? `${size}${unit}` : size;
+                      }
+                      
+                      return 'Default';
+                    })()} 
                   </div>
                   
                   {/* Price */}
