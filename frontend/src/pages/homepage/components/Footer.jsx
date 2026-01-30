@@ -50,7 +50,7 @@ const Footer = () => {
 
   const contactInfo = {
     phone: "9845651468",
-    whatsapp: "+91 9845651468",
+    whatsapp: "+90080 03096⁩",
     email: "hello@neenusnatural.com",
     address: "123 MG Road, Bengaluru, Karnataka 560001"
   };

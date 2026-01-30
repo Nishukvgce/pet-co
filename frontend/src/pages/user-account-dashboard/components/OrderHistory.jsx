@@ -42,6 +42,33 @@ const OrderHistory = () => {
     }
   };
 
+  // Helper: derive readable variant/unit label from possible item fields
+  const getVariantLabel = (item) => {
+    if (!item) return '';
+    const candidates = [
+      item.variantLabel,
+      item.variantName,
+      item.variant,
+      item.sizeLabel,
+      item.size,
+      item.weight,
+      item.unit,
+      item.format
+    ];
+
+    // handle object-shaped variant
+    if (item.variant && typeof item.variant === 'object') {
+      candidates.unshift(item.variant.label || item.variant.name || item.variant.weight || item.variant.size || item.variant.value);
+    }
+
+    for (const c of candidates) {
+      if (c === null || c === undefined) continue;
+      const s = String(c).trim();
+      if (s.length > 0) return s;
+    }
+    return '';
+  };
+
   // Resolve product image URL to absolute path served by backend
   const resolveImageUrl = (candidate) => {
     if (!candidate || typeof candidate !== 'string') return '';
@@ -388,7 +415,7 @@ const OrderHistory = () => {
       const settings = {
         siteName: "PET&CO",
         companyAddress: "Natural & Organic Products Hub, Bangalore, India",
-        companyPhone: "+91 9845651468",
+        companyPhone: "+90080 03096⁩",
         companyEmail: "info@petco.com"
       };
       
@@ -440,7 +467,7 @@ const OrderHistory = () => {
       const settings = {
         siteName: "PET&CO",
         companyAddress: "Natural & Organic Products Hub, Bangalore, India",
-        companyPhone: "+91 9845651468",
+        companyPhone: "+90080 03096⁩",
         companyEmail: "info@petco.com"
       };
       
@@ -800,7 +827,7 @@ const OrderHistory = () => {
                               {item?.productName || 'Product'}
                             </h5>
                             <p className="font-caption text-sm text-muted-foreground">
-                              Qty: {parseInt(item?.quantity) || 1} • ₹{(parseFloat(item?.price) || 0).toFixed(2)} each
+                              {getVariantLabel(item) ? `${getVariantLabel(item)} • ` : ''}Qty: {parseInt(item?.quantity) || 1} • ₹{(parseFloat(item?.price) || 0).toFixed(2)} each
                             </p>
                             {order?.status?.toLowerCase() === 'delivered' && (
                               <div className="mt-2">

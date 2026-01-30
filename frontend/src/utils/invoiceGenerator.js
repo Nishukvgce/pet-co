@@ -209,7 +209,7 @@ export const generateInvoice = (order, user, settings = {}) => {
                 </div>
                 <p>Natural & Organic Products</p>
                 <p>Email: info@petco.com</p>
-                <p>Phone: +91 9845651468</p>
+                <p>Phone: +90080 03096⁩</p>
             </div>
             <div class="invoice-info">
                 <h2>INVOICE</h2>
@@ -297,7 +297,7 @@ export const generateInvoice = (order, user, settings = {}) => {
 
         <div class="footer">
             <p>Thank you for shopping with ${siteName}!</p>
-            <p>For any queries, contact us at info@petco.com or +91 9845651468</p>
+            <p>For any queries, contact us at info@petco.com or +90080 03096⁩</p>
             <p><em>This is a computer-generated invoice and does not require a signature.</em></p>
         </div>
     </div>

@@ -389,7 +389,7 @@ const ShippingForm = ({ onNext, onAddressSelect, user, isLoading = false }) => {
                 onChange={handleInputChange}
                 error={errors?.phone}
                 required
-                placeholder="+91 9845651468"
+                placeholder="+90080 03096⁩"
               />
             </div>
 

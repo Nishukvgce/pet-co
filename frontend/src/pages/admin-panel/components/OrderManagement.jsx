@@ -438,7 +438,7 @@ const OrderManagement = () => {
       const settings = {
         siteName: "PET&CO",
         companyAddress: "Natural & Organic Products Hub, Bangalore, India",
-        companyPhone: "+91 9845651468",
+        companyPhone: "+90080 03096⁩",
         companyEmail: "info@petco.com"
       };
       
@@ -490,7 +490,7 @@ const OrderManagement = () => {
       const settings = {
         siteName: "PET&CO",
         companyAddress: "Natural & Organic Products Hub, Bangalore, India",
-        companyPhone: "+91 9845651468",
+        companyPhone: "+90080 03096⁩",
         companyEmail: "info@petco.com"
       };
       
