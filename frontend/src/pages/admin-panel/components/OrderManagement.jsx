@@ -24,6 +24,35 @@ const OrderManagement = () => {
     }
   };
 
+  // Helper: derive a readable variant label from various possible item fields
+  const getVariantLabel = (item) => {
+    if (!item) return '';
+    // Common fields used by different APIs / payloads
+    const candidates = [
+      item.variant,
+      item.variantLabel,
+      item.variantName,
+      item.unit,
+      item.weight,
+      item.size,
+      item.sizeLabel,
+      item.format
+    ];
+
+    // If variant is an object (sometimes stored as object), try to pick a useful property
+    if (item.variant && typeof item.variant === 'object') {
+      candidates.unshift(item.variant.label || item.variant.name || item.variant.weight || item.variant.size || item.variant.value);
+    }
+
+    for (const c of candidates) {
+      if (c === null || c === undefined) continue;
+      const s = String(c).trim();
+      if (s.length > 0) return s;
+    }
+
+    return '';
+  };
+
   useEffect(() => {
     loadOrders();
   }, []);
@@ -691,7 +720,9 @@ const OrderManagement = () => {
                               <div className="flex-1 min-w-0">
                                 <div className="font-medium text-foreground text-sm sm:text-base truncate">{item.productName}</div>
                                 <div className="text-xs sm:text-sm text-muted-foreground">
-                                  {item.brand ? `${item.brand} • ` : ''}{item.variant ? `${item.variant} • ` : ''}Qty: {parseInt(item.quantity) || 1}
+                                  {item.brand ? `${item.brand} • ` : ''}
+                                  {getVariantLabel(item) ? `${getVariantLabel(item)} • ` : ''}
+                                  Qty: {parseInt(item.quantity) || 1}
                                 </div>
                                 <div className="text-sm text-primary font-medium">₹{item.price?.toFixed(2) || '0.00'}</div>
                               </div>

@@ -514,6 +514,45 @@ export const CartProvider = ({ children }) => {
       quantity: parseInt(quantity) || 1,
     };
 
+    // Ensure variant labels include units when callers pass numeric-only weights/sizes
+    try {
+      const variantText = `${sanitizedProduct.variant || ''}`.trim();
+      const looksNumeric = /^\d+(?:[\.,]\d+)?$/.test(variantText);
+      if (variantText && looksNumeric) {
+        const pid = sanitizedProduct.productId || sanitizedProduct.id;
+        if (pid) {
+          try {
+            const prod = await productApi.getById(pid);
+            const findVariant = (vid) => {
+              const variants = Array.isArray(prod?.variants) && prod.variants.length ? prod.variants : (Array.isArray(prod?.metadata?.variants) ? prod.metadata.variants : []);
+              if (!variants || variants.length === 0) return null;
+              if (sanitizedProduct.variantId) {
+                return variants.find(v => (v?.id || v?.variantId || v?.code) === sanitizedProduct.variantId) || null;
+              }
+              // fallback: match by numeric weight/size value
+              return variants.find(v => String(v?.weight || v?.size || v?.label) === variantText) || null;
+            };
+
+            const matched = findVariant(sanitizedProduct.variantId);
+            let unit = '';
+            if (matched) {
+              unit = matched.weightUnit || matched.sizeUnit || matched.unit || matched.unitType || '';
+            }
+            if (!unit) {
+              unit = prod?.weightUnit || prod?.sizeUnit || prod?.unit || '';
+            }
+            if (unit) {
+              sanitizedProduct.variant = `${variantText}${unit.startsWith(' ') ? unit : unit}`;
+            }
+          } catch (e) {
+            // ignore - best-effort only
+          }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
     const availableStock = sanitizedProduct.stock ?? sanitizedProduct.stockQuantity ?? null;
     if (availableStock !== null) {
       if (parseInt(availableStock) <= 0) {
