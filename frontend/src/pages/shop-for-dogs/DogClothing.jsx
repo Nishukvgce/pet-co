@@ -328,6 +328,30 @@ export default function DogClothing({ initialActive = 'All Dog Clothing' }) {
 
   const clearFilters = () => setSelectedFilters({});
 
+  // Function to check if any filters are applied
+  const hasAppliedFilters = () => {
+    return Object.keys(selectedFilters).some(key => selectedFilters[key] && selectedFilters[key].length > 0);
+  };
+
+  // Function to check if a specific filter category has selections
+  const hasFilterSelections = (filterType) => {
+    const filterKey = filterType; // Direct mapping for this implementation
+    return selectedFilters[filterKey] && selectedFilters[filterKey].length > 0;
+  };
+
+  // Function to get count for a specific filter category
+  const getFilterCount = (filterType) => {
+    const filterKey = filterType;
+    return selectedFilters[filterKey] ? selectedFilters[filterKey].length : 0;
+  };
+
+  // Function to get total applied filter count
+  const getTotalFilterCount = () => {
+    return Object.values(selectedFilters).reduce((total, filterArray) => {
+      return total + (filterArray ? filterArray.length : 0);
+    }, 0);
+  };
+
   // Apply additional filters (brand, price, etc.) on top of category/subcategory filtered products
   const displayedProducts = React.useMemo(() => {
     const keys = Object.keys(selectedFilters).filter(k => selectedFilters[k] && selectedFilters[k].length);

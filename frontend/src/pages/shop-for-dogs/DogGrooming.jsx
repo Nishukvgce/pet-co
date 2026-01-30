@@ -222,6 +222,7 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState('');
   const location = useLocation();
 
   const handleQuickView = (product) => {
@@ -446,12 +447,44 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
       console.log(`DogGrooming: After subcategory filter (${activeSubcategory}): ${working.length} products`);
     }
     
-    // Step 3: Apply additional filters (brand, price, etc.)
+    // Step 3: Apply additional filters
 
-    // Apply selected filters (brands, productTypes, priceRanges, sizes) - keep original logic
+    // Dog/Cat filter
+    if (selectedFilters?.catKitten?.length > 0) {
+      working = working.filter((p) => 
+        selectedFilters.catKitten.some((dogCat) => 
+          String(p.dogCat || p.petType || '').toLowerCase().includes(dogCat.toLowerCase()) ||
+          (dogCat === 'Dog' && isDogProduct(p))
+        )
+      );
+    }
+
+    // Life Stage filter
+    if (selectedFilters?.lifeStages?.length > 0) {
+      working = working.filter((p) => 
+        selectedFilters.lifeStages.some((stage) => 
+          String(p.lifeStage || '').toLowerCase().includes(stage.toLowerCase()) ||
+          String(p.name || '').toLowerCase().includes(stage.toLowerCase())
+        )
+      );
+    }
+
+    // Breed Size filter
+    if (selectedFilters?.breedSizes?.length > 0) {
+      working = working.filter((p) => 
+        selectedFilters.breedSizes.some((size) => 
+          String(p.breedSize || '').toLowerCase().includes(size.toLowerCase()) ||
+          String(p.name || '').toLowerCase().includes(size.toLowerCase())
+        )
+      );
+    }
+
+    // Brand filter
     if (selectedFilters?.brands?.length > 0) {
       working = working.filter((p) => selectedFilters.brands.includes(p.brand));
     }
+
+    // Product Type filter
     if (selectedFilters?.productTypes?.length > 0) {
       working = working.filter((p) =>
         selectedFilters.productTypes.some((pt) =>
@@ -461,23 +494,67 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
         )
       );
     }
+
+    // Special Diet filter
+    if (selectedFilters?.specialDiets?.length > 0) {
+      working = working.filter((p) => 
+        selectedFilters.specialDiets.some((diet) => 
+          String(p.specialDiet || '').toLowerCase().includes(diet.toLowerCase()) ||
+          String(p.name || '').toLowerCase().includes(diet.toLowerCase())
+        )
+      );
+    }
+
+    // Protein Source filter
+    if (selectedFilters?.proteinSource?.length > 0) {
+      working = working.filter((p) => 
+        selectedFilters.proteinSource.some((protein) => 
+          String(p.proteinSource || '').toLowerCase().includes(protein.toLowerCase()) ||
+          String(p.name || '').toLowerCase().includes(protein.toLowerCase())
+        )
+      );
+    }
+
+    // Price Range filter
     if (selectedFilters?.priceRanges?.length > 0) {
       working = working.filter((p) => {
         const price = p.price || 0;
         return selectedFilters.priceRanges.some((range) => {
-          if (range === 'INR 200 - INR 500') return price >= 200 && price <= 500;
+          if (range === 'INR 10 - INR 300') return price >= 10 && price <= 300;
+          if (range === 'INR 301 - INR 500') return price >= 301 && price <= 500;
           if (range === 'INR 501 - INR 1000') return price >= 501 && price <= 1000;
-          if (range === 'INR 1001 - INR 2000') return price >= 1001 && price <= 2000;
-          if (range === 'INR 2000+') return price > 2000;
+          if (range === 'INR 1000+') return price > 1000;
           return true;
         });
       });
     }
+
+    // Weight filter
+    if (selectedFilters?.weights?.length > 0) {
+      working = working.filter((p) =>
+        selectedFilters.weights.some((w) =>
+          String(p.weight || '').toLowerCase().includes(w.toLowerCase()) ||
+          (p.variants || []).some((variant) => String(variant.weight || variant).toLowerCase().includes(w.toLowerCase()))
+        )
+      );
+    }
+
+    // Size filter
     if (selectedFilters?.sizes?.length > 0) {
       working = working.filter((p) =>
         selectedFilters.sizes.some((s) =>
           String(p.size || '').toLowerCase().includes(s.toLowerCase()) ||
           (p.variants || []).some((variant) => String(variant).toLowerCase().includes(s.toLowerCase()))
+        )
+      );
+    }
+
+    // Sub Category filter
+    if (selectedFilters?.subCategories?.length > 0) {
+      working = working.filter((p) =>
+        selectedFilters.subCategories.some((sub) =>
+          String(p.subcategory || '').toLowerCase().includes(sub.toLowerCase()) ||
+          String(p.category || '').toLowerCase().includes(sub.toLowerCase())
         )
       );
     }
@@ -511,9 +588,16 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
     active, 
     location.search,
     selectedFilters?.brands?.length,
+    selectedFilters?.catKitten?.length,
+    selectedFilters?.lifeStages?.length,
+    selectedFilters?.breedSizes?.length,
     selectedFilters?.productTypes?.length,
+    selectedFilters?.specialDiets?.length,
+    selectedFilters?.proteinSource?.length,
     selectedFilters?.priceRanges?.length,
+    selectedFilters?.weights?.length,
     selectedFilters?.sizes?.length,
+    selectedFilters?.subCategories?.length,
     selectedFilters?.sortBy,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     JSON.stringify(selectedFilters)
@@ -543,11 +627,30 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
                   }
         
                   /* hide scrollbar for horizontal top filters */
-                  .hide-scrollbar {
+                  .hide-scrollbar, .scrollbar-hide {
                     -ms-overflow-style: none; /* IE and Edge */
                     scrollbar-width: none; /* Firefox */
                   }
-                  .hide-scrollbar::-webkit-scrollbar { display: none; }
+                  .hide-scrollbar::-webkit-scrollbar, .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+                  /* thin gold scroll for sidebar */
+                  .thin-gold-scroll {
+                    scrollbar-width: thin;
+                    scrollbar-color: #d4af37 #f1f1f1;
+                  }
+                  .thin-gold-scroll::-webkit-scrollbar {
+                    width: 6px;
+                  }
+                  .thin-gold-scroll::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                  }
+                  .thin-gold-scroll::-webkit-scrollbar-thumb {
+                    background: #d4af37;
+                    border-radius: 3px;
+                  }
+                  .thin-gold-scroll::-webkit-scrollbar-thumb:hover {
+                    background: #b8941f;
+                  }
         
                   /* small scroll button styles (page-scoped) */
                   .top-scroll-btn { width: 34px; height: 34px; border-radius: 9999px; }
@@ -568,72 +671,71 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
       <Header cartItemCount={getCartItemCount()} cartItems={cartItems} onSearch={() => { }} />
 
       <div className="container mx-auto px-4 py-8 pb-20 lg:pb-0">
-        {/* Horizontal Category Navigation */}
-        <div className="mb-6">
-          <div className="relative flex items-center">
-            {/* Left scroll button */}
-            <button
-              onClick={scrollTopLeft}
-              aria-label="Scroll left"
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow-sm hover:bg-gray-50 mr-3 z-10"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            {/* Horizontal scrollable category list */}
-            <div 
-              ref={topRef}
-              className="flex-1 overflow-x-auto hide-scrollbar"
-              style={{ scrollBehavior: 'smooth' }}
-            >
-              <div className="flex items-center gap-3 pb-2">
-                {categories.map((c, idx) => (
-                  <button
-                    key={c.id}
-                    onClick={() => { setActive(c.label); const p = routeMap[c.label]; if (p) navigate(p); }}
-                    className={`flex-shrink-0 flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 min-w-[80px] ${
-                      active === c.label 
-                        ? 'bg-orange-50 border-2 border-orange-400 shadow-sm' 
-                        : 'bg-white border border-gray-200 hover:border-orange-200 hover:bg-orange-50/50'
-                    }`}
-                  >
-                    <div className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center ${
-                      active === c.label ? 'ring-2 ring-orange-300' : 'border border-gray-100'
-                    }`}>
-                      <img src={c.img} alt={c.label} className="w-full h-full object-cover" />
-                    </div>
-                    <span className={`text-xs font-medium text-center leading-tight ${
-                      active === c.label ? 'text-orange-700' : 'text-gray-700'
-                    }`}>
-                      {c.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Right scroll button */}
-            <button
-              onClick={scrollTopRight}
-              aria-label="Scroll right"
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white shadow-sm hover:bg-gray-50 ml-3 z-10"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+        {fetchError && (
+          <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            {fetchError}
+          </div>
+        )}
+        
+        {/* Mobile horizontal categories */}
+        <div className="md:hidden mb-6">
+          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+            {categories.map((c, idx) => (
+              <button
+                key={c.id}
+                onClick={() => { setActive(c.label); const p = routeMap[c.label]; if (p) navigate(p); }}
+                className={`flex-shrink-0 flex flex-col items-center gap-2 p-3 min-w-[80px] rounded-lg border ${
+                  active === c.label ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-200'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${
+                  active === c.label ? 'ring-2 ring-orange-400' : ''
+                }`}>
+                  <img src={c.img} alt={c.label} className="w-full h-full object-cover" />
+                </div>
+                <span className="text-xs font-medium text-gray-800 text-center leading-tight">
+                  {c.label}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Main content area - full width now */}
-        <div className="w-full">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-6">
+          {/* Desktop vertical sidebar */}
+          <aside className="hidden md:block md:col-span-3 lg:col-span-3 xl:col-span-2">
+            <div
+              ref={leftRef}
+              onWheel={handleLeftWheel}
+              className="bg-white rounded border border-border overflow-hidden thin-gold-scroll"
+              style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}
+            >
+              <ul className="divide-y">
+                {categories.map((c, idx) => (
+                  <li key={c.id} className={`relative border-b ${active === c.label ? 'bg-[#fff6ee]' : ''}`}>
+                    <button
+                      onClick={() => { setActive(c.label); const p = routeMap[c.label]; if (p) navigate(p); }}
+                      className="w-full text-left flex items-center gap-3 p-4"
+                    >
+                      <div className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center border ${active === c.label ? 'ring-2 ring-orange-400' : 'border-gray-100'}`}>
+                        <img src={c.img} alt={c.label} className="w-full h-full object-cover" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-800">{c.label}</span>
+                    </button>
+                    {/* orange vertical accent on the right when active */}
+                    {active === c.label && (
+                      <div className="absolute right-0 top-0 h-full w-1 bg-orange-400" />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
           <main
             ref={rightRef}
             onWheel={handleRightWheel}
-            className="w-full"
-            style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 280px)' }}
+            className="col-span-1 md:col-span-9 lg:col-span-9 xl:col-span-10"
+            style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}
           >
             {/* top filter bar (simple placeholder matching ref) */}
             <div className="mb-4 flex items-center justify-between">
@@ -767,7 +869,17 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
               <h4 className="text-sm font-medium mb-3">Sort By</h4>
               <div className="flex flex-wrap gap-2">
                 {['Featured', 'Best selling', 'Alphabetically, A-Z', 'Alphabetically, Z-A', 'Price, low to high', 'Price, high to low', 'Date, old to new', 'Date, new to old'].map(s => (
-                  <button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>
+                  <button 
+                    key={s} 
+                    onClick={() => setSelectedFilters(prev => ({ ...prev, sortBy: prev.sortBy === s ? '' : s }))}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.sortBy === s 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {s}
+                  </button>
                 ))}
               </div>
             </section>
@@ -776,75 +888,237 @@ const DogGroomingPage = ({ initialActive = 'All Dog Grooming' }) => {
             <section ref={el => sectionRefs.current['Brand'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Brand</h4>
               <div className="flex flex-wrap gap-2">
-                {brands.map(b => (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}
+                {brands.map(b => (
+                  <button 
+                    key={b} 
+                    onClick={() => toggleFilter('brands', b)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.brands.includes(b) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {b}
+                  </button>
+                ))}
               </div>
             </section>
 
             {/* Dog/cat */}
             <section ref={el => sectionRefs.current['Dog/Cat'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Dog/cat</h4>
-              <div className="flex flex-wrap gap-2">{dogCat.map(d => (<button key={d} className="text-xs px-3 py-1 border border-border rounded bg-white">{d}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {dogCat.map(d => (
+                  <button 
+                    key={d} 
+                    onClick={() => toggleFilter('catKitten', d)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.catKitten.includes(d) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Life stage */}
             <section ref={el => sectionRefs.current['Life Stage'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Life stage</h4>
-              <div className="flex flex-wrap gap-2">{lifeStages.map(l => (<button key={l} className="text-xs px-3 py-1 border border-border rounded bg-white">{l}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {lifeStages.map(l => (
+                  <button 
+                    key={l} 
+                    onClick={() => toggleFilter('lifeStages', l)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.lifeStages.includes(l) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Breed size */}
             <section ref={el => sectionRefs.current['Breed Size'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Breed size</h4>
-              <div className="flex flex-wrap gap-2">{breedSizes.map(b => (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {breedSizes.map(b => (
+                  <button 
+                    key={b} 
+                    onClick={() => toggleFilter('breedSizes', b)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.breedSizes.includes(b) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Product type */}
             <section ref={el => sectionRefs.current['Product Type'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Product type</h4>
-              <div className="flex flex-wrap gap-2">{productTypes.map(p => (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {productTypes.map(p => (
+                  <button 
+                    key={p} 
+                    onClick={() => toggleFilter('productTypes', p)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.productTypes.includes(p) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Special diet */}
             <section ref={el => sectionRefs.current['Special Diet'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Special diet</h4>
-              <div className="flex flex-wrap gap-2">{specialDiets.map(s => (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {specialDiets.map(s => (
+                  <button 
+                    key={s} 
+                    onClick={() => toggleFilter('specialDiets', s)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.specialDiets.includes(s) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Protein source */}
             <section ref={el => sectionRefs.current['Protein Source'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Protein source</h4>
-              <div className="flex flex-wrap gap-2">{proteinSource.map(p => (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {proteinSource.map(p => (
+                  <button 
+                    key={p} 
+                    onClick={() => toggleFilter('proteinSource', p)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.proteinSource.includes(p) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Price */}
             <section ref={el => sectionRefs.current['Price'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Price</h4>
-              <div className="flex flex-wrap gap-2">{priceRanges.map(r => (<button key={r} className="text-xs px-3 py-1 border border-border rounded bg-white">{r}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {priceRanges.map(r => (
+                  <button 
+                    key={r} 
+                    onClick={() => toggleFilter('priceRanges', r)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.priceRanges.includes(r) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Weight */}
             <section ref={el => sectionRefs.current['Weight'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Weight</h4>
-              <div className="flex flex-wrap gap-2">{weights.map(w => (<button key={w} className="text-xs px-3 py-1 border border-border rounded bg-white">{w}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {weights.map(w => (
+                  <button 
+                    key={w} 
+                    onClick={() => toggleFilter('weights', w)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.weights.includes(w) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {w}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Size */}
             <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Size</h4>
-              <div className="flex flex-wrap gap-2">{sizes.map(s => (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {sizes.map(s => (
+                  <button 
+                    key={s} 
+                    onClick={() => toggleFilter('sizes', s)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.sizes.includes(s) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Sub category */}
             <section ref={el => sectionRefs.current['Sub Category'] = el} className="mb-6">
               <h4 className="text-sm font-medium mb-3">Sub category</h4>
-              <div className="flex flex-wrap gap-2">{subCategories.map(s => (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+              <div className="flex flex-wrap gap-2">
+                {subCategories.map(s => (
+                  <button 
+                    key={s} 
+                    onClick={() => toggleFilter('subCategories', s)}
+                    className={`text-xs px-3 py-1 border rounded transition-colors ${
+                      selectedFilters.subCategories.includes(s) 
+                        ? 'bg-orange-100 border-orange-400 text-orange-700' 
+                        : 'border-border bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </section>
           </div>
 
           {/* footer actions */}
           <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
-            <button className="text-sm text-orange-500">Clear All</button>
-            <button className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
+            <button 
+              onClick={clearAllFilters}
+              className="text-sm text-orange-500 hover:text-orange-600"
+            >
+              Clear All
+            </button>
+            <button 
+              onClick={() => setFilterOpen(false)}
+              className="bg-orange-500 text-white px-5 py-2 rounded hover:bg-orange-600"
+            >
+              Continue
+            </button>
           </div>
         </aside>
       </div>
