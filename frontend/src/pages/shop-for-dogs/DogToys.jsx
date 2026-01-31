@@ -69,6 +69,9 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  
+  // Selected filters state
+  const [selectedFilters, setSelectedFilters] = useState(() => ({}));
 
   useEffect(() => {
     try {
@@ -198,7 +201,17 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
             original: originalPrice,
             brand: p?.brand || p?.manufacturer || '',
             category: p?.category || '',
-            subcategory: p?.subcategory || p?.subcategoryLabel || ''
+            subcategory: p?.subcategory || p?.subcategoryLabel || '',
+            // Additional filter properties
+            animal: p?.animal || p?.type || 'Dog',
+            lifeStage: p?.lifeStage || p?.life_stage || '',
+            breedSize: p?.breedSize || p?.breed_size || '',
+            productType: p?.productType || p?.product_type || '',
+            specialDiet: p?.specialDiet || p?.special_diet || '',
+            proteinSource: p?.proteinSource || p?.protein_source || '',
+            weight: p?.weight || '',
+            size: p?.size || '',
+            subCategory: p?.subCategory || p?.subcategory || p?.subcategoryLabel || ''
           };
         };
 
@@ -320,7 +333,93 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
   const priceRanges = ['INR 10 - INR 300','INR 301 - INR 500','INR 501 - INR 1000','INR 1000 - INR 2000','INR 2000+'];
   const weights = ['320 g','500 g','800 g','1kg','300 g','340 g','370 g','400 g','500 g','800 g','1 kg','1.5 kg','2 kg','3 kg','5 kg','10 kg','20 kg'];
   const sizes = ['Pack of 1','Pack of 2','Pack of 3','Pack of 5'];
-  const subCategories = ['Biscuits & Snacks','Natural Treats','Puppy Treats','Vegetarian Treats','Grain Free Treat'];
+  const subCategories = ['Balls','Chew Toys','Crinkle Toys','Fetch Toys','Interactive Toys','Plush Toys','Rope Toys','Squeaker Toys'];
+
+  // Filter management functions
+  const toggleFilter = (key, value) => {
+    setSelectedFilters(prev => {
+      const copy = { ...prev };
+      const setForKey = new Set(copy[key] || []);
+      if (setForKey.has(value)) setForKey.delete(value);
+      else setForKey.add(value);
+      copy[key] = Array.from(setForKey);
+      return copy;
+    });
+  };
+
+  const clearFilters = () => setSelectedFilters({});
+
+  // Function to check if any filters are applied
+  const hasAppliedFilters = () => {
+    return Object.keys(selectedFilters).some(key => selectedFilters[key] && selectedFilters[key].length > 0);
+  };
+
+  // Function to check if a specific filter category has selections
+  const hasFilterSelections = (filterType) => {
+    const filterKey = filterType;
+    return selectedFilters[filterKey] && selectedFilters[filterKey].length > 0;
+  };
+
+  // Function to get count for a specific filter category
+  const getFilterCount = (filterType) => {
+    const filterKey = filterType;
+    return selectedFilters[filterKey] ? selectedFilters[filterKey].length : 0;
+  };
+
+  // Function to get total applied filter count
+  const getTotalFilterCount = () => {
+    return Object.values(selectedFilters).reduce((total, filterArray) => {
+      return total + (filterArray ? filterArray.length : 0);
+    }, 0);
+  };
+
+  // Apply additional filters (brand, price, etc.) on top of category/subcategory filtered products
+  const displayedProducts = React.useMemo(() => {
+    const keys = Object.keys(selectedFilters).filter(k => selectedFilters[k] && selectedFilters[k].length);
+    if (!keys.length) return filteredProducts;
+    return filteredProducts.filter(p => {
+      for (const key of keys) {
+        const values = selectedFilters[key];
+        if (!values || !values.length) continue;
+        let ok = false;
+        // map UI keys to product properties
+        if (key === 'Brand') ok = values.includes(p.brand);
+        else if (key === 'Dog/Cat') ok = values.includes(p.animal);
+        else if (key === 'Life Stage') ok = values.includes(p.lifeStage);
+        else if (key === 'Breed Size') ok = values.includes(p.breedSize);
+        else if (key === 'Product Type') ok = values.includes(p.productType);
+        else if (key === 'Special Diet') ok = values.includes(p.specialDiet);
+        else if (key === 'Protein Source') ok = values.includes(p.proteinSource);
+        else if (key === 'Price') {
+          // values are strings like 'INR 10 - INR 300'
+          ok = values.some(v => {
+            if (!p.price) return false;
+            const parts = v.replace(/INR|\s/g, '').split('-');
+            if (parts.length === 2) {
+              const low = parseInt(parts[0]) || 0;
+              const high = parseInt(parts[1]) || Number.MAX_SAFE_INTEGER;
+              return p.price >= low && p.price <= high;
+            }
+            if (v.includes('+')) {
+              const num = parseInt(v) || 0;
+              return p.price >= num;
+            }
+            return false;
+          });
+        } else if (key === 'Weight') ok = values.includes(p.weight);
+        else if (key === 'Size') ok = values.includes(p.size);
+        else if (key === 'Sub Category') ok = values.includes(p.subCategory) || values.includes(p.subcategory);
+        else {
+          // fallback: try matching property by lowercased key
+          const prop = p[key?.toLowerCase?.()];
+          if (Array.isArray(prop)) ok = prop.some(x => values.includes(x));
+          else ok = values.includes(prop);
+        }
+        if (!ok) return false;
+      }
+      return true;
+    });
+  }, [selectedFilters, filteredProducts]);
 
   const leftRef = useRef(null);
   const rightRef = useRef(null);
@@ -485,7 +584,7 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
                     <button
                       key={t}
                       onClick={() => openFilterAndScroll(t)}
-                      className={`flex items-center gap-2 text-sm px-3 py-1 border border-border rounded-full bg-white ${selectedTopFilter === t ? 'ring-1 ring-orange-300' : ''}`}
+                      className={`flex items-center gap-2 text-sm px-3 py-1 border border-border rounded-full bg-white ${selectedTopFilter === t ? 'ring-1 ring-orange-300' : (hasFilterSelections(t) ? 'ring-1 ring-orange-200 bg-orange-50' : '')}`}
                       style={{ whiteSpace: 'nowrap' }}
                     >
                       {selectedTopFilter === t ? (
@@ -496,6 +595,9 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
                         <span className="inline-flex items-center justify-center w-4 h-4 bg-transparent rounded-sm" />
                       )}
                       <span>{t}</span>
+                      {getFilterCount(t) > 0 && (
+                        <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-orange-500 rounded-full ml-2">{getFilterCount(t)}</span>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -531,8 +633,8 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {loading ? (
               <div className="col-span-full text-center py-8">Loading products...</div>
-            ) : filteredProducts.length > 0 ? (
-              filteredProducts.map(p=> (
+            ) : displayedProducts.length > 0 ? (
+              displayedProducts.map(p=> (
                 <ProductCard key={p.id} p={p} />
               ))
             ) : (
@@ -560,7 +662,7 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
         <div className="flex items-center justify-between p-4 border-b">
           <div>
             <div className="text-sm font-semibold">Filter</div>
-            <div className="text-xs text-muted-foreground">250 products</div>
+            <div className="text-xs text-muted-foreground">{displayedProducts.length} products</div>
           </div>
           <div>
             <button onClick={() => setFilterOpen(false)} className="p-2">
@@ -587,75 +689,227 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
           <section ref={el => sectionRefs.current['Brand'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Brand</h4>
             <div className="flex flex-wrap gap-2">
-              {brands.map(b=> (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}
+              {brands.map(b=> (
+                <button 
+                  key={b} 
+                  onClick={() => toggleFilter('Brand', b)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Brand']?.includes(b) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
             </div>
           </section>
 
           {/* Dog/cat */}
           <section ref={el => sectionRefs.current['Dog/Cat'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Dog/cat</h4>
-            <div className="flex flex-wrap gap-2">{dogCat.map(d=> (<button key={d} className="text-xs px-3 py-1 border border-border rounded bg-white">{d}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {dogCat.map(d=> (
+                <button 
+                  key={d} 
+                  onClick={() => toggleFilter('Dog/Cat', d)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Dog/Cat']?.includes(d) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Life stage */}
           <section ref={el => sectionRefs.current['Life Stage'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Life stage</h4>
-            <div className="flex flex-wrap gap-2">{lifeStages.map(l=> (<button key={l} className="text-xs px-3 py-1 border border-border rounded bg-white">{l}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {lifeStages.map(l=> (
+                <button 
+                  key={l} 
+                  onClick={() => toggleFilter('Life Stage', l)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Life Stage']?.includes(l) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Breed size */}
           <section ref={el => sectionRefs.current['Breed Size'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Breed size</h4>
-            <div className="flex flex-wrap gap-2">{breedSizes.map(b=> (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {breedSizes.map(b=> (
+                <button 
+                  key={b} 
+                  onClick={() => toggleFilter('Breed Size', b)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Breed Size']?.includes(b) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Product type */}
           <section ref={el => sectionRefs.current['Product Type'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Product type</h4>
-            <div className="flex flex-wrap gap-2">{productTypes.map(p=> (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {productTypes.map(p=> (
+                <button 
+                  key={p} 
+                  onClick={() => toggleFilter('Product Type', p)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Product Type']?.includes(p) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Special diet */}
           <section ref={el => sectionRefs.current['Special Diet'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Special diet</h4>
-            <div className="flex flex-wrap gap-2">{specialDiets.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {specialDiets.map(s=> (
+                <button 
+                  key={s} 
+                  onClick={() => toggleFilter('Special Diet', s)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Special Diet']?.includes(s) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Protein source */}
           <section ref={el => sectionRefs.current['Protein Source'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Protein source</h4>
-            <div className="flex flex-wrap gap-2">{proteinSource.map(p=> (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {proteinSource.map(p=> (
+                <button 
+                  key={p} 
+                  onClick={() => toggleFilter('Protein Source', p)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Protein Source']?.includes(p) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Price */}
           <section ref={el => sectionRefs.current['Price'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Price</h4>
-            <div className="flex flex-wrap gap-2">{priceRanges.map(r=> (<button key={r} className="text-xs px-3 py-1 border border-border rounded bg-white">{r}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {priceRanges.map(r=> (
+                <button 
+                  key={r} 
+                  onClick={() => toggleFilter('Price', r)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Price']?.includes(r) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Weight */}
           <section ref={el => sectionRefs.current['Weight'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Weight</h4>
-            <div className="flex flex-wrap gap-2">{weights.map(w=> (<button key={w} className="text-xs px-3 py-1 border border-border rounded bg-white">{w}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {weights.map(w=> (
+                <button 
+                  key={w} 
+                  onClick={() => toggleFilter('Weight', w)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Weight']?.includes(w) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {w}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Size */}
           <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Size</h4>
-            <div className="flex flex-wrap gap-2">{sizes.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {sizes.map(s=> (
+                <button 
+                  key={s} 
+                  onClick={() => toggleFilter('Size', s)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Size']?.includes(s) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
 
           {/* Sub category */}
           <section ref={el => sectionRefs.current['Sub Category'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Sub category</h4>
-            <div className="flex flex-wrap gap-2">{subCategories.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">
+              {subCategories.map(s=> (
+                <button 
+                  key={s} 
+                  onClick={() => toggleFilter('Sub Category', s)}
+                  className={`text-xs px-3 py-1 border rounded transition-colors ${
+                    selectedFilters['Sub Category']?.includes(s) 
+                      ? 'border-orange-400 bg-orange-50 text-orange-700' 
+                      : 'border-border bg-white hover:border-orange-200'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
         </div>
 
         {/* footer actions */}
         <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
-          <button className="text-sm text-orange-500">Clear All</button>
-          <button className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
+          <button onClick={clearFilters} className="text-sm text-orange-500">Clear All</button>
+          <button onClick={() => setFilterOpen(false)} className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
         </div>
       </aside>
     </div>
