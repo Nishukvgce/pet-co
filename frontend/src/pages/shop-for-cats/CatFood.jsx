@@ -853,7 +853,7 @@ const CatFood = ({ initialActive = 'All Cat Food' }) => {
                     <button
                       key={option}
                       onClick={() => setSortBy(option)}
-                      className={`text-xs px-3 py-1 border border-border rounded ${isSelected ? 'bg-green-600 text-white border-green-600' : 'bg-white'}`}
+                      className={`text-xs px-3 py-1 border border-border rounded ${isSelected ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
                     >
                       {option}
                     </button>
@@ -878,7 +878,7 @@ const CatFood = ({ initialActive = 'All Cat Food' }) => {
                         <button
                           key={option}
                           onClick={() => toggleFilter(section.id, option)}
-                          className={`text-xs px-3 py-1 border border-border rounded ${isSelected ? 'bg-green-600 text-white border-green-600' : 'bg-white'}`}
+                          className={`text-xs px-3 py-1 border border-border rounded ${isSelected ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
                         >
                           {option}
                         </button>
@@ -894,8 +894,8 @@ const CatFood = ({ initialActive = 'All Cat Food' }) => {
 
           {/* footer actions */}
           <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
-            <button className="text-sm text-orange-500">Clear All</button>
-            <button className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
+            <button onClick={clearAllFilters} className="text-sm text-orange-500">Clear All</button>
+            <button onClick={() => setFilterOpen(false)} className="bg-orange-500 text-white px-5 py-2 rounded">Show Products</button>
           </div>
         </aside>
       </div>

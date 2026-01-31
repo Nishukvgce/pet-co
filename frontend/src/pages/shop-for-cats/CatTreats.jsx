@@ -320,6 +320,37 @@ const CatTreats = ({ initialActive = 'All Cat Treats' }) => {
         });
       });
     }
+    if (selectedFilters.catKitten.length > 0) {
+        working = working.filter(p => selectedFilters.catKitten.some(ck => 
+          String(p.lifeStage || '').toLowerCase().includes(ck.toLowerCase()) ||
+          (p.tags || []).some(tag => tag.toLowerCase().includes(ck.toLowerCase()))
+        ));
+    }
+    if (selectedFilters.lifeStages.length > 0) {
+        working = working.filter(p => selectedFilters.lifeStages.some(ls => 
+          String(p.lifeStage || '').toLowerCase().includes(ls.toLowerCase())
+        ));
+    }
+    if (selectedFilters.breedSizes.length > 0) {
+        working = working.filter(p => selectedFilters.breedSizes.some(bs => 
+          String(p.breedSize || '').toLowerCase().includes(bs.toLowerCase())
+        ));
+    }
+    if (selectedFilters.specialDiets.length > 0) {
+        working = working.filter(p => selectedFilters.specialDiets.some(sd => 
+            String(p.specialDiet || '').toLowerCase().includes(sd.toLowerCase()) || (p.tags||[]).some(t=>t.toLowerCase().includes(sd.toLowerCase()))
+        ));
+    }
+    if (selectedFilters.proteinSource.length > 0) {
+        working = working.filter(p => selectedFilters.proteinSource.some(ps => 
+            String(p.proteinSource || '').toLowerCase().includes(ps.toLowerCase())
+        ));
+    }
+    if (selectedFilters.sizes.length > 0) {
+        working = working.filter(p => selectedFilters.sizes.some(s => 
+            String(p.size || '').toLowerCase().includes(s.toLowerCase())
+        ));
+    }
     if (selectedFilters.weights.length > 0) {
       working = working.filter(p => selectedFilters.weights.some(w => 
         String(p.weight || '').toLowerCase().includes(w.toLowerCase()) ||
@@ -593,7 +624,13 @@ const CatTreats = ({ initialActive = 'All Cat Treats' }) => {
             <h4 className="text-sm font-medium mb-3">Sort By</h4>
             <div className="flex flex-wrap gap-2">
               {['Featured','Best selling','Alphabetically, A-Z','Alphabetically, Z-A','Price, low to high','Price, high to low','Date, old to new','Date, new to old'].map(s=> (
-                <button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>
+                <button 
+                  key={s} 
+                  onClick={() => setSelectedFilters(prev => ({...prev, sortBy: s}))}
+                  className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.sortBy === s ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                  {s}
+                </button>
               ))}
             </div>
           </section>
@@ -602,75 +639,163 @@ const CatTreats = ({ initialActive = 'All Cat Treats' }) => {
           <section ref={el => sectionRefs.current['Brand'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Brand</h4>
             <div className="flex flex-wrap gap-2">
-              {brands.map(b=> (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}
+              {brands.map(b=> (
+                <button 
+                  key={b} 
+                  onClick={() => toggleFilter('brands', b)}
+                  className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.brands.includes(b) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                  {b}
+                </button>
+              ))}
             </div>
           </section>
 
           {/* Dog/cat */}
           <section ref={el => sectionRefs.current['Dog/Cat'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Dog/cat</h4>
-            <div className="flex flex-wrap gap-2">{dogCat.map(d=> (<button key={d} className="text-xs px-3 py-1 border border-border rounded bg-white">{d}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{dogCat.map(d=> (
+                <button 
+                    key={d} 
+                    onClick={() => toggleFilter('catKitten', d)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.catKitten.includes(d) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {d}
+                </button>
+            ))}</div>
           </section>
 
           {/* Life stage */}
           <section ref={el => sectionRefs.current['Life Stage'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Life stage</h4>
-            <div className="flex flex-wrap gap-2">{lifeStages.map(l=> (<button key={l} className="text-xs px-3 py-1 border border-border rounded bg-white">{l}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{lifeStages.map(l=> (
+                <button 
+                    key={l} 
+                    onClick={() => toggleFilter('lifeStages', l)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.lifeStages.includes(l) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {l}
+                </button>
+            ))}</div>
           </section>
 
           {/* Breed size */}
           <section ref={el => sectionRefs.current['Breed Size'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Breed size</h4>
-            <div className="flex flex-wrap gap-2">{breedSizes.map(b=> (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{breedSizes.map(b=> (
+                <button 
+                    key={b} 
+                    onClick={() => toggleFilter('breedSizes', b)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.breedSizes.includes(b) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {b}
+                </button>
+            ))}</div>
           </section>
 
           {/* Product type */}
           <section ref={el => sectionRefs.current['Product Type'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Product type</h4>
-            <div className="flex flex-wrap gap-2">{productTypes.map(p=> (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{productTypes.map(p=> (
+                <button 
+                    key={p} 
+                    onClick={() => toggleFilter('productTypes', p)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.productTypes.includes(p) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {p}
+                </button>
+            ))}</div>
           </section>
 
           {/* Special diet */}
           <section ref={el => sectionRefs.current['Special Diet'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Special diet</h4>
-            <div className="flex flex-wrap gap-2">{specialDiets.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{specialDiets.map(s=> (
+                <button 
+                    key={s} 
+                    onClick={() => toggleFilter('specialDiets', s)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.specialDiets.includes(s) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {s}
+                </button>
+            ))}</div>
           </section>
 
           {/* Protein source */}
           <section ref={el => sectionRefs.current['Protein Source'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Protein source</h4>
-            <div className="flex flex-wrap gap-2">{proteinSource.map(p=> (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{proteinSource.map(p=> (
+                <button 
+                    key={p} 
+                    onClick={() => toggleFilter('proteinSource', p)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.proteinSource.includes(p) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {p}
+                </button>
+            ))}</div>
           </section>
 
           {/* Price */}
           <section ref={el => sectionRefs.current['Price'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Price</h4>
-            <div className="flex flex-wrap gap-2">{priceRanges.map(r=> (<button key={r} className="text-xs px-3 py-1 border border-border rounded bg-white">{r}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{priceRanges.map(r=> (
+                <button 
+                    key={r} 
+                    onClick={() => toggleFilter('priceRanges', r)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.priceRanges.includes(r) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {r}
+                </button>
+            ))}</div>
           </section>
 
           {/* Weight */}
           <section ref={el => sectionRefs.current['Weight'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Weight</h4>
-            <div className="flex flex-wrap gap-2">{weights.map(w=> (<button key={w} className="text-xs px-3 py-1 border border-border rounded bg-white">{w}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{weights.map(w=> (
+                <button 
+                    key={w} 
+                    onClick={() => toggleFilter('weights', w)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.weights.includes(w) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {w}
+                </button>
+            ))}</div>
           </section>
 
           {/* Size */}
           <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Size</h4>
-            <div className="flex flex-wrap gap-2">{sizes.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{sizes.map(s=> (
+                <button 
+                    key={s} 
+                    onClick={() => toggleFilter('sizes', s)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.sizes.includes(s) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {s}
+                </button>
+            ))}</div>
           </section>
 
           {/* Sub category */}
           <section ref={el => sectionRefs.current['Sub Category'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Sub category</h4>
-            <div className="flex flex-wrap gap-2">{subCategories.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{subCategories.map(s=> (
+                <button 
+                    key={s} 
+                    onClick={() => toggleFilter('subCategories', s)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.subCategories.includes(s) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {s}
+                </button>
+            ))}</div>
           </section>
         </div>
 
         {/* footer actions */}
         <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
-          <button className="text-sm text-orange-500">Clear All</button>
-          <button className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
+          <button onClick={() => setSelectedFilters({ brands: [], catKitten: [], lifeStages: [], breedSizes: [], productTypes: [], specialDiets: [], proteinSource: [], priceRanges: [], weights: [], sizes: [], subCategories: [], sortBy: '' })} className="text-sm text-orange-500">Clear All</button>
+          <button onClick={() => setFilterOpen(false)} className="bg-orange-500 text-white px-5 py-2 rounded">Show Products</button>
         </div>
       </aside>
     </div>
