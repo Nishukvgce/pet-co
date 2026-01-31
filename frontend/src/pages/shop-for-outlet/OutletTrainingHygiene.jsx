@@ -10,10 +10,10 @@ import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 import { getFilterSections } from '../../data/categoryFilters';
 
 const categories = [
-  { id: 'training-aids', label: 'Training Aids', img: '/assets/images/dog/db1.webp' },
-  { id: 'hygiene-products', label: 'Hygiene Products', img: '/assets/images/dog/db2.webp' },
-  { id: 'cleaning-supplies', label: 'Cleaning Supplies', img: '/assets/images/dog/db3.webp' },
-  { id: 'all', label: 'All Training & Hygiene', img: '/assets/images/essential/all-training.webp' }
+  { id: 'training-aids', label: 'Training Aids', img: '/assets/images/outlet/training-adds.png' },
+  { id: 'hygiene-products', label: 'Hygiene Products', img: '/assets/images/outlet/Hygine-products.png' },
+  { id: 'cleaning-supplies', label: 'Cleaning Supplies', img: '/assets/images/outlet/Hygine-products.png' },
+  { id: 'all', label: 'All Training & Hygiene', img: '/assets/images/outlet/training-adds.png' }
 ];
 
 const ProductCard = ({ p }) => {

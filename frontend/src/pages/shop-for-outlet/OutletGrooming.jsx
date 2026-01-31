@@ -13,12 +13,12 @@ import AppImage from '../../components/AppImage';
 import { resolveImageUrl } from '../../lib/imageUtils';
 
 const categories = [
-  { id: 'combs', label: 'Combs', img: '/assets/images/dog/db1.webp' },
-  { id: 'brushes', label: 'Brushes', img: '/assets/images/dog/db2.webp' },
-  { id: 'nail-clippers', label: 'Nail Clippers', img: '/assets/images/dog/db3.webp' },
-  { id: 'trimmers', label: 'Trimmers', img: '/assets/images/dog/db4.webp' },
-  { id: 'shampoos', label: 'Shampoos', img: '/assets/images/essential/dry-food.webp' },
-  { id: 'all', label: 'All Grooming & Care', img: '/assets/images/essential/all-food.webp' }
+  { id: 'combs', label: 'Combs', img: '/assets/images/outlet/combs.png' },
+  { id: 'brushes', label: 'Brushes', img: '/assets/images/outlet/brushes.png' },
+  { id: 'nail-clippers', label: 'Nail Clippers', img: '/assets/images/outlet/nail-cutter.png' },
+  { id: 'trimmers', label: 'Trimmers', img: '/assets/images/outlet/trimmer.png' },
+  { id: 'shampoos', label: 'Shampoos', img: '/assets/images/outlet/Hygine-products.png' },
+  { id: 'all', label: 'All Grooming & Care', img: '/assets/images/outlet/all-grooming.png' }
 ];
 
 const ProductCard = ({ p }) => {

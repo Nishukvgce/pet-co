@@ -13,16 +13,16 @@ import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 
 // Outlet Food & Treats categories - matching backend subcategory names
 const categories = [
-  { id: 'raw-hide-bones', label: 'Raw Hide Bones', img: '/assets/images/dog/db1.webp' },
-  { id: 'knotted-bones', label: 'Knotted Bones', img: '/assets/images/dog/db2.webp' },
-  { id: 'munchies', label: 'Munchies', img: '/assets/images/dog/db3.webp' },
-  { id: 'dental-treats', label: 'Dental Treats', img: '/assets/images/dog/db4.webp' },
-  { id: 'calcium-treats', label: 'Calcium Treats', img: '/assets/images/essential/dry-food.webp' },
-  { id: 'wet-food-gravy', label: 'Wet Food / Gravy', img: '/assets/images/essential/wet-food.webp' },
-  { id: 'puppy-treats', label: 'Puppy Treats', img: '/assets/images/essential/treats.webp' },
-  { id: 'dry-food', label: 'Dry Food', img: '/assets/images/essential/dry-food.webp' },
-  { id: 'treats', label: 'Treats', img: '/assets/images/essential/treats.webp' },
-  { id: 'all', label: 'All Food & Treats', img: '/assets/images/essential/all-food.webp' }
+  { id: 'raw-hide-bones', label: 'Raw Hide Bones', img: '/assets/images/outlet/row-hided-bones.png' },
+  { id: 'knotted-bones', label: 'Knotted Bones', img: '/assets/images/outlet/knotted-bones.png' },
+  { id: 'munchies', label: 'Munchies', img: '/assets/images/outlet/munchies.png' },
+  { id: 'dental-treats', label: 'Dental Treats', img: '/assets/images/outlet/dental-treates.png' },
+  { id: 'calcium-treats', label: 'Calcium Treats', img: '/assets/images/outlet/calcium-treats.png' },
+  { id: 'wet-food-gravy', label: 'Wet Food / Gravy', img: '/assets/images/outlet/wetfood.png' },
+  { id: 'puppy-treats', label: 'Puppy Treats', img: '/assets/images/outlet/puppy-treats.png' },
+  { id: 'dry-food', label: 'Dry Food', img: '/assets/images/outlet/all-food-treats.png' },
+  { id: 'treats', label: 'Treats', img: '/assets/images/outlet/twisted-snicks.png' },
+  { id: 'all', label: 'All Food & Treats', img: '/assets/images/outlet/all-food-treats.png' }
 ];
 
 const ProductCard = ({ p }) => {

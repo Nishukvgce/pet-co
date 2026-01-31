@@ -13,14 +13,14 @@ import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 
 // Outlet Toys categories - matching backend subcategory names
 const categories = [
-  { id: 'soft-toys', label: 'Soft Toys', img: '/assets/images/dog/db1.webp' },
-  { id: 'rubber-toys', label: 'Rubber Toys', img: '/assets/images/dog/db2.webp' },
-  { id: 'rope-toys', label: 'Rope Toys', img: '/assets/images/dog/db3.webp' },
-  { id: 'squeaky-toys', label: 'Squeaky Toys', img: '/assets/images/dog/db4.webp' },
-  { id: 'interactive-toys', label: 'Interactive Toys', img: '/assets/images/essential/dry-food.webp' },
-  { id: 'chew-toys', label: 'Chew Toys', img: '/assets/images/essential/treats.webp' },
-  { id: 'puzzle-toys', label: 'Puzzle Toys', img: '/assets/images/essential/wet-food.webp' },
-  { id: 'all', label: 'All Toys', img: '/assets/images/essential/all-food.webp' }
+  { id: 'soft-toys', label: 'Soft Toys', img: '/assets/images/outlet/soft-toys.png' },
+  { id: 'rubber-toys', label: 'Rubber Toys', img: '/assets/images/outlet/rubber-toys.png' },
+  { id: 'rope-toys', label: 'Rope Toys', img: '/assets/images/outlet/rope-toys.png' },
+  { id: 'squeaky-toys', label: 'Squeaky Toys', img: '/assets/images/outlet/sqeauy-toys.png' },
+  { id: 'interactive-toys', label: 'Interactive Toys', img: '/assets/images/outlet/interactive-toys.png' },
+  { id: 'chew-toys', label: 'Chew Toys', img: '/assets/images/outlet/rubber-toys.png' },
+  { id: 'puzzle-toys', label: 'Puzzle Toys', img: '/assets/images/outlet/interactive-toys.png' },
+  { id: 'all', label: 'All Toys', img: '/assets/images/outlet/all-toys.png' }
 ];
 
 const ProductCard = ({ p }) => {

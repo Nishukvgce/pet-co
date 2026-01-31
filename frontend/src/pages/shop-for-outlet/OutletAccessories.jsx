@@ -11,11 +11,11 @@ import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 import { getFilterSections } from '../../data/categoryFilters';
 
 const categories = [
-  { id: 'pet-accessories', label: 'Pet Accessories', img: '/assets/images/dog/db1.webp' },
-  { id: 'training-aids', label: 'Training Aids', img: '/assets/images/dog/db2.webp' },
-  { id: 'hygiene-products', label: 'Hygiene Products', img: '/assets/images/dog/db3.webp' },
-  { id: 'fashion-accessories', label: 'Fashion Accessories', img: '/assets/images/dog/db4.webp' },
-  { id: 'all', label: 'All Accessories', img: '/assets/images/essential/all-accessories.webp' }
+  { id: 'pet-accessories', label: 'Pet Accessories', img: '/assets/images/outlet/pet-accessories.png' },
+  { id: 'training-aids', label: 'Training Aids', img: '/assets/images/outlet/training-adds.png' },
+  { id: 'hygiene-products', label: 'Hygiene Products', img: '/assets/images/outlet/Hygine-products.png' },
+  { id: 'fashion-accessories', label: 'Fashion Accessories', img: '/assets/images/outlet/all-accessories.png' },
+  { id: 'all', label: 'All Accessories', img: '/assets/images/outlet/all-accessories.png' }
 ];
 
 const ProductCard = ({ p }) => {

@@ -11,11 +11,11 @@ import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 import { getFilterSections } from '../../data/categoryFilters';
 
 const categories = [
-  { id: 'bowls', label: 'Bowls', img: '/assets/images/dog/db1.webp' },
-  { id: 'slow-feeders', label: 'Slow Feeders', img: '/assets/images/dog/db2.webp' },
-  { id: 'water-dispensers', label: 'Water Dispensers', img: '/assets/images/dog/db3.webp' },
-  { id: 'feeding-mats', label: 'Feeding Mats', img: '/assets/images/dog/db4.webp' },
-  { id: 'all', label: 'All Feeding Essentials', img: '/assets/images/essential/all-food.webp' }
+  { id: 'bowls', label: 'Bowls', img: '/assets/images/outlet/bowls.png' },
+  { id: 'slow-feeders', label: 'Slow Feeders', img: '/assets/images/outlet/slow-feeders.png' },
+  { id: 'water-dispensers', label: 'Water Dispensers', img: '/assets/images/outlet/dispensers.png' },
+  { id: 'feeding-mats', label: 'Feeding Mats', img: '/assets/images/outlet/all-feeding-essential.png' },
+  { id: 'all', label: 'All Feeding Essentials', img: '/assets/images/outlet/all-feeding-essential.png' }
 ];
 
 const ProductCard = ({ p }) => {

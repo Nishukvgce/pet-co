@@ -11,11 +11,11 @@ import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 import { getFilterSections } from '../../data/categoryFilters';
 
 const categories = [
-  { id: 'carriers', label: 'Carriers', img: '/assets/images/dog/db1.webp' },
-  { id: 'travel-bowls', label: 'Travel Bowls', img: '/assets/images/dog/db2.webp' },
-  { id: 'safety-gear', label: 'Safety Gear', img: '/assets/images/dog/db3.webp' },
-  { id: 'car-accessories', label: 'Car Accessories', img: '/assets/images/dog/db4.webp' },
-  { id: 'all', label: 'All Travel & Safety', img: '/assets/images/essential/all-travel.webp' }
+  { id: 'carriers', label: 'Carriers', img: '/assets/images/outlet/carriers.png' },
+  { id: 'travel-bowls', label: 'Travel Bowls', img: '/assets/images/outlet/travel-bowls.png' },
+  { id: 'safety-gear', label: 'Safety Gear', img: '/assets/images/outlet/safety-gear.png' },
+  { id: 'car-accessories', label: 'Car Accessories', img: '/assets/images/outlet/all-travel-safety.png' },
+  { id: 'all', label: 'All Travel & Safety', img: '/assets/images/outlet/all-travel-safety.png' }
 ];
 
 const ProductCard = ({ p }) => {

@@ -11,11 +11,11 @@ import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 import { getFilterSections } from '../../data/categoryFilters';
 
 const categories = [
-  { id: 'pet-beds', label: 'Pet Beds', img: '/assets/images/dog/db1.webp' },
-  { id: 'blankets', label: 'Blankets', img: '/assets/images/dog/db2.webp' },
-  { id: 'cushions', label: 'Cushions', img: '/assets/images/dog/db3.webp' },
-  { id: 'mats', label: 'Mats', img: '/assets/images/dog/db4.webp' },
-  { id: 'all', label: 'All Beds & Comfort', img: '/assets/images/essential/all-beds.webp' }
+  { id: 'pet-beds', label: 'Pet Beds', img: '/assets/images/outlet/Fil_beds.webp' },
+  { id: 'blankets', label: 'Blankets', img: '/assets/images/outlet/Fil_blanketscushions.webp' },
+  { id: 'cushions', label: 'Cushions', img: '/assets/images/outlet/Fil_blanketscushions.webp' },
+  { id: 'mats', label: 'Mats', img: '/assets/images/outlet/Fil_beds.webp' },
+  { id: 'all', label: 'All Beds & Comfort', img: '/assets/images/outlet/Fil_beds.webp' }
 ];
 
 const ProductCard = ({ p }) => {
@@ -293,7 +293,7 @@ const OutletBedsComfort = ({ initialActive = 'All Beds & Comfort' }) => {
             ))}
           </div>
 
-          <div className="flex-1">
+          <div className="col-span-1 md:col-span-9">
             <div className="mb-6 bg-white rounded-lg p-4 border border-border">
               <h2 className="text-2xl font-bold text-foreground mb-2">{active}</h2>
               <div className="flex items-center gap-4">

@@ -29,47 +29,47 @@ const PharmacyCollectionPage = ({ subLabel }) => {
   // Categories based on path - matching mega menu structure
   const categories = isDogPath
     ? [
-      { id: 'medicines-for-skin', label: 'Medicines for Skin', img: '/assets/images/dog/db1.webp', path: '/pharmacy/dogs/medicines-for-skin' },
-      { id: 'joint-mobility', label: 'Joint & Mobility', img: '/assets/images/dog/db2.webp', path: '/pharmacy/dogs/joint-mobility' },
-      { id: 'digestive-care', label: 'Digestive Care', img: '/assets/images/dog/db3.webp', path: '/pharmacy/dogs/digestive-care' },
-      { id: 'all-dog-pharmacy', label: 'All Dog Pharmacy', img: '/assets/images/dog/db4.webp', path: '/pharmacy/dogs/all-dog-pharmacy' }
+      { id: 'medicines-for-skin', label: 'Medicines for Skin', img: '/assets/images/pharmacy/medicines-for-skin.png', path: '/pharmacy/dogs/medicines-for-skin' },
+      { id: 'joint-mobility', label: 'Joint & Mobility', img: '/assets/images/pharmacy/joint-mobility.png', path: '/pharmacy/dogs/joint-mobility' },
+      { id: 'digestive-care', label: 'Digestive Care', img: '/assets/images/pharmacy/digestive-care.png', path: '/pharmacy/dogs/digestive-care' },
+      { id: 'all-dog-pharmacy', label: 'All Dog Pharmacy', img: '/assets/images/pharmacy/all-dog-pharmacy.png', path: '/pharmacy/dogs/all-dog-pharmacy' }
     ]
     : isCatPath
       ? [
-        { id: 'skin-coat-care', label: 'Skin & Coat Care', img: '/assets/images/cat/cf1.webp', path: '/pharmacy/cats/skin-coat-care' },
-        { id: 'worming', label: 'Worming', img: '/assets/images/cat/cf2.webp', path: '/pharmacy/cats/worming' },
-        { id: 'oral-care', label: 'Oral Care', img: '/assets/images/cat/cf3.webp', path: '/pharmacy/cats/oral-care' },
-        { id: 'all-cat-pharmacy', label: 'All Cat Pharmacy', img: '/assets/images/cat/cf4.webp', path: '/pharmacy/cats/all-cat-pharmacy' }
+        { id: 'skin-coat-care', label: 'Skin & Coat Care', img: '/assets/images/pharmacy/Skin-coat-care.png', path: '/pharmacy/cats/skin-coat-care' },
+        { id: 'worming', label: 'Worming', img: '/assets/images/pharmacy/worming.png', path: '/pharmacy/cats/worming' },
+        { id: 'oral-care', label: 'Oral Care', img: '/assets/images/pharmacy/oral-care.png', path: '/pharmacy/cats/oral-care' },
+        { id: 'all-cat-pharmacy', label: 'All Cat Pharmacy', img: '/assets/images/pharmacy/all-cat-pharmacy.png', path: '/pharmacy/cats/all-cat-pharmacy' }
       ]
       : isMedicinesPath
         ? [
-          { id: 'antibiotics', label: 'Antibiotics', img: '/assets/images/essential/meowsi.webp', path: '/pharmacy/medicines/antibiotics' },
-          { id: 'antifungals', label: 'Antifungals', img: '/assets/images/essential/whiskas.webp', path: '/pharmacy/medicines/antifungals' },
-          { id: 'anti-inflammatories', label: 'Anti Inflammatories', img: '/assets/images/essential/sheba.webp', path: '/pharmacy/medicines/anti-inflammatories' },
-          { id: 'pain-relief', label: 'Pain Relief', img: '/assets/images/essential/royal canin.webp', path: '/pharmacy/medicines/pain-relief' },
-          { id: 'all-medicines', label: 'All Medicines', img: '/assets/images/dog/db1.webp', path: '/pharmacy/medicines/all-medicines' }
+          { id: 'antibiotics', label: 'Antibiotics', img: '/assets/images/pharmacy/Antibiotics.png', path: '/pharmacy/medicines/antibiotics' },
+          { id: 'antifungals', label: 'Antifungals', img: '/assets/images/pharmacy/all-medicines.png', path: '/pharmacy/medicines/antifungals' },
+          { id: 'anti-inflammatories', label: 'Anti Inflammatories', img: '/assets/images/pharmacy/all-medicines.png', path: '/pharmacy/medicines/anti-inflammatories' },
+          { id: 'pain-relief', label: 'Pain Relief', img: '/assets/images/pharmacy/pain-relief.png', path: '/pharmacy/medicines/pain-relief' },
+          { id: 'all-medicines', label: 'All Medicines', img: '/assets/images/pharmacy/all-medicines.png', path: '/pharmacy/medicines/all-medicines' }
         ]
         : isSupplementsPath
           ? [
-            { id: 'vitamins-minerals', label: 'Vitamins & Minerals', img: '/assets/images/essential/meowsi.webp', path: '/pharmacy/supplements/vitamins-minerals' },
-            { id: 'joint-supplements', label: 'Joint Supplements', img: '/assets/images/essential/whiskas.webp', path: '/pharmacy/supplements/joint-supplements' },
-            { id: 'probiotics-gut-health', label: 'Probiotics & Gut Health', img: '/assets/images/essential/sheba.webp', path: '/pharmacy/supplements/probiotics-gut-health' },
-            { id: 'skin-coat-supplements', label: 'Skin & Coat Supplements', img: '/assets/images/essential/royal canin.webp', path: '/pharmacy/supplements/skin-coat-supplements' },
-            { id: 'all-supplements', label: 'All Supplements', img: '/assets/images/dog/db2.webp', path: '/pharmacy/supplements/all-supplements' }
+            { id: 'vitamins-minerals', label: 'Vitamins & Minerals', img: '/assets/images/pharmacy/vitamins-minerals.png', path: '/pharmacy/supplements/vitamins-minerals' },
+            { id: 'joint-supplements', label: 'Joint Supplements', img: '/assets/images/pharmacy/joints-suppliments.png', path: '/pharmacy/supplements/joint-supplements' },
+            { id: 'probiotics-gut-health', label: 'Probiotics & Gut Health', img: '/assets/images/pharmacy/digestive-support.png', path: '/pharmacy/supplements/probiotics-gut-health' },
+            { id: 'skin-coat-supplements', label: 'Skin & Coat Supplements', img: '/assets/images/pharmacy/skin-coat-supplements.png', path: '/pharmacy/supplements/skin-coat-supplements' },
+            { id: 'all-supplements', label: 'All Supplements', img: '/assets/images/pharmacy/all-supplements.png', path: '/pharmacy/supplements/all-supplements' }
           ]
           : isPrescriptionPath
             ? [
-              { id: 'renal-support', label: 'Renal Support', img: '/assets/images/essential/meowsi.webp', path: '/pharmacy/prescription-food/renal-support' },
-              { id: 'hypoallergenic-diets', label: 'Hypoallergenic Diets', img: '/assets/images/essential/whiskas.webp', path: '/pharmacy/prescription-food/hypoallergenic-diets' },
-              { id: 'digestive-support', label: 'Digestive Support', img: '/assets/images/essential/sheba.webp', path: '/pharmacy/prescription-food/digestive-support' },
-              { id: 'weight-management', label: 'Weight Management', img: '/assets/images/essential/royal canin.webp', path: '/pharmacy/prescription-food/weight-management' },
-              { id: 'all-prescription-food', label: 'All Prescription Food', img: '/assets/images/dog/db3.webp', path: '/pharmacy/prescription-food/all-prescription-food' }
+              { id: 'renal-support', label: 'Renal Support', img: '/assets/images/pharmacy/renal-support.png', path: '/pharmacy/prescription-food/renal-support' },
+              { id: 'hypoallergenic-diets', label: 'Hypoallergenic Diets', img: '/assets/images/pharmacy/hypoallergenic-diets.png', path: '/pharmacy/prescription-food/hypoallergenic-diets' },
+              { id: 'digestive-support', label: 'Digestive Support', img: '/assets/images/pharmacy/digestive-support.png', path: '/pharmacy/prescription-food/digestive-support' },
+              { id: 'weight-management', label: 'Weight Management', img: '/assets/images/pharmacy/weight-management.png', path: '/pharmacy/prescription-food/weight-management' },
+              { id: 'all-prescription-food', label: 'All Prescription Food', img: '/assets/images/pharmacy/all-prescription-food.png', path: '/pharmacy/prescription-food/all-prescription-food' }
             ]
             : [
-              { id: 'medicines', label: 'Medicines', img: '/assets/images/essential/meowsi.webp', path: '/pharmacy/medicines' },
-              { id: 'supplements', label: 'Supplements', img: '/assets/images/essential/whiskas.webp', path: '/pharmacy/supplements' },
-              { id: 'prescription', label: 'Prescription Food', img: '/assets/images/essential/sheba.webp', path: '/pharmacy/prescription-food' },
-              { id: 'all', label: 'All Pharmacy', img: '/assets/images/essential/royal canin.webp', path: '/pharmacy' }
+              { id: 'medicines', label: 'Medicines', img: '/assets/images/pharmacy/all-medicines.png', path: '/pharmacy/medicines' },
+              { id: 'supplements', label: 'Supplements', img: '/assets/images/pharmacy/all-supplements.png', path: '/pharmacy/supplements' },
+              { id: 'prescription', label: 'Prescription Food', img: '/assets/images/pharmacy/all-prescription-food.png', path: '/pharmacy/prescription-food' },
+              { id: 'all', label: 'All Pharmacy', img: '/assets/images/pharmacy/all-dog-pharmacy.png', path: '/pharmacy' }
             ];
 
   const [active, setActive] = useState(categories[categories.length - 1].label);

@@ -11,10 +11,10 @@ import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 import { getFilterSections } from '../../data/categoryFilters';
 
 const categories = [
-  { id: 'collars', label: 'Collars', img: '/assets/images/outlet/collars.webp' },
-  { id: 'leashes', label: 'Leashes', img: '/assets/images/outlet/leashes.webp' },
-  { id: 'harnesses', label: 'Harnesses', img: '/assets/images/outlet/harnesses.webp' },
-  { id: 'all', label: 'All Walking Essentials', img: '/assets/images/outlet/allwalking.webp' }
+  { id: 'collars', label: 'Collars', img: '/assets/images/outlet/all-walking-essential.png' },
+  { id: 'leashes', label: 'Leashes', img: '/assets/images/outlet/leashes.png' },
+  { id: 'harnesses', label: 'Harnesses', img: '/assets/images/outlet/harness.png' },
+  { id: 'all', label: 'All Walking Essentials', img: '/assets/images/outlet/all-walking-essential.png' }
 ];
 
 const ProductCard = ({ p }) => {
