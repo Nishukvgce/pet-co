@@ -97,14 +97,14 @@ const CatGrooming = ({ initialActive = 'All Grooming' }) => {
   const [error, setError] = useState('');
   const [serverFiltered, setServerFiltered] = useState(false);
 
-  const topFilters = ['Brand', 'Type', 'Coat Type', 'Price', 'Sub Category'];
+  const topFilters = ['Brand', 'Product Type', 'Coat Type', 'Price', 'Sub Category'];
   const [selectedTopFilter, setSelectedTopFilter] = useState(topFilters[0]);
   const topRef = useRef(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const drawerContentRef = useRef(null);
   const sectionRefs = useRef({});
 
-  const [selectedFilters, setSelectedFilters] = useState({ brands: [], type: [], coatTypes: [], priceRanges: [], subCategories: [], sortBy: '' });
+  const [selectedFilters, setSelectedFilters] = useState({ brands: [], productTypes: [], coatTypes: [], priceRanges: [], subCategories: [], catKitten: [], lifeStages: [], breedSizes: [], specialDiets: [], proteinSource: [], weights: [], sizes: [], sortBy: '' });
   const toggleFilter = (category, value) => setSelectedFilters(prev => ({ ...prev, [category]: prev[category].includes(value) ? prev[category].filter(x => x !== value) : [...prev[category], value] }));
 
   const brands = ['FurCare', 'PetGroom', 'Meowsi', 'PawClean'];
@@ -210,10 +210,100 @@ const CatGrooming = ({ initialActive = 'All Grooming' }) => {
     }
 
     if (selectedFilters.brands?.length > 0) working = working.filter(p => selectedFilters.brands.includes(p.brand));
-    if (selectedFilters.subCategories?.length > 0) working = working.filter(p => selectedFilters.subCategories.some(sc => (p.subcategory || '').toLowerCase().includes(sc.toLowerCase()) || (p.productType || '').toLowerCase().includes(sc.toLowerCase())));
+    if (selectedFilters.catKitten.length > 0) {
+        working = working.filter(p => selectedFilters.catKitten.some(ck => 
+          String(p.lifeStage || '').toLowerCase().includes(ck.toLowerCase()) ||
+          (p.tags || []).some(tag => tag.toLowerCase().includes(ck.toLowerCase()))
+        ));
+    }
+    if (selectedFilters.lifeStages.length > 0) {
+        working = working.filter(p => selectedFilters.lifeStages.some(ls => 
+          String(p.lifeStage || '').toLowerCase().includes(ls.toLowerCase())
+        ));
+    }
+    if (selectedFilters.breedSizes.length > 0) {
+        working = working.filter(p => selectedFilters.breedSizes.some(bs => 
+          String(p.breedSize || '').toLowerCase().includes(bs.toLowerCase())
+        ));
+    }
+    if (selectedFilters.productTypes.length > 0) {
+        working = working.filter(p => selectedFilters.productTypes.some(pt => 
+          String(p.productType || '').toLowerCase().includes(pt.toLowerCase())
+        ));
+    }
+    if (selectedFilters.specialDiets.length > 0) {
+        working = working.filter(p => selectedFilters.specialDiets.some(sd => 
+            String(p.specialDiet || '').toLowerCase().includes(sd.toLowerCase()) || (p.tags||[]).some(t=>t.toLowerCase().includes(sd.toLowerCase()))
+        ));
+    }
+    if (selectedFilters.proteinSource.length > 0) {
+        working = working.filter(p => selectedFilters.proteinSource.some(ps => 
+            String(p.proteinSource || '').toLowerCase().includes(ps.toLowerCase())
+        ));
+    }
+    if (selectedFilters.weights.length > 0) {
+        working = working.filter(p => selectedFilters.weights.some(w => 
+            String(p.weight || '').toLowerCase().includes(w.toLowerCase())
+        ));
+    }
+    if (selectedFilters.sizes.length > 0) {
+        working = working.filter(p => selectedFilters.sizes.some(s => 
+            String(p.size || '').toLowerCase().includes(s.toLowerCase())
+        ));
+    }
+    if (selectedFilters.priceRanges.length > 0) {
+        working = working.filter(p => {
+          const price = p.price || 0;
+          return selectedFilters.priceRanges.some(range => {
+            if (range === 'INR 100 - INR 300') return price >= 100 && price <= 300;
+            if (range === 'INR 301 - INR 700') return price >= 301 && price <= 700;
+            if (range === 'INR 701+') return price > 701;
+            return true;
+          });
+        });
+    }
+    if (selectedFilters.subCategories?.length>0) working = working.filter(p => selectedFilters.subCategories.some(sc => (p.subcategory||'').toLowerCase().includes(sc.toLowerCase()) || (p.productType||'').toLowerCase().includes(sc.toLowerCase())));
+
+    // Apply sorting
+    switch (selectedFilters.sortBy) {
+        case 'Price, low to high':
+          working.sort((a, b) => (a.price || 0) - (b.price || 0));
+          break;
+        case 'Price, high to low':
+          working.sort((a, b) => (b.price || 0) - (a.price || 0));
+          break;
+        case 'Alphabetically, A-Z':
+          working.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+          break;
+        case 'Alphabetically, Z-A':
+          working.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+          break;
+        default:
+          break;
+      }
 
     setFilteredProducts(working);
   }, [products, selectedFilters, initialActive]);
+
+  const openFilterAndScroll = (key) => {
+    setSelectedTopFilter(key);
+    setFilterOpen(true);
+    const doScroll = () => {
+      const container = drawerContentRef.current;
+      const el = sectionRefs.current[key];
+      if (container && el) {
+        const drawerHeaderHeight = 64;
+        const top = el.offsetTop;
+        const scrollTo = Math.max(0, top - drawerHeaderHeight - 8);
+        container.scrollTo({ top: scrollTo, behavior: 'smooth' });
+        try {
+          el.classList.add('section-highlight');
+          setTimeout(() => { el.classList.remove('section-highlight'); }, 1400);
+        } catch (err) {}
+      }
+    };
+    setTimeout(doScroll, 220);
+  };
 
   const scrollTopLeft = () => { if (topRef.current) topRef.current.scrollBy({ left: -220, behavior: 'smooth' }); };
   const scrollTopRight = () => { if (topRef.current) topRef.current.scrollBy({ left: 220, behavior: 'smooth' }); };
@@ -469,85 +559,195 @@ const CatGrooming = ({ initialActive = 'All Grooming' }) => {
               <h4 className="text-sm font-medium mb-3">Sort By</h4>
               <div className="flex flex-wrap gap-2">
                 {['Featured', 'Best selling', 'Alphabetically, A-Z', 'Alphabetically, Z-A', 'Price, low to high', 'Price, high to low', 'Date, old to new', 'Date, new to old'].map(s => (
-                  <button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>
+                  <button 
+                    key={s} 
+                    onClick={() => setSelectedFilters(prev => ({...prev, sortBy: s}))}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.sortBy === s ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                  >
+                    {s}
+                  </button>
                 ))}
               </div>
             </section>
+ 
+             {/* Brand */}
+             <section ref={el => sectionRefs.current['Brand'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Brand</h4>
+               <div className="flex flex-wrap gap-2">
+                 {brands.map(b => (
+                   <button 
+                     key={b} 
+                     onClick={() => toggleFilter('brands', b)}
+                     className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.brands.includes(b) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                     {b}
+                   </button>
+                 ))}
+               </div>
+             </section>
 
-            {/* Brand */}
-            <section ref={el => sectionRefs.current['Brand'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Brand</h4>
-              <div className="flex flex-wrap gap-2">
-                {brands.map(b => (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}
-              </div>
-            </section>
-
-            {/* Dog/cat */}
-            <section ref={el => sectionRefs.current['Dog/Cat'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Dog/cat</h4>
-              <div className="flex flex-wrap gap-2">{dogCat.map(d => (<button key={d} className="text-xs px-3 py-1 border border-border rounded bg-white">{d}</button>))}</div>
-            </section>
-
-            {/* Life stage */}
-            <section ref={el => sectionRefs.current['Life Stage'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Life stage</h4>
-              <div className="flex flex-wrap gap-2">{lifeStages.map(l => (<button key={l} className="text-xs px-3 py-1 border border-border rounded bg-white">{l}</button>))}</div>
-            </section>
-
-            {/* Breed size */}
-            <section ref={el => sectionRefs.current['Breed Size'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Breed size</h4>
-              <div className="flex flex-wrap gap-2">{breedSizes.map(b => (<button key={b} className="text-xs px-3 py-1 border border-border rounded bg-white">{b}</button>))}</div>
-            </section>
-
-            {/* Product type */}
-            <section ref={el => sectionRefs.current['Product Type'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Product type</h4>
-              <div className="flex flex-wrap gap-2">{productTypes.map(p => (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
-            </section>
-
-            {/* Special diet */}
-            <section ref={el => sectionRefs.current['Special Diet'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Special diet</h4>
-              <div className="flex flex-wrap gap-2">{specialDiets.map(s => (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
-            </section>
-
-            {/* Protein source */}
-            <section ref={el => sectionRefs.current['Protein Source'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Protein source</h4>
-              <div className="flex flex-wrap gap-2">{proteinSource.map(p => (<button key={p} className="text-xs px-3 py-1 border border-border rounded bg-white">{p}</button>))}</div>
-            </section>
-
-            {/* Price */}
-            <section ref={el => sectionRefs.current['Price'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Price</h4>
-              <div className="flex flex-wrap gap-2">{priceRanges.map(r => (<button key={r} className="text-xs px-3 py-1 border border-border rounded bg-white">{r}</button>))}</div>
-            </section>
-
-            {/* Weight */}
-            <section ref={el => sectionRefs.current['Weight'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Weight</h4>
-              <div className="flex flex-wrap gap-2">{weights.map(w => (<button key={w} className="text-xs px-3 py-1 border border-border rounded bg-white">{w}</button>))}</div>
-            </section>
-
-            {/* Size */}
-            <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Size</h4>
-              <div className="flex flex-wrap gap-2">{sizes.map(s => (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
-            </section>
-
-            {/* Sub category */}
-            <section ref={el => sectionRefs.current['Sub Category'] = el} className="mb-6">
-              <h4 className="text-sm font-medium mb-3">Sub category</h4>
-              <div className="flex flex-wrap gap-2">{subCategories.map(s => (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
-            </section>
-          </div>
-
-          {/* footer actions */}
-          <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
-            <button className="text-sm text-orange-500">Clear All</button>
-            <button className="bg-orange-500 text-white px-5 py-2 rounded">Continue</button>
-          </div>
+             {/* Coat Type */}
+             <section ref={el => sectionRefs.current['Coat Type'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Coat Type</h4>
+               <div className="flex flex-wrap gap-2">
+                 {coatTypes.map(c => (
+                   <button 
+                     key={c} 
+                     onClick={() => toggleFilter('coatTypes', c)}
+                     className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.coatTypes.includes(c) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                     {c}
+                   </button>
+                 ))}
+               </div>
+             </section>
+ 
+             {/* Dog/cat */}
+             <section ref={el => sectionRefs.current['Dog/Cat'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Dog/cat</h4>
+               <div className="flex flex-wrap gap-2">{dogCat.map(d => (
+                   <button 
+                       key={d} 
+                       onClick={() => toggleFilter('catKitten', d)} 
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.catKitten.includes(d) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {d}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Life stage */}
+             <section ref={el => sectionRefs.current['Life Stage'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Life stage</h4>
+               <div className="flex flex-wrap gap-2">{lifeStages.map(l => (
+                   <button 
+                       key={l} 
+                       onClick={() => toggleFilter('lifeStages', l)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.lifeStages.includes(l) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {l}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Breed size */}
+             <section ref={el => sectionRefs.current['Breed Size'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Breed size</h4>
+               <div className="flex flex-wrap gap-2">{breedSizes.map(b => (
+                   <button 
+                       key={b} 
+                       onClick={() => toggleFilter('breedSizes', b)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.breedSizes.includes(b) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {b}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Product type */}
+             <section ref={el => sectionRefs.current['Product Type'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Product type</h4>
+               <div className="flex flex-wrap gap-2">{productTypes.map(p => (
+                   <button 
+                       key={p} 
+                       onClick={() => toggleFilter('productTypes', p)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.productTypes.includes(p) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {p}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Special diet */}
+             <section ref={el => sectionRefs.current['Special Diet'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Special diet</h4>
+               <div className="flex flex-wrap gap-2">{specialDiets.map(s => (
+                   <button 
+                       key={s} 
+                       onClick={() => toggleFilter('specialDiets', s)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.specialDiets.includes(s) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {s}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Protein source */}
+             <section ref={el => sectionRefs.current['Protein Source'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Protein source</h4>
+               <div className="flex flex-wrap gap-2">{proteinSource.map(p => (
+                   <button 
+                       key={p} 
+                       onClick={() => toggleFilter('proteinSource', p)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.proteinSource.includes(p) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {p}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Price */}
+             <section ref={el => sectionRefs.current['Price'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Price</h4>
+               <div className="flex flex-wrap gap-2">{priceRanges.map(r => (
+                   <button 
+                       key={r} 
+                       onClick={() => toggleFilter('priceRanges', r)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.priceRanges.includes(r) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {r}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Weight */}
+             <section ref={el => sectionRefs.current['Weight'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Weight</h4>
+               <div className="flex flex-wrap gap-2">{weights.map(w => (
+                   <button 
+                       key={w} 
+                       onClick={() => toggleFilter('weights', w)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.weights.includes(w) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {w}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Size */}
+             <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Size</h4>
+               <div className="flex flex-wrap gap-2">{sizes.map(s => (
+                   <button 
+                       key={s} 
+                       onClick={() => toggleFilter('sizes', s)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.sizes.includes(s) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {s}
+                   </button>
+               ))}</div>
+             </section>
+ 
+             {/* Sub category */}
+             <section ref={el => sectionRefs.current['Sub Category'] = el} className="mb-6">
+               <h4 className="text-sm font-medium mb-3">Sub category</h4>
+               <div className="flex flex-wrap gap-2">{subCategories.map(s => (
+                   <button 
+                       key={s} 
+                       onClick={() => toggleFilter('subCategories', s)}
+                       className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.subCategories.includes(s) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                   >
+                       {s}
+                   </button>
+               ))}</div>
+             </section>
+           </div>
+ 
+           {/* footer actions */}
+           <div className="fixed bottom-0 right-0 left-auto w-full sm:w-96 bg-white border-t p-4 flex items-center justify-between">
+             <button onClick={() => setSelectedFilters({ brands: [], productTypes: [], coatTypes: [], priceRanges: [], subCategories: [], catKitten: [], lifeStages: [], breedSizes: [], specialDiets: [], proteinSource: [], weights: [], sizes: [], sortBy: '' })} className="text-sm text-orange-500">Clear All</button>
+             <button onClick={() => setFilterOpen(false)} className="bg-orange-500 text-white px-5 py-2 rounded">Show Products</button>
+           </div>
         </aside>
       </div>
       {/* Footer */}

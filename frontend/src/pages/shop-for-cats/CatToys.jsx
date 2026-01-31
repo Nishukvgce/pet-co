@@ -808,7 +808,7 @@ const CatToys = ({ initialActive = 'All Cat Toys' }) => {
           </section>
 
           {/* Dog/cat */}
-          <section ref={el => sectionRefs.current['Dog/Cat'] = el} className="mb-6">
+          <section ref={el => sectionRefs.current['Cat/Kitten'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Dog/cat</h4>
             <div className="flex flex-wrap gap-2">{dogCat.map(d=> (
                 <button 
@@ -908,19 +908,43 @@ const CatToys = ({ initialActive = 'All Cat Toys' }) => {
           {/* Weight */}
           <section ref={el => sectionRefs.current['Weight'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Weight</h4>
-            <div className="flex flex-wrap gap-2">{weights.map(w=> (<button key={w} className="text-xs px-3 py-1 border border-border rounded bg-white">{w}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{weights.map(w=> (
+                <button 
+                    key={w} 
+                    onClick={() => toggleFilter('weights', w)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.weights.includes(w) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {w}
+                </button>
+            ))}</div>
           </section>
 
           {/* Size */}
           <section ref={el => sectionRefs.current['Size'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Size</h4>
-            <div className="flex flex-wrap gap-2">{sizes.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{sizes.map(s=> (
+                <button 
+                    key={s} 
+                    onClick={() => toggleFilter('sizes', s)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.sizes.includes(s) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {s}
+                </button>
+            ))}</div>
           </section>
 
           {/* Sub category */}
           <section ref={el => sectionRefs.current['Sub Category'] = el} className="mb-6">
             <h4 className="text-sm font-medium mb-3">Sub category</h4>
-            <div className="flex flex-wrap gap-2">{subCategories.map(s=> (<button key={s} className="text-xs px-3 py-1 border border-border rounded bg-white">{s}</button>))}</div>
+            <div className="flex flex-wrap gap-2">{subCategories.map(s=> (
+                <button 
+                    key={s} 
+                    onClick={() => toggleFilter('subCategories', s)}
+                    className={`text-xs px-3 py-1 border border-border rounded ${selectedFilters.subCategories.includes(s) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white'}`}
+                >
+                    {s}
+                </button>
+            ))}</div>
           </section>
         </div>
 
