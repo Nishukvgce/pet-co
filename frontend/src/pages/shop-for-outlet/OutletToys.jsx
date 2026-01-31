@@ -309,7 +309,7 @@ const OutletToys = ({ initialActive = 'All Toys' }) => {
                     }}
                   />
                 </div>
-                <div className="flex-1">
+                <div className="col-span-1 md:col-span-9">
                   <div className={`font-semibold text-sm ${
                     active === c.label ? 'text-orange-600' : 'text-foreground'
                   }`}>

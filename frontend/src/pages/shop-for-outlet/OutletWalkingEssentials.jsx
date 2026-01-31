@@ -281,7 +281,7 @@ const OutletWalkingEssentials = ({ initialActive = 'All Walking Essentials' }) =
                     onError={(e) => e.target.src = '/assets/images/no_image.png'}
                   />
                 </div>
-                <div className="flex-1">
+                <div className="col-span-1 md:col-span-9">
                   <div className={`font-semibold text-sm ${active === c.label ? 'text-orange-600' : 'text-foreground'}`}>
                     {c.label}
                   </div>
