@@ -22,6 +22,6 @@ jobs:
              cd backend
              mvn clean package -DskipTests
              pkill -f pet-co.jar || true
-             nohup java -jar target/*.jar > app.log 2>&1 < /dev/null &
+             nohup java -jar target/*pet-co.jar > app.log 2>&1 < /dev/null &
              disown
 
