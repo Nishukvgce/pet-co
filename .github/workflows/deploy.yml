@@ -17,5 +17,13 @@ jobs:
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          cd ecommerce
-          ./deploy.sh
+          cd /home/ec2-user/pet-co
+          git pull
+
+          echo "Building Backend..."
+          cd backend
+          mvn clean package -DskipTests
+
+          echo "Restarting Backend..."
+          pkill -f pet-co.jar || true
+          nohup java -jar target/*.jar > app.log 2>&1 &
