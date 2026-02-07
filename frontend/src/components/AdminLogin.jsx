@@ -86,11 +86,7 @@ const AdminLogin = ({ onLoginSuccess }) => {
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Demo credentials: admin@petco.com / admin123
-            </p>
-          </div>
+          
         </form>
       </div>
     </div>
