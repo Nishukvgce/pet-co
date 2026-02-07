@@ -16,12 +16,11 @@ jobs:
           host: 3.110.55.100
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
-          command_timeout: 60m
+          port: 22
+          command_timeout: 30m
           script: |
-             cd pet-co
-             git pull
-             cd backend
-             mvn clean package -DskipTests
-             pkill -f pet-co.jar || true
-             nohup java -jar target/*pet-co.jar > app.log 2>&1 < /dev/null &
-             disown
+            cd pet-co
+            git pull
+            cd backend
+            mvn clean package -DskipTests
+            sudo systemctl restart petco
