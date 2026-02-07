@@ -16,6 +16,7 @@ jobs:
           host: 3.110.55.100
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 30m
           script: |
              cd pet-co
              git pull
@@ -24,4 +25,3 @@ jobs:
              pkill -f pet-co.jar || true
              nohup java -jar target/*pet-co.jar > app.log 2>&1 < /dev/null &
              disown
-
