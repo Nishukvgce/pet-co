@@ -17,9 +17,10 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd pet-co
-            git pull
-            cd backend
-            mvn clean package -DskipTests
-            pkill -f pet-co.jar || true
-            nohup java -jar target/*.jar > app.log 2>&1 &
+             cd pet-co
+             git pull
+             cd backend
+             mvn clean package -DskipTests
+             pkill -f pet-co.jar || true
+             nohup java -jar target/*.jar > app.log 2>&1 &
+
