@@ -9,8 +9,8 @@ import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 import { getFilterConfig, getSortOptions } from '../../data/categoryFilters';
-import { normalizePrice } from '../../utils/priceNormalization';
-import { normalizeProductFromApi, productMatchesFilterSelections, isDogProduct, isFoodProduct } from '../../utils/productUtils';
+import { normalizeProductFromApi, productMatchesFilterSelections, isFoodProduct } from '../../utils/productUtils';
+import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
   { id: 'all-cat-food', label: 'All Cat Food', img: '/assets/images/cat/cf1.webp' },
@@ -50,79 +50,6 @@ const sampleProducts = [
     price: 99
   }
 ];
-
-const ProductCard = ({ p }) => {
-  const [qty] = useState(1);
-  const initialVariant = Array.isArray(p.variants) && p.variants.length > 0
-    ? (typeof p.variants[0] === 'object' ? p.variants[0] : { id: 'default', weight: String(p.variants[0] || 'Default'), price: p.price })
-    : { id: 'default', weight: 'Default', price: p.price };
-  const [selectedVariant, setSelectedVariant] = useState(initialVariant);
-  const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useCart();
-  const navigate = useNavigate();
-
-  const handleAdd = () => {
-    const productToAdd = {
-      id: p.id,
-      productId: p.id,
-      variantId: selectedVariant?.id || 'default',
-      name: p.name,
-      image: p.image,
-      price: parseFloat(selectedVariant?.price ?? p.price ?? 0),
-      originalPrice: parseFloat(selectedVariant?.originalPrice ?? p.original ?? selectedVariant?.price ?? p.price ?? 0),
-      variant: selectedVariant?.weight || selectedVariant?.size || selectedVariant?.label || String(selectedVariant || 'Default'),
-      category: p.category || 'cat-food',
-      brand: p.brand || 'Brand'
-    };
-    addToCart(productToAdd, 1);
-  };
-
-  const handleWishlist = () => {
-    if (isInWishlist(p.id)) {
-      removeFromWishlist(p.id);
-    } else {
-      addToWishlist({ id: p.id, name: p.name, image: p.image, price: p.price });
-    }
-  };
-
-  return (
-    <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm">
-      <div className="p-3">
-        <div className="h-8 flex items-center justify-start">
-          <div className="bg-green-500 text-white text-xs px-3 py-1 rounded-t-md">{p.badges?.[0]}</div>
-        </div>
-        <button onClick={() => navigate(`/product-detail-page?id=${p.id}`)} className="mt-3 h-44 flex items-center justify-center bg-[#f6f8fb] rounded w-full">
-          <img src={p.image} alt={p.name} className="max-h-40 object-contain" />
-        </button>
-        <div className="mt-3">
-          <h3 onClick={() => navigate(`/product-detail-page?id=${p.id}`)} className="text-sm font-semibold text-foreground cursor-pointer inline-block mr-2">{p.name}</h3>
-          <button onClick={() => navigate(`/product-full/${p.id}`)} className="text-xs text-primary hover:underline">Full</button>
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {(p.variants || []).map((v, i) => {
-            const label = typeof v === 'object' ? (v.weight || v.size || v.label || 'Option') : String(v);
-            const active = (typeof v === 'object') ? (selectedVariant?.id === v.id) : (String(selectedVariant?.weight || selectedVariant) === String(v));
-            return (
-              <button key={i} onClick={() => setSelectedVariant(typeof v === 'object' ? v : { id: 'default', weight: String(v), price: p.price })} className={`text-xs px-2 py-1 border border-border rounded ${active ? 'bg-green-600 text-white' : 'bg-white'}`}>{label}</button>
-            );
-          })}
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <div className="text-lg font-bold">₹{Number(selectedVariant?.price ?? p.price ?? 0).toFixed(2)}</div>
-            {(selectedVariant?.originalPrice || p.original) && (
-              <div className="text-sm text-muted-foreground line-through">₹{Number(selectedVariant?.originalPrice ?? p.original).toFixed(2)}</div>
-            )}
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <button onClick={handleAdd} className="bg-orange-500 text-white px-4 py-2 rounded-full">Add</button>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
 
 const CatFood = ({ initialActive = 'All Cat Food' }) => {
   const [active, setActive] = useState(initialActive);
@@ -367,39 +294,25 @@ const CatFood = ({ initialActive = 'All Cat Food' }) => {
         const apiData = await productApi.getCustomerProducts(params);
         console.log('CatFood: API response received:', (apiData || []).length, 'products');
         
-        // Process and filter the products from API (same as DogFood.jsx)
+        // Process and normalize products (same as DogFood.jsx)
         const normalizedProducts = (apiData || []).map((item) => {
-          const { price, originalPrice } = normalizePrice(item);
-          const apiVariants = Array.isArray(item?.variants) ? item.variants : [];
-          const variants = apiVariants.length > 0
-            ? apiVariants.map((v, idx) => ({
-                id: v?.id || v?.variantId || v?.code || `variant-${idx}`,
-                weight: v?.weight || v?.size || v?.label || `Option ${idx + 1}`,
-                size: v?.size || v?.weight || v?.label || `Option ${idx + 1}`,
-                label: v?.label || v?.weight || v?.size || `Option ${idx + 1}`,
-                price: parseFloat(v?.price ?? item?.price ?? 0) || 0,
-                originalPrice: parseFloat(v?.originalPrice ?? v?.mrp ?? item?.originalPrice ?? item?.mrp ?? v?.price ?? item?.price ?? 0) || 0,
-                stock: v?.stock ?? null
-              }))
-            : [{ id: 'default', weight: item?.weight || 'Default', size: item?.size || 'Default', label: item?.weight || item?.size || 'Default', price: parseFloat(item?.price ?? 0) || 0, originalPrice: parseFloat(item?.originalPrice ?? item?.mrp ?? item?.price ?? 0) || 0, stock: item?.stock || item?.stockQuantity || null }];
+          const normalizedProduct = normalizeProductFromApi(item);
+          const filters = { ...(normalizedProduct.filters || {}) };
+          const brand = normalizedProduct.brand || item?.brand || '';
+          
+          // Ensure brand is present in filters for filtering
+          if (brand) {
+            const list = Array.isArray(filters.brands) ? filters.brands.slice() : [];
+            if (!list.map(v => `${v}`.toLowerCase()).includes(`${brand}`.toLowerCase())) {
+              list.push(brand);
+            }
+            filters.brands = list;
+          }
+          
           return {
-            id: item?.id,
-            name: item?.name || item?.title,
-            category: item?.category || item?.categoryId || item?.subcategory || '',
-            subcategory: item?.subcategory || '',
-            brand: item?.brand || item?.manufacturer || 'Brand',
-            price,
-            original: originalPrice,
-            image: resolveImageUrl(item),
-            badges: item?.badges || [],
-            variants,
-            tags: item?.tags || [],
-            lifeStage: item?.lifeStage || item?.age_group || '',
-            breedSize: item?.breedSize || item?.breed || '',
-            productType: item?.productType || item?.type || '',
-            specialDiet: item?.specialDiet || '',
-            proteinSource: item?.proteinSource || item?.protein || '',
-            weight: item?.weight || ''
+            ...normalizedProduct,
+            image: resolveImageUrl(normalizedProduct),
+            filters
           };
         });
         

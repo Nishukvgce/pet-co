@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, HeartFill } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 
@@ -11,12 +11,49 @@ const ProductCard = ({ p }) => {
   const navigate = useNavigate();
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useCart();
   const [variantIdx, setVariantIdx] = useState(0);
-  const variants = p.variants && p.variants.length > 0 ? p.variants : [{ weight: 'Default', price: p.price, originalPrice: p.originalPrice || p.original, stock: 1 }];
+  
+  // Normalize variants to handle both object and string formats
+  const normalizeVariants = () => {
+    if (!p.variants || p.variants.length === 0) {
+      return [{ 
+        id: 'default', 
+        weight: 'Default', 
+        label: 'Default',
+        price: p.price, 
+        originalPrice: p.originalPrice || p.original, 
+        stock: p.stockQuantity ?? 1 
+      }];
+    }
+    
+    return p.variants.map((v, idx) => {
+      if (typeof v === 'object') {
+        return {
+          id: v.id || `variant-${idx}`,
+          weight: v.weight || v.size || v.label || `Variant ${idx + 1}`,
+          label: v.label || v.weight || v.size || `Variant ${idx + 1}`,
+          price: v.price || p.price || 0,
+          originalPrice: v.originalPrice || v.original || p.originalPrice || p.original || v.price || p.price || 0,
+          stock: v.stock ?? v.stockQuantity ?? p.stockQuantity ?? 1
+        };
+      }
+      // If variant is a string, use product price
+      return {
+        id: `variant-${idx}`,
+        weight: String(v),
+        label: String(v),
+        price: p.price || 0,
+        originalPrice: p.originalPrice || p.original || p.price || 0,
+        stock: p.stockQuantity ?? 1
+      };
+    });
+  };
+  
+  const variants = normalizeVariants();
   const currentVariant = variants[variantIdx];
-  const currentPrice = currentVariant.price || p.price || 0;
-  const originalPrice = currentVariant.originalPrice || p.originalPrice || p.original || 0;
+  const currentPrice = Number(currentVariant.price) || 0;
+  const originalPrice = Number(currentVariant.originalPrice) || 0;
   const discount = originalPrice > currentPrice ? Math.round(100 - (currentPrice / originalPrice) * 100) : 0;
-  const isInStock = (currentVariant.stock ?? p.stockQuantity ?? 1) > 0;
+  const isInStock = (currentVariant.stock ?? 1) > 0;
   const brand = p.brand || (p.filters && p.filters.brands && p.filters.brands[0]) || '';
 
   // Wishlist logic
@@ -34,20 +71,22 @@ const ProductCard = ({ p }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation();
     if (!isInStock) return;
-    const variantId = currentVariant?.id || `v${variantIdx}`;
-    addToCart({
+    
+    const cartItem = {
       id: p.id,
       productId: p.id,
-      variantId,
+      variantId: currentVariant.id,
       name: p.name,
       image: p.image,
       price: currentPrice,
       originalPrice: originalPrice,
-      variant: currentVariant.weight || currentVariant.size || currentVariant.label || 'Default',
+      variant: currentVariant.label || currentVariant.weight,
       brand,
       quantity: 1,
       category: p.category || '',
-    });
+    };
+    
+    addToCart(cartItem);
   };
 
   // Image fallback
@@ -77,7 +116,7 @@ const ProductCard = ({ p }) => {
         onClick={handleWishlist}
         aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
       >
-        {wishlisted ? <HeartFill className="text-pink-500" size={22} /> : <Heart className="text-gray-400" size={22} />}
+        <Heart className={`${wishlisted ? 'text-pink-500 fill-pink-500' : 'text-gray-400'}`} size={22} />
       </button>
       {/* Product Image (clickable) */}
       <div className="h-44 md:h-56 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-2xl overflow-hidden relative"
@@ -112,15 +151,26 @@ const ProductCard = ({ p }) => {
         {variants.length > 1 && (
           <div className="flex flex-wrap gap-2 mb-2">
             {variants.map((v, i) => {
-              const label = v.weight || v.size || v.label || v;
               const active = i === variantIdx;
+              const variantLabel = v.label || v.weight;
+              const variantPrice = Number(v.price) || 0;
+              
               return (
                 <button
                   key={i}
                   onClick={e => { e.stopPropagation(); setVariantIdx(i); }}
-                  className={`text-xs px-3 py-1 border rounded-full font-semibold transition-colors ${active ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-700 border-gray-300 hover:border-orange-300'}`}
+                  className={`text-xs px-3 py-1.5 border rounded-lg font-semibold transition-all ${
+                    active 
+                      ? 'bg-orange-500 text-white border-orange-500 shadow-md' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:border-orange-300 hover:bg-orange-50'
+                  }`}
                 >
-                  {label}
+                  <div className="flex flex-col items-center">
+                    <span className="font-bold">{variantLabel}</span>
+                    <span className={`text-[10px] ${active ? 'text-white' : 'text-gray-600'}`}>
+                      ₹{variantPrice.toFixed(0)}
+                    </span>
+                  </div>
                 </button>
               );
             })}

@@ -9,6 +9,7 @@ import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
+import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
   { id: 'all-cat-toys', label: 'All Cat Toys', img: '/assets/images/cat/Fil_plushtoys.webp' },
@@ -24,69 +25,6 @@ const sampleProducts = [
   { id: 'y2', name: 'Feather Teaser Wand', image: '/assets/images/essential/whiskas.webp', badges: ['New'], variants: ['One Size'], price: 199 },
   { id: 'y3', name: 'Plush Cat Pillow', image: '/assets/images/essential/sheba.webp', badges: ['Soft'], variants: ['Small','Large'], price: 599 }
 ];
-
-const ProductCard = ({p}) => {
-  const [qty] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState((p.variants || [null])[0] || null);
-  const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useCart();
-  const navigate = useNavigate();
-
-  const handleAdd = () => {
-    const productToAdd = {
-      id: p.id,
-      productId: p.id,
-      variantId: selectedVariant?.id || 'default',
-      name: p.name,
-      image: p.image,
-      price: p.price,
-      originalPrice: p.original || p.price,
-      variant: selectedVariant || 'Default',
-      category: p.category || 'cat-food',
-      brand: p.brand || 'Brand'
-    };
-    addToCart(productToAdd, 1);
-  };
-
-  const handleWishlist = () => {
-    if (isInWishlist(p.id)) {
-      removeFromWishlist(p.id);
-    } else {
-      addToWishlist({ id: p.id, name: p.name, image: p.image, price: p.price });
-    }
-  };
-
-  return (
-    <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm">
-      <div className="p-3">
-        <div className="h-8 flex items-center justify-start">
-          <div className="bg-green-500 text-white text-xs px-3 py-1 rounded-t-md">{p.badges?.[0]}</div>
-        </div>
-        <button onClick={() => navigate(`/product-detail-page?id=${p.id}`)} className="mt-3 h-44 flex items-center justify-center bg-[#f6f8fb] rounded w-full">
-          <img src={p.image} alt={p.name} className="max-h-40 object-contain" />
-        </button>
-        <h3 onClick={() => navigate(`/product-detail-page?id=${p.id}`)} className="mt-3 text-sm font-semibold text-foreground cursor-pointer">{p.name}</h3>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {(p.variants || []).map((v,i)=>(
-            <button key={i} onClick={() => setSelectedVariant(v)} className={`text-xs px-2 py-1 border border-border rounded ${selectedVariant === v ? 'bg-green-600 text-white' : 'bg-white'}`}>{v}</button>
-          ))}
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <div className="text-lg font-bold">₹{(Number(p.price) || 0).toFixed(2)}</div>
-            {p.original && <div className="text-sm text-muted-foreground line-through">₹{p.original}</div>}
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <button onClick={handleAdd} className="bg-orange-500 text-white px-4 py-2 rounded-full">Add</button>
-            <button onClick={handleWishlist} className="text-xs text-muted-foreground">{isInWishlist(p.id) ? 'Remove ♥' : 'Wishlist ♡'}</button>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 
 const CatToys = ({ initialActive = 'All Cat Toys' }) => {
   const [active, setActive] = useState(initialActive);
@@ -323,25 +261,10 @@ const CatToys = ({ initialActive = 'All Cat Toys' }) => {
         
         // Process and filter the products from API
         const normalizedProducts = (apiData || []).map((item) => {
+          const normalizedProduct = normalizeProductFromApi(item);
           return {
-            id: item?.id,
-            name: item?.name || item?.title,
-            category: item?.category || item?.categoryId || item?.subcategory || '',
-            subcategory: item?.subcategory || '',
-            brand: item?.brand || item?.manufacturer || 'Brand',
-            price: parseFloat(item?.price ?? item?.salePrice ?? 0) || 0,
-            original: parseFloat(item?.originalPrice ?? item?.mrp ?? item?.price ?? 0) || 0,
-            image: resolveImageUrl(item),
-            badges: item?.badges || [],
-            variants: item?.variants?.map(v => v?.weight || v?.label) || ['Default'],
-            tags: item?.tags || [],
-            lifeStage: item?.lifeStage || item?.age_group || '',
-            breedSize: item?.breedSize || item?.breed || '',
-            productType: item?.productType || item?.type || '',
-            specialDiet: item?.specialDiet || '',
-            proteinSource: item?.proteinSource || item?.protein || '',
-            weight: item?.weight || '',
-            size: item?.size || ''
+            ...normalizedProduct,
+            image: resolveImageUrl(normalizedProduct)
           };
         });
         
