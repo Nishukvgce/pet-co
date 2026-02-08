@@ -19,8 +19,19 @@ jobs:
           port: 22
           command_timeout: 30m
           script: |
-            cd pet-co
-            git pull
-            cd backend
-            mvn clean package -DskipTests
-            sudo systemctl restart petco
+              cd pet-co
+              git pull origin main
+
+              # ---------- BACKEND ----------
+              cd backend
+              mvn clean package -DskipTests
+              sudo systemctl restart petco
+
+              # ---------- FRONTEND ----------
+              cd ../frontend
+              npm install
+              npm run build
+
+              sudo rm -rf /var/www/html/*
+              sudo cp -r dist/* /var/www/html/
+
