@@ -27,13 +27,31 @@ const ProductCard = ({ p }) => {
     
     return p.variants.map((v, idx) => {
       if (typeof v === 'object') {
+        // Build label with units from database (same logic as DogFood)
+        let label = '';
+        if (v.weight && v.weight.toString().trim()) {
+          const weight = v.weight.toString().trim();
+          const unit = v.weightUnit?.toString().trim() || '';
+          label = unit ? `${weight}${unit}` : weight;
+        } else if (v.size && v.size.toString().trim()) {
+          const size = v.size.toString().trim();
+          const unit = v.sizeUnit?.toString().trim() || '';
+          label = unit ? `${size}${unit}` : size;
+        } else if (v.label) {
+          label = v.label.toString().trim();
+        } else {
+          label = `Variant ${idx + 1}`;
+        }
+        
         return {
           id: v.id || `variant-${idx}`,
-          weight: v.weight || v.size || v.label || `Variant ${idx + 1}`,
-          label: v.label || v.weight || v.size || `Variant ${idx + 1}`,
+          weight: v.weight || v.size || label,
+          label: label,
           price: v.price || p.price || 0,
           originalPrice: v.originalPrice || v.original || p.originalPrice || p.original || v.price || p.price || 0,
-          stock: v.stock ?? v.stockQuantity ?? p.stockQuantity ?? 1
+          stock: v.stock ?? v.stockQuantity ?? p.stockQuantity ?? 1,
+          weightUnit: v.weightUnit || '',
+          sizeUnit: v.sizeUnit || ''
         };
       }
       // If variant is a string, use product price
