@@ -119,7 +119,9 @@ const ProductDetailPage = () => {
               return productData.variants.map((variant, index) => ({
                 id: variant?.id || `variant-${index}`,
                 weight: variant?.weight || variant?.size || `Option ${index + 1}`,
+                weightUnit: variant?.weightUnit || '',
                 size: variant?.size || variant?.weight || `Option ${index + 1}`,
+                sizeUnit: variant?.sizeUnit || '',
                 label: variant?.label || variant?.weight || variant?.size || `Option ${index + 1}`,
                 price: parseFloat(variant?.price || productData?.price || 0),
                 originalPrice: parseFloat(variant?.originalPrice || variant?.mrp || productData?.originalPrice || productData?.mrp || variant?.price || productData?.price || 0),
@@ -134,7 +136,9 @@ const ProductDetailPage = () => {
               return productData.metadata.variants.map((variant, index) => ({
                 id: variant?.id || `variant-${index}`,
                 weight: variant?.weight || variant?.size || `Option ${index + 1}`,
+                weightUnit: variant?.weightUnit || '',
                 size: variant?.size || variant?.weight || `Option ${index + 1}`,
+                sizeUnit: variant?.sizeUnit || '',
                 label: variant?.label || variant?.weight || variant?.size || `Option ${index + 1}`,
                 price: parseFloat(variant?.price || productData?.price || 0),
                 originalPrice: parseFloat(variant?.originalPrice || variant?.mrp || productData?.originalPrice || productData?.mrp || variant?.price || productData?.price || 0),

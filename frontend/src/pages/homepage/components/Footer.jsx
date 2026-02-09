@@ -43,9 +43,9 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { name: "Facebook", icon: "Facebook", url: "https://www.facebook.com/profile.php?id=61581179697955" },
-    { name: "Instagram", icon: "Instagram", url: "https://www.instagram.com/root_straditional/" },
-    { name: "YouTube", icon: "Youtube", url: "https://www.youtube.com/@rootstraditionalfoods" }
+    { name: "Facebook", icon: "Facebook", url: "" },
+    { name: "Instagram", icon: "Instagram", url: "" },
+    { name: "YouTube", icon: "Youtube", url: "" }
   ];
 
   const contactInfo = {

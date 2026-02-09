@@ -207,7 +207,7 @@ export const generateInvoice = (order, user, settings = {}) => {
                     <img src="/assets/images/logo.png" alt="${siteName} Logo" class="company-logo">
                     <h1>${siteName}</h1>
                 </div>
-                <p>Natural & Organic Products</p>
+                <p>Pet Products</p>
                 <p>Email: info@petco.com</p>
                 <p>Phone: +90080 03096⁩</p>
             </div>
