@@ -12,6 +12,7 @@ import AnnouncementBar from './AnnouncementBar';
 import MegaMenu from './MegaMenu';
 import CartDrawer from './CartDrawer';
 import { useCart } from '../../contexts/CartContext.jsx';
+import { resolveImageUrl } from '../../lib/imageUtils';
 
 
 const Header = ({ onSearch = () => { } }) => {
@@ -577,7 +578,7 @@ const Header = ({ onSearch = () => { } }) => {
                     aria-label={featuredProduct.name || 'Featured product'}
                   >
                     <img
-                      src={featuredProduct.image || featuredProduct.imageUrl || featuredProduct.thumbnailUrl || featuredProduct.image_path}
+                      src={resolveImageUrl(featuredProduct)}
                       alt={featuredProduct.name || featuredProduct.title || 'Product'}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
