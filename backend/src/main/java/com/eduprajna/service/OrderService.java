@@ -30,7 +30,7 @@ import com.eduprajna.repository.OrderRepository;
 @Service
 public class OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
-    
+
     private final OrderRepository orderRepo;
     private final CartItemRepository cartRepo;
     private final CheckoutSelectionRepository selectionRepo;
@@ -40,12 +40,12 @@ public class OrderService {
     private final com.eduprajna.roots.coupons.CouponRedemptionRepository redemptionRepo;
     private final EmailService emailService;
 
-    public OrderService(OrderRepository orderRepo, CartItemRepository cartRepo, 
-                       CheckoutSelectionRepository selectionRepo, AddressRepository addressRepo,
-                       com.eduprajna.repository.ProductRepository productRepo,
-                       com.eduprajna.roots.coupons.CouponRepository couponRepo,
-                       com.eduprajna.roots.coupons.CouponRedemptionRepository redemptionRepo,
-                       EmailService emailService) {
+    public OrderService(OrderRepository orderRepo, CartItemRepository cartRepo,
+            CheckoutSelectionRepository selectionRepo, AddressRepository addressRepo,
+            com.eduprajna.repository.ProductRepository productRepo,
+            com.eduprajna.roots.coupons.CouponRepository couponRepo,
+            com.eduprajna.roots.coupons.CouponRedemptionRepository redemptionRepo,
+            EmailService emailService) {
         this.orderRepo = orderRepo;
         this.cartRepo = cartRepo;
         this.selectionRepo = selectionRepo;
@@ -64,36 +64,36 @@ public class OrderService {
     @Transactional
     public Order placeOrder(User user) {
         logger.debug("Placing order for user: {}", user.getEmail());
-        
+
         // 1. Get cart items
         List<CartItem> cart = cartRepo.findByUser(user);
         if (cart.isEmpty()) {
             throw new IllegalStateException("Cart is empty");
         }
         logger.debug("Found {} items in cart for user: {}", cart.size(), user.getEmail());
-        
+
         // 1b. Validate stock availability for all items before proceeding
         for (CartItem ci : cart) {
             Product product = ci.getProduct();
             String variantId = ci.getVariantId();
             int qty = ci.getQuantity() != null ? ci.getQuantity() : 0;
-            
-            logger.debug("Checking stock for product: {} (ID: {}), variantId: {}, quantity: {}", 
-                product.getName(), product.getId(), variantId, qty);
-            
+
+            logger.debug("Checking stock for product: {} (ID: {}), variantId: {}, quantity: {}",
+                    product.getName(), product.getId(), variantId, qty);
+
             if (qty <= 0) {
                 throw new IllegalStateException("Invalid quantity for product: " + product.getName());
             }
-            
+
             // Simple stock validation - just check if product is in stock
             boolean isInStock = false;
             String stockInfo = "unknown";
-            
+
             try {
                 // Check if product has an inStock flag
                 Boolean productInStock = product.getInStock();
                 Integer stockQuantity = product.getStockQuantity();
-                
+
                 if (productInStock != null && !productInStock) {
                     isInStock = false;
                     stockInfo = "marked as out of stock";
@@ -122,14 +122,15 @@ public class OrderService {
                         stockInfo = "variant check failed";
                     }
                 }
-                
-                logger.debug("Stock check result for product {}: isInStock={}, info={}", 
-                    product.getName(), isInStock, stockInfo);
-                
+
+                logger.debug("Stock check result for product {}: isInStock={}, info={}",
+                        product.getName(), isInStock, stockInfo);
+
                 if (!isInStock) {
-                    throw new IllegalStateException("Insufficient stock for product: " + product.getName() + " (" + stockInfo + ")");
+                    throw new IllegalStateException(
+                            "Insufficient stock for product: " + product.getName() + " (" + stockInfo + ")");
                 }
-                
+
             } catch (IllegalStateException e) {
                 // Re-throw stock validation errors
                 throw e;
@@ -138,21 +139,21 @@ public class OrderService {
                 throw new IllegalStateException("Unable to validate stock for product: " + product.getName());
             }
         }
-        
+
         // 2. Get checkout selection
         CheckoutSelection selection = selectionRepo.findByUser(user)
-            .orElseThrow(() -> new IllegalStateException("No checkout selection found"));
-        
+                .orElseThrow(() -> new IllegalStateException("No checkout selection found"));
+
         // 3. Get selected address
         Address address = addressRepo.findById(selection.getAddressId())
-            .orElseThrow(() -> new IllegalStateException("Selected address not found"));
-        
+                .orElseThrow(() -> new IllegalStateException("Selected address not found"));
+
         // 4. Create order
         Order order = new Order();
         order.setUser(user);
         order.setDeliveryOption(selection.getDeliveryOption());
         order.setPaymentMethod(selection.getPaymentMethod());
-        
+
         // 5. Create shipping snapshot
         ShippingSnapshot shippingSnapshot = new ShippingSnapshot();
         shippingSnapshot.setName(address.getName());
@@ -164,14 +165,15 @@ public class OrderService {
         shippingSnapshot.setLandmark(address.getLandmark());
         shippingSnapshot.setAddressType(address.getAddressType());
         order.setShipping(shippingSnapshot);
-        
+
         // 6. Calculate totals
         double subtotal = cart.stream()
-            .mapToDouble(ci -> (ci.getPriceAtAdd() != null ? ci.getPriceAtAdd() : 0.0) * ci.getQuantity())
-            .sum();
+                .mapToDouble(ci -> (ci.getPriceAtAdd() != null ? ci.getPriceAtAdd() : 0.0) * ci.getQuantity())
+                .sum();
 
         // Shipping fee: ₹50 when subtotal < ₹500, otherwise Free
-        double shippingFee = (selection.getShippingFee() != null) ? selection.getShippingFee() : ((subtotal >= 500.0) ? 0.0 : 50.0);
+        double shippingFee = (selection.getShippingFee() != null) ? selection.getShippingFee()
+                : ((subtotal >= 500.0) ? 0.0 : 50.0);
         double total;
         if (selection.getTotal() != null) {
             total = selection.getTotal();
@@ -182,7 +184,7 @@ public class OrderService {
         order.setSubtotal(subtotal);
         order.setShippingFee(shippingFee);
         order.setTotal(total);
-        
+
         // 7. Create order items
         List<OrderItem> orderItems = cart.stream().map(cartItem -> {
             OrderItem orderItem = new OrderItem();
@@ -191,7 +193,8 @@ public class OrderService {
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(cartItem.getPriceAtAdd());
             orderItem.setVariantId(cartItem.getVariantId()); // Store variant ID
-            // Derive a human readable label for the variant and store it as well to avoid display glitches
+            // Derive a human readable label for the variant and store it as well to avoid
+            // display glitches
             try {
                 String vLabel = null;
                 String vid = cartItem.getVariantId();
@@ -202,14 +205,17 @@ public class OrderService {
                         if (lbl == null) {
                             // Try common keys
                             lbl = variant.get("weight");
-                            if (lbl == null) lbl = variant.get("size");
+                            if (lbl == null)
+                                lbl = variant.get("size");
                         }
-                        if (lbl != null) vLabel = String.valueOf(lbl);
+                        if (lbl != null)
+                            vLabel = String.valueOf(lbl);
 
                         // If unit info exists, append (weightUnit/sizeUnit)
                         if (vLabel != null && !vLabel.isEmpty()) {
                             Object unit = variant.get("weightUnit");
-                            if (unit == null) unit = variant.get("sizeUnit");
+                            if (unit == null)
+                                unit = variant.get("sizeUnit");
                             if (unit != null) {
                                 String u = String.valueOf(unit).trim();
                                 if (!u.isEmpty() && !vLabel.toLowerCase().contains(u.toLowerCase())) {
@@ -222,13 +228,16 @@ public class OrderService {
                 // Sanitize and fallback: prefer numeric weight/size or small textual labels
                 if (vLabel != null && !vLabel.isEmpty()) {
                     String low = vLabel.toLowerCase();
-                    boolean looksLikeSize = vLabel.matches(".*\\d.*") || low.matches(".*(g|kg|ml|l|lit|ltr|cm|in|ft).*");
-                    boolean disallowed = low.matches(".*(category|care|antibiotic|antibiotics|oral|medicine|medical).*");
+                    boolean looksLikeSize = vLabel.matches(".*\\d.*")
+                            || low.matches(".*(g|kg|ml|l|lit|ltr|cm|in|ft).*");
+                    boolean disallowed = low
+                            .matches(".*(category|care|antibiotic|antibiotics|oral|medicine|medical).*");
                     if (!looksLikeSize && disallowed) {
                         vLabel = null;
                     } else if (!looksLikeSize) {
                         // allow short textual labels like 'Medium', 'Large'
-                        if (vLabel.split("\\s+").length > 3 || vLabel.length() > 40) vLabel = null;
+                        if (vLabel.split("\\s+").length > 3 || vLabel.length() > 40)
+                            vLabel = null;
                     }
                 }
 
@@ -236,7 +245,9 @@ public class OrderService {
                     Product p = cartItem.getProduct();
                     if (p.getWeight() != null && p.getWeight().matches(".*\\d.*")) {
                         vLabel = p.getWeight();
-                        if (p.getWeightUnit() != null && !p.getWeightUnit().isEmpty() && !vLabel.toLowerCase().contains(p.getWeightUnit().toLowerCase())) vLabel = vLabel + p.getWeightUnit();
+                        if (p.getWeightUnit() != null && !p.getWeightUnit().isEmpty()
+                                && !vLabel.toLowerCase().contains(p.getWeightUnit().toLowerCase()))
+                            vLabel = vLabel + p.getWeightUnit();
                     }
                 }
 
@@ -244,12 +255,12 @@ public class OrderService {
             } catch (Exception e) {
                 // don't fail order creation for label extraction
             }
-            
+
             // Decrement stock for the purchased product (variant-aware)
             Product product = cartItem.getProduct();
             String variantId = cartItem.getVariantId();
             int qty = cartItem.getQuantity() != null ? cartItem.getQuantity() : 0;
-            
+
             try {
                 boolean hasVariants = product.hasVariants();
                 if (variantId != null && !variantId.isEmpty() && hasVariants) {
@@ -284,7 +295,7 @@ public class OrderService {
                     product.setInStock(newQty > 0);
                     logger.debug("Updated main product stock from {} to {}", available, newQty);
                 }
-                
+
                 productRepo.save(product);
             } catch (Exception e) {
                 logger.error("Error updating stock for product {}: {}", product.getId(), e.getMessage());
@@ -293,19 +304,20 @@ public class OrderService {
             return orderItem;
         }).collect(Collectors.toList());
         order.setItems(orderItems);
-        
+
         // 8. Save order
         Order savedOrder = orderRepo.save(order);
         logger.info("Order created with ID: {} for user: {}", savedOrder.getId(), user.getEmail());
-        
+
         // 9. Clear cart after successful order creation
         cartRepo.deleteByUser(user);
         logger.info("Cart cleared for user: {}", user.getEmail());
-        
+
         // 10. Update user's order count
         user.incrementTotalOrders();
 
-        // 11. Record coupon redemption if a coupon code was applied in checkout selection
+        // 11. Record coupon redemption if a coupon code was applied in checkout
+        // selection
         try {
             CheckoutSelection sel = selectionRepo.findByUser(user).orElse(null);
             if (sel != null && sel.getCouponCode() != null && !sel.getCouponCode().trim().isEmpty()) {
@@ -326,34 +338,36 @@ public class OrderService {
         } catch (Exception e) {
             logger.warn("Failed to record coupon redemption: {}", e.getMessage());
         }
-        
+
         return savedOrder;
     }
 
     /**
      * Place an order for online payment after signature verification
-     * This method doesn't require cart items as they are already stored in checkout selection
+     * This method doesn't require cart items as they are already stored in checkout
+     * selection
+     * 
      * @param user The user placing the order
      * @return The created order
      */
     @Transactional
     public Order placeOrderForOnlinePayment(User user) {
         logger.debug("Placing order for online payment user: {}", user.getEmail());
-        
+
         // Get checkout selection with totals
         CheckoutSelection selection = selectionRepo.findByUser(user)
-            .orElseThrow(() -> new IllegalStateException("No checkout selection found"));
-        
+                .orElseThrow(() -> new IllegalStateException("No checkout selection found"));
+
         // Get selected address
         Address address = addressRepo.findById(selection.getAddressId())
-            .orElseThrow(() -> new IllegalStateException("Selected address not found"));
-        
+                .orElseThrow(() -> new IllegalStateException("Selected address not found"));
+
         // Create order using checkout selection data
         Order order = new Order();
         order.setUser(user);
         order.setDeliveryOption(selection.getDeliveryOption());
         order.setPaymentMethod(selection.getPaymentMethod());
-        
+
         // Create shipping snapshot
         ShippingSnapshot shippingSnapshot = new ShippingSnapshot();
         shippingSnapshot.setName(address.getName());
@@ -365,33 +379,36 @@ public class OrderService {
         shippingSnapshot.setLandmark(address.getLandmark());
         shippingSnapshot.setAddressType(address.getAddressType());
         order.setShipping(shippingSnapshot);
-        
+
         // Use totals from checkout selection
         Double subtotal = selection.getSubtotal();
         Double shippingFee = selection.getShippingFee();
         Double total = selection.getTotal();
 
-        logger.debug("CheckoutSelection found - ID: {}, DeliveryOption: {}, PaymentMethod: {}", 
-                    selection.getId(), selection.getDeliveryOption(), selection.getPaymentMethod());
-        logger.debug("CheckoutSelection totals - subtotal: {}, shippingFee: {}, total: {}", 
-                    subtotal, shippingFee, total);
+        logger.debug("CheckoutSelection found - ID: {}, DeliveryOption: {}, PaymentMethod: {}",
+                selection.getId(), selection.getDeliveryOption(), selection.getPaymentMethod());
+        logger.debug("CheckoutSelection totals - subtotal: {}, shippingFee: {}, total: {}",
+                subtotal, shippingFee, total);
 
         if (subtotal == null) {
             logger.error("Order subtotal is null in checkout selection.");
             throw new IllegalStateException("Order subtotal not found in checkout selection");
         }
 
-        // If shippingFee is missing, default to threshold rule; if total missing, derive from subtotal + shipping
-        if (shippingFee == null) shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
-        if (total == null) total = subtotal + shippingFee; // selection may have already applied coupon
+        // If shippingFee is missing, default to threshold rule; if total missing,
+        // derive from subtotal + shipping
+        if (shippingFee == null)
+            shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
+        if (total == null)
+            total = subtotal + shippingFee; // selection may have already applied coupon
 
         order.setSubtotal(subtotal);
         order.setShippingFee(shippingFee);
         order.setTotal(total);
-        
+
         // Try to get cart items if they still exist, otherwise create empty order
         List<CartItem> cart = cartRepo.findByUser(user);
-        
+
         if (!cart.isEmpty()) {
             // Create order items from cart
             List<OrderItem> orderItems = cart.stream().map(cartItem -> {
@@ -411,12 +428,15 @@ public class OrderService {
                             Object lbl = variant.get("label");
                             if (lbl == null) {
                                 lbl = variant.get("weight");
-                                if (lbl == null) lbl = variant.get("size");
+                                if (lbl == null)
+                                    lbl = variant.get("size");
                             }
-                            if (lbl != null) vLabel = String.valueOf(lbl);
+                            if (lbl != null)
+                                vLabel = String.valueOf(lbl);
                             if (vLabel != null && !vLabel.isEmpty()) {
                                 Object unit = variant.get("weightUnit");
-                                if (unit == null) unit = variant.get("sizeUnit");
+                                if (unit == null)
+                                    unit = variant.get("sizeUnit");
                                 if (unit != null) {
                                     String u = String.valueOf(unit).trim();
                                     if (!u.isEmpty() && !vLabel.toLowerCase().contains(u.toLowerCase())) {
@@ -430,14 +450,15 @@ public class OrderService {
                         Product p = cartItem.getProduct();
                         if (p.getWeight() != null && p.getWeight().matches(".*\\d.*")) {
                             vLabel = p.getWeight();
-                            if (p.getWeightUnit() != null && !p.getWeightUnit().isEmpty()) vLabel = vLabel + p.getWeightUnit();
+                            if (p.getWeightUnit() != null && !p.getWeightUnit().isEmpty())
+                                vLabel = vLabel + p.getWeightUnit();
                         }
                     }
                     orderItem.setVariantLabel(vLabel);
                 } catch (Exception e) {
                     // ignore
                 }
-                
+
                 // Decrement stock
                 Product product = cartItem.getProduct();
                 Integer stockQuantity = product.getStockQuantity();
@@ -451,7 +472,7 @@ public class OrderService {
                 return orderItem;
             }).collect(Collectors.toList());
             order.setItems(orderItems);
-            
+
             // Clear cart after order creation
             cartRepo.deleteByUser(user);
             logger.info("Cart cleared for user: {}", user.getEmail());
@@ -459,11 +480,11 @@ public class OrderService {
             logger.warn("No cart items found for online payment order, creating empty order items list");
             order.setItems(new ArrayList<>());
         }
-        
+
         // Save order
         Order savedOrder = orderRepo.save(order);
         logger.info("Online payment order created with ID: {} for user: {}", savedOrder.getId(), user.getEmail());
-        
+
         // Update user's order count
         user.incrementTotalOrders();
 
@@ -488,33 +509,36 @@ public class OrderService {
         } catch (Exception e) {
             logger.warn("Failed to record coupon redemption (online): {}", e.getMessage());
         }
-        
+
         return savedOrder;
     }
 
     /**
      * Get all orders for a specific user, ordered by creation date (newest first)
+     * 
      * @param user The user to get orders for
      * @return List of orders for the user
      */
-    public List<Order> getUserOrders(User user) { 
-        return orderRepo.findByUserOrderByCreatedAtDesc(user); 
+    public List<Order> getUserOrders(User user) {
+        return orderRepo.findByUserOrderByCreatedAtDesc(user);
     }
-    
+
     /**
      * Get all orders in the system, ordered by creation date (newest first)
+     * 
      * @return List of all orders
      */
-    public List<Order> getAllOrders() { 
+    public List<Order> getAllOrders() {
         return orderRepo.findAll().stream()
-            .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
-            .collect(Collectors.toList());
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .collect(Collectors.toList());
     }
-    
+
     /**
      * Update the status of an order
+     * 
      * @param orderId The ID of the order to update
-     * @param status The new status
+     * @param status  The new status
      * @return The updated order
      * @throws RuntimeException if order is not found
      */
@@ -523,29 +547,31 @@ public class OrderService {
         System.out.println("🔄 Processing order status update...");
         System.out.println("🎯 Order ID: #" + orderId);
         System.out.println("📋 New Status: " + status);
-        
+
         Order order = orderRepo.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
-        
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+
         String oldStatus = order.getStatus();
         System.out.println("📊 Previous Status: " + (oldStatus != null ? oldStatus : "null"));
-        
+
         order.setStatus(status);
         Order updatedOrder = orderRepo.save(order);
-        
+
         logger.info("Order {} status updated from '{}' to '{}'", orderId, oldStatus, status);
         System.out.println("✅ Database updated successfully");
-        
+
         // Send email notification if status actually changed
         if (oldStatus == null || !oldStatus.equals(status)) {
             System.out.println("📧 Triggering email notification...");
             try {
                 emailService.sendOrderStatusUpdate(updatedOrder, oldStatus, status);
-                logger.info("Email notification sent for order {} status change from '{}' to '{}'", orderId, oldStatus, status);
+                logger.info("Email notification sent for order {} status change from '{}' to '{}'", orderId, oldStatus,
+                        status);
                 System.out.println("✅ EMAIL NOTIFICATION COMPLETED SUCCESSFULLY");
                 System.out.println("👤 Customer will receive email about status change");
             } catch (Exception e) {
-                logger.error("Failed to send email notification for order {} status change from '{}' to '{}': {}", orderId, oldStatus, status, e.getMessage(), e);
+                logger.error("Failed to send email notification for order {} status change from '{}' to '{}': {}",
+                        orderId, oldStatus, status, e.getMessage(), e);
                 System.err.println("❌ EMAIL NOTIFICATION FAILED");
                 System.err.println("💡 Error: " + e.getMessage());
                 System.err.println("⚠️  Customer will NOT receive email notification");
@@ -554,43 +580,47 @@ public class OrderService {
         } else {
             System.out.println("ℹ️  Status unchanged - no email notification needed");
         }
-        
+
         System.out.println("=== ORDER SERVICE COMPLETE ===\n");
         return updatedOrder;
     }
-    
+
     /**
      * Get order by ID with all details
+     * 
      * @param orderId The ID of the order
      * @return The order with all details
      * @throws RuntimeException if order is not found
      */
     public Order getOrderById(Long orderId) {
         return orderRepo.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
     }
-    
+
     /**
      * Get orders by status
+     * 
      * @param status The status to filter by
      * @return List of orders with the specified status
      */
     public List<Order> getOrdersByStatus(String status) {
         return orderRepo.findByStatusOrderByCreatedAtDesc(status);
     }
-    
+
     /**
      * Get orders for a user by status
-     * @param user The user to get orders for
+     * 
+     * @param user   The user to get orders for
      * @param status The status to filter by
      * @return List of orders for the user with the specified status
      */
     public List<Order> getUserOrdersByStatus(User user, String status) {
         return orderRepo.findByUserAndStatusOrderByCreatedAtDesc(user, status);
     }
-    
+
     /**
      * Get order statistics
+     * 
      * @return Map containing order statistics
      */
     public java.util.Map<String, Object> getOrderStatistics() {

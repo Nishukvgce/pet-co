@@ -24,7 +24,8 @@ import com.eduprajna.service.UserService;
 
 @RestController
 @RequestMapping("/api/payments/razorpay")
-@CrossOrigin(origins = {CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW, CorsConfig.AWS_CURRENT_IP_HTTP, CorsConfig.AWS_CURRENT_IP_HTTPS}, allowCredentials = "true")
+@CrossOrigin(origins = { CorsConfig.LOCALHOST_3000, CorsConfig.LOCALHOST_IP_3000, CorsConfig.VERCEL_NEW,
+        CorsConfig.AWS_CURRENT_IP_HTTP, CorsConfig.AWS_CURRENT_IP_HTTPS }, allowCredentials = "true")
 public class PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
@@ -40,11 +41,12 @@ public class PaymentController {
     @Value("${razorpay.keyId:}")
     private String razorpayKeyId;
 
-    public PaymentController(RazorpayService razorpayService, OrderService orderService, UserService userService, OrderRepository orderRepo,
-                             com.eduprajna.service.CartService cartService,
-                             com.eduprajna.repository.CheckoutSelectionRepository selectionRepo,
-                             com.eduprajna.repository.AddressRepository addressRepo,
-                             com.eduprajna.roots.coupons.CouponService couponService) {
+    public PaymentController(RazorpayService razorpayService, OrderService orderService, UserService userService,
+            OrderRepository orderRepo,
+            com.eduprajna.service.CartService cartService,
+            com.eduprajna.repository.CheckoutSelectionRepository selectionRepo,
+            com.eduprajna.repository.AddressRepository addressRepo,
+            com.eduprajna.roots.coupons.CouponService couponService) {
         this.razorpayService = razorpayService;
         this.orderService = orderService;
         this.userService = userService;
@@ -96,25 +98,26 @@ public class PaymentController {
                 for (com.eduprajna.entity.CartItem ci : cart) {
                     Double priceAtAdd = ci.getPriceAtAdd();
                     Double productPrice = ci.getProduct().getPrice();
-                    double price = (priceAtAdd != null && priceAtAdd > 0) ? priceAtAdd : 
-                                   (productPrice != null ? productPrice : 0.0);
+                    double price = (priceAtAdd != null && priceAtAdd > 0) ? priceAtAdd
+                            : (productPrice != null ? productPrice : 0.0);
                     subtotal += price * ci.getQuantity();
-                    logger.debug("Cart item: product={}, quantity={}, price={}, line_total={}", 
-                        ci.getProduct().getName(), ci.getQuantity(), price, price * ci.getQuantity());
+                    logger.debug("Cart item: product={}, quantity={}, price={}, line_total={}",
+                            ci.getProduct().getName(), ci.getQuantity(), price, price * ci.getQuantity());
                 }
-                
-                // Shipping fee removed; default to 0 and total equals subtotal (coupon already applied in selection if any)
+
+                // Shipping fee removed; default to 0 and total equals subtotal (coupon already
+                // applied in selection if any)
                 // Shipping fee: ₹50 when subtotal < ₹500, otherwise Free
                 shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
                 total = subtotal + shippingFee;
-                
+
                 // Save calculated totals back to selection for order service
                 selection.setSubtotal(subtotal);
                 selection.setShippingFee(shippingFee);
                 selection.setTotal(total);
                 selectionRepo.save(selection);
-                logger.debug("Saved calculated totals to checkout selection: subtotal={}, shippingFee={}, total={}", 
-                           subtotal, shippingFee, total);
+                logger.debug("Saved calculated totals to checkout selection: subtotal={}, shippingFee={}, total={}",
+                        subtotal, shippingFee, total);
             }
 
             logger.debug("Razorpay order amount: {} INR = subtotal: {}, shipping: {}", total, subtotal, shippingFee);
@@ -137,7 +140,8 @@ public class PaymentController {
 
         } catch (Exception e) {
             logger.error("Failed to create razorpay order for {}", email, e);
-            return ResponseEntity.status(500).body("Failed to create razorpay order");
+            // Return specific error message to help debugging
+            return ResponseEntity.status(500).body("Failed to create razorpay order: " + e.getMessage());
         }
     }
 
@@ -162,17 +166,21 @@ public class PaymentController {
                 logger.info("Signature verified successfully for payment: {}", rzpPaymentId);
             } catch (Exception e) {
                 logger.error("Payment signature verification failed for email: {}", email, e);
-                return ResponseEntity.status(400).body(Map.of("error", "Payment verification failed: " + e.getMessage()));
+                return ResponseEntity.status(400)
+                        .body(Map.of("error", "Payment verification failed: " + e.getMessage()));
             }
 
-            // Place the application order using online payment method (doesn't require cart)
+            // Place the application order using online payment method (doesn't require
+            // cart)
             User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-            
+
             // CRUCIAL: Ensure totals are calculated before placing order
             com.eduprajna.entity.CheckoutSelection selection = selectionRepo.findByUser(user).orElse(null);
             if (selection != null && (selection.getSubtotal() == null || selection.getTotal() == null)) {
-                logger.warn("Totals missing in checkout selection for payment verification. Calculating fallback totals for user: {}", email);
-                
+                logger.warn(
+                        "Totals missing in checkout selection for payment verification. Calculating fallback totals for user: {}",
+                        email);
+
                 // Calculate totals as fallback
                 java.util.List<com.eduprajna.entity.CartItem> cart = cartService.getCart(user);
                 if (cart != null && !cart.isEmpty()) {
@@ -180,17 +188,18 @@ public class PaymentController {
                     for (com.eduprajna.entity.CartItem ci : cart) {
                         Double priceAtAdd = ci.getPriceAtAdd();
                         Double productPrice = ci.getProduct().getPrice();
-                        double price = (priceAtAdd != null && priceAtAdd > 0) ? priceAtAdd : 
-                                       (productPrice != null ? productPrice : 0.0);
+                        double price = (priceAtAdd != null && priceAtAdd > 0) ? priceAtAdd
+                                : (productPrice != null ? productPrice : 0.0);
                         subtotal += price * ci.getQuantity();
                     }
-                    
+
                     // Shipping fee: ₹50 when subtotal < ₹500, otherwise Free
                     double shippingFee = (subtotal >= 500.0) ? 0.0 : 50.0;
                     double discount = 0.0;
                     try {
                         if (selection.getCouponCode() != null && !selection.getCouponCode().trim().isEmpty()) {
-                            var vr = couponService.validate(selection.getCouponCode().trim(), subtotal, null, null, null, java.time.LocalDateTime.now(), user.getId());
+                            var vr = couponService.validate(selection.getCouponCode().trim(), subtotal, null, null,
+                                    null, java.time.LocalDateTime.now(), user.getId());
                             if (vr != null && vr.isValid()) {
                                 discount = vr.getDiscount();
                             } else {
@@ -207,12 +216,13 @@ public class PaymentController {
                     selection.setShippingFee(shippingFee);
                     selection.setTotal(total);
                     selectionRepo.save(selection);
-                    
-                    logger.info("Saved fallback totals to checkout selection for user: {} - subtotal: {}, shippingFee: {}, total: {}", 
-                               email, subtotal, shippingFee, total);
+
+                    logger.info(
+                            "Saved fallback totals to checkout selection for user: {} - subtotal: {}, shippingFee: {}, total: {}",
+                            email, subtotal, shippingFee, total);
                 }
             }
-            
+
             Order placed = orderService.placeOrderForOnlinePayment(user);
 
             // Update order with payment data
@@ -221,7 +231,7 @@ public class PaymentController {
             placed.setPaymentStatus("paid");
             placed.setStatus("paid");
             Order updated = orderRepo.save(placed);
-            
+
             logger.info("Order placed successfully for user: {}, orderId: {}", email, updated.getId());
 
             // Return a simplified response to avoid JSON nesting issues

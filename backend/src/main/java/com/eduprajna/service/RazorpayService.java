@@ -19,13 +19,15 @@ public class RazorpayService {
     private final String keySecret;
 
     public RazorpayService(@Value("${razorpay.keyId:}") String keyId,
-                          @Value("${razorpay.keySecret:}") String keySecret) {
+            @Value("${razorpay.keySecret:}") String keySecret) {
         this.keySecret = keySecret;
         if (keyId == null || keyId.isEmpty() || keySecret == null || keySecret.isEmpty()) {
+            System.out.println("RazorpayService: Keys missing. Client NOT initialized.");
             this.client = null;
         } else {
             try {
                 this.client = new RazorpayClient(keyId, keySecret);
+                System.out.println("RazorpayService: Client initialized successfully with Key ID: " + keyId);
             } catch (RazorpayException e) {
                 throw new RuntimeException("Failed to initialize Razorpay client", e);
             }
@@ -43,7 +45,8 @@ public class RazorpayService {
         options.put("receipt", receipt);
         options.put("payment_capture", 1);
 
-        // The Razorpay SDK exposes the Orders API via the 'orders' field on RazorpayClient
+        // The Razorpay SDK exposes the Orders API via the 'orders' field on
+        // RazorpayClient
         Order order = client.Orders.create(options);
 
         Map<String, Object> resp = new HashMap<>();
@@ -54,8 +57,10 @@ public class RazorpayService {
         return resp;
     }
 
-    public boolean verifySignature(String razorpayPaymentId, String razorpayOrderId, String razorpaySignature) throws Exception {
-        if (client == null) throw new IllegalStateException("Razorpay client not configured");
+    public boolean verifySignature(String razorpayPaymentId, String razorpayOrderId, String razorpaySignature)
+            throws Exception {
+        if (client == null)
+            throw new IllegalStateException("Razorpay client not configured");
 
         JSONObject attrs = new JSONObject();
         attrs.put("razorpay_payment_id", razorpayPaymentId);
