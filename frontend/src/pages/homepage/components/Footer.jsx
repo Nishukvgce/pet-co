@@ -43,8 +43,8 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { name: "Facebook", icon: "Facebook", url: "" },
-    { name: "Instagram", icon: "Instagram", url: "" },
+    { name: "Facebook", icon: "Facebook", url: "https://www.facebook.com/people/PET-CO/61580257131444" },
+    { name: "Instagram", icon: "Instagram", url: "https://www.instagram.com/petandco_bangalore" },
     { name: "YouTube", icon: "Youtube", url: "" }
   ];
 
