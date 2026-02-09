@@ -9,7 +9,7 @@ import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
-import { normalizeProductFromApi } from '../../utils/productUtils';
+import { normalizeProductFromApi, isGroomingProduct } from '../../utils/productUtils';
 import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
@@ -89,7 +89,7 @@ const CatGrooming = ({ initialActive = 'All Grooming' }) => {
             ...normalizedProduct,
             image: resolveImageUrl(normalizedProduct)
           };
-        });
+        }).filter(isGroomingProduct);
 
         if (!mounted) return; setProducts(normalized);
         setServerFiltered(Boolean(sub));

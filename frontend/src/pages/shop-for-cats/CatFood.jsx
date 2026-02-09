@@ -327,7 +327,7 @@ const CatFood = ({ initialActive = 'All Cat Food' }) => {
         }
 
         // Mark that results are server-filtered when we have explicit category/sub
-        setServerFiltered(Boolean(apiCategory) || Boolean(finalSubcategory));
+        // setServerFiltered(Boolean(apiCategory) || Boolean(finalSubcategory));
 
         console.log('CatFood: normalized products:', normalizedProducts.length, 'food-classified:', foodProducts.length, 'after-brand-filter:', filteredProducts.length);
 
@@ -497,7 +497,7 @@ const CatFood = ({ initialActive = 'All Cat Food' }) => {
 
   const displayedProducts = useMemo(() => {
     // If server already filtered, render as-is to avoid hiding valid items
-    if (serverFiltered) return products;
+    // if (serverFiltered) return products;
     let filtered = products;
     if (active && active !== 'All Cat Food') {
       const activeFilter = active.toLowerCase();

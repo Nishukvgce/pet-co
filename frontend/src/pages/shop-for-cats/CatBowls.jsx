@@ -8,7 +8,7 @@ import { useCart } from '../../contexts/CartContext';
 import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
-import { normalizeProductFromApi } from '../../utils/productUtils';
+import { normalizeProductFromApi, isBowlProduct } from '../../utils/productUtils';
 import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
@@ -157,7 +157,7 @@ const CatBowls = ({ initialActive = 'All Cat Bowls' }) => {
             ...normalizedProduct,
             image: resolveImageUrl(normalizedProduct)
           };
-        });
+        }).filter(isBowlProduct);
 
         if (!mounted) return;
         setProducts(normalized);

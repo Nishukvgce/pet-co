@@ -414,3 +414,147 @@ export const isGroomingProduct = (product = {}) => {
   return false;
 };
 
+
+export const isTreatProduct = (product = {}) => {
+  const subcategory = (product.subcategory || product.subcategoryLabel || '')
+    .toString()
+    .toLowerCase();
+  const category = (product.category || '').toString().toLowerCase();
+  const productTypes = [
+    ...ensureArray(product.filters?.productTypes),
+    ...(ensureArray(product.productType)),
+    ...(ensureArray(product.type))
+  ].map((v) => `${v}`.toLowerCase());
+  const tags = ensureArray(product.tags).map((v) => `${v}`.toLowerCase());
+
+  const treatKeywords = ['treat', 'treats', 'chew', 'biscuit', 'cookie', 'snack', 'catnip'];
+
+  if (category.includes('treat') || subcategory.includes('treat')) return true;
+  if (productTypes.some((pt) => treatKeywords.some((k) => pt.includes(k)))) return true;
+  if (tags.some((t) => treatKeywords.some((k) => t.includes(k)))) return true;
+
+  const name = (product.name || '').toString().toLowerCase();
+  if (treatKeywords.some((k) => name.includes(k))) return true;
+
+  return false;
+};
+
+export const isToyProduct = (product = {}) => {
+  const subcategory = (product.subcategory || product.subcategoryLabel || '')
+    .toString()
+    .toLowerCase();
+  const category = (product.category || '').toString().toLowerCase();
+  const productTypes = [
+    ...ensureArray(product.filters?.productTypes),
+    ...(ensureArray(product.productType)),
+    ...(ensureArray(product.type))
+  ].map((v) => `${v}`.toLowerCase());
+  const tags = ensureArray(product.tags).map((v) => `${v}`.toLowerCase());
+
+  const toyKeywords = ['toy', 'toys', 'play', 'game', 'teaser', 'wand', 'tunnel', 'laser', 'mouse', 'plush', 'ball', 'scratcher'];
+
+  if (category.includes('toy') || subcategory.includes('toy')) return true;
+  if (productTypes.some((pt) => toyKeywords.some((k) => pt.includes(k)))) return true;
+  if (tags.some((t) => toyKeywords.some((k) => t.includes(k)))) return true;
+
+  const name = (product.name || '').toString().toLowerCase();
+  if (toyKeywords.some((k) => name.includes(k))) return true;
+
+  return false;
+};
+
+export const isLitterProduct = (product = {}) => {
+  const subcategory = (product.subcategory || product.subcategoryLabel || '')
+    .toString()
+    .toLowerCase();
+  const category = (product.category || '').toString().toLowerCase();
+  const productTypes = [
+    ...ensureArray(product.filters?.productTypes),
+    ...(ensureArray(product.productType)),
+    ...(ensureArray(product.type))
+  ].map((v) => `${v}`.toLowerCase());
+  const tags = ensureArray(product.tags).map((v) => `${v}`.toLowerCase());
+
+  const litterKeywords = ['litter', 'tray', 'scoop', 'liner', 'deodorizer', 'mat', 'sand', 'toilet'];
+
+  if (category.includes('litter') || subcategory.includes('litter')) return true;
+  if (productTypes.some((pt) => litterKeywords.some((k) => pt.includes(k)))) return true;
+  if (tags.some((t) => litterKeywords.some((k) => t.includes(k)))) return true;
+
+  const name = (product.name || '').toString().toLowerCase();
+  if (litterKeywords.some((k) => name.includes(k))) return true;
+
+  return false;
+};
+
+export const isBeddingProduct = (product = {}) => {
+  const subcategory = (product.subcategory || product.subcategoryLabel || '')
+    .toString()
+    .toLowerCase();
+  const category = (product.category || '').toString().toLowerCase();
+  const productTypes = [
+    ...ensureArray(product.filters?.productTypes),
+    ...(ensureArray(product.productType)),
+    ...(ensureArray(product.type))
+  ].map((v) => `${v}`.toLowerCase());
+  const tags = ensureArray(product.tags).map((v) => `${v}`.toLowerCase());
+
+  const beddingKeywords = ['bed', 'bedding', 'blanket', 'mat', 'pillow', 'cave', 'house', 'tree', 'scratcher', 'furniture', 'hammock'];
+
+  if (category.includes('bed') || subcategory.includes('bed')) return true;
+  if (productTypes.some((pt) => beddingKeywords.some((k) => pt.includes(k)))) return true;
+  if (tags.some((t) => beddingKeywords.some((k) => t.includes(k)))) return true;
+
+  const name = (product.name || '').toString().toLowerCase();
+  if (beddingKeywords.some((k) => name.includes(k))) return true;
+
+  return false;
+};
+
+export const isBowlProduct = (product = {}) => {
+  const subcategory = (product.subcategory || product.subcategoryLabel || '')
+    .toString()
+    .toLowerCase();
+  const category = (product.category || '').toString().toLowerCase();
+  const productTypes = [
+    ...ensureArray(product.filters?.productTypes),
+    ...(ensureArray(product.productType)),
+    ...(ensureArray(product.type))
+  ].map((v) => `${v}`.toLowerCase());
+  const tags = ensureArray(product.tags).map((v) => `${v}`.toLowerCase());
+
+  const bowlKeywords = ['bowl', 'feeder', 'fountain', 'dish', 'placemat', 'water', 'dispenser'];
+
+  if (category.includes('bowl') || subcategory.includes('bowl')) return true;
+  if (productTypes.some((pt) => bowlKeywords.some((k) => pt.includes(k)))) return true;
+  if (tags.some((t) => bowlKeywords.some((k) => t.includes(k)))) return true;
+
+  const name = (product.name || '').toString().toLowerCase();
+  if (bowlKeywords.some((k) => name.includes(k))) return true;
+
+  return false;
+};
+
+export const isCollarProduct = (product = {}) => {
+  const subcategory = (product.subcategory || product.subcategoryLabel || '')
+    .toString()
+    .toLowerCase();
+  const category = (product.category || '').toString().toLowerCase();
+  const productTypes = [
+    ...ensureArray(product.filters?.productTypes),
+    ...(ensureArray(product.productType)),
+    ...(ensureArray(product.type))
+  ].map((v) => `${v}`.toLowerCase());
+  const tags = ensureArray(product.tags).map((v) => `${v}`.toLowerCase());
+
+  const collarKeywords = ['collar', 'harness', 'leash', 'tag', 'bell', 'bow', 'tie', 'bandana', 'tracker'];
+
+  if (category.includes('collar') || subcategory.includes('collar')) return true;
+  if (productTypes.some((pt) => collarKeywords.some((k) => pt.includes(k)))) return true;
+  if (tags.some((t) => collarKeywords.some((k) => t.includes(k)))) return true;
+
+  const name = (product.name || '').toString().toLowerCase();
+  if (collarKeywords.some((k) => name.includes(k))) return true;
+
+  return false;
+};

@@ -9,6 +9,7 @@ import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
+import { normalizeProductFromApi, isToyProduct } from '../../utils/productUtils';
 import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
@@ -266,7 +267,7 @@ const CatToys = ({ initialActive = 'All Cat Toys' }) => {
             ...normalizedProduct,
             image: resolveImageUrl(normalizedProduct)
           };
-        });
+        }).filter(isToyProduct);
         
         // Apply additional local filtering based on URL parameters
         let filteredProducts = normalizedProducts;

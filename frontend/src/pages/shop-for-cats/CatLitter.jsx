@@ -8,7 +8,9 @@ import { useCart } from '../../contexts/CartContext';
 import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
-import { resolveImageUrl } from '../../lib/imageUtils';import { normalizeProductFromApi } from '../../utils/productUtils';import ProductCard from '../../components/ui/ProductCard';
+import { resolveImageUrl } from '../../lib/imageUtils';
+import { normalizeProductFromApi, isLitterProduct } from '../../utils/productUtils';
+import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
   { id: 'all', label: 'All Litter & Supplies', img: '/assets/images/cat/Fil_littertrays.webp' },
@@ -160,7 +162,7 @@ const CatLitter = ({ initialActive = 'All Litter & Supplies' }) => {
             ...normalizedProduct,
             image: resolveImageUrl(normalizedProduct)
           };
-        });
+        }).filter(isLitterProduct);
         if (!mounted) return;
         setProducts(normalized);
         setFetchError('');

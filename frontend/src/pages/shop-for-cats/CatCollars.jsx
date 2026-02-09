@@ -9,7 +9,7 @@ import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
-import { normalizeProductFromApi } from '../../utils/productUtils';
+import { normalizeProductFromApi, isCollarProduct } from '../../utils/productUtils';
 import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
@@ -122,7 +122,7 @@ const CatCollars = ({ initialActive = 'All Collars & Accessories' }) => {
             ...normalizedProduct,
             image: resolveImageUrl(normalizedProduct)
           };
-        });
+        }).filter(isCollarProduct);
 
         if (!mounted) return; 
         setProducts(normalized);

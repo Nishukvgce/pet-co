@@ -9,7 +9,7 @@ import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 import { resolveImageUrl } from '../../lib/imageUtils';
-import { normalizeProductFromApi } from '../../utils/productUtils';
+import { normalizeProductFromApi, isTreatProduct } from '../../utils/productUtils';
 import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
@@ -170,7 +170,7 @@ const CatTreats = ({ initialActive = 'All Cat Treats' }) => {
             ...normalizedProduct,
             image: resolveImageUrl(normalizedProduct)
           };
-        });
+        }).filter(isTreatProduct);
 
         if (!mounted) return;
         setProducts(normalized);

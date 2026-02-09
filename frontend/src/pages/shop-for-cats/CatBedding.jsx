@@ -8,7 +8,7 @@ import { useCart } from '../../contexts/CartContext';
 import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
-import { normalizeProductFromApi } from '../../utils/productUtils';
+import { normalizeProductFromApi, isBeddingProduct } from '../../utils/productUtils';
 import ProductCard from '../../components/ui/ProductCard';
 
 const categories = [
@@ -186,7 +186,7 @@ const CatBedding = ({ initialActive = 'All Beds & Scratchers' }) => {
             ...normalizedProduct,
             image: resolveImageUrl(normalizedProduct)
           };
-        });
+        }).filter(isBeddingProduct);
 
         if (!mounted) return;
         setProducts(normalized);
