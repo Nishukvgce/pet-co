@@ -45,7 +45,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
     {
       key: 'outlet',
       label: 'PET&CO Outlet',
-      icon: '/assets/images/outlet/outlet-icon.webp',
+      icon: '/assets/images/outlet/all-food-treats.png',
       children: [
         { label: 'Outlet Food & Treats', path: '/shop-for-outlet/food-treats', subs: ['Raw Hide Bones','Knotted Bones','Munchies','Dental Treats','Calcium Treats','Wet Food / Gravy','Puppy Treats','All Food & Treats'] },
         { label: 'Outlet Toys', path: '/shop-for-outlet/toys', subs: ['Soft Toys','Rubber Toys','Rope Toys','Squeaky Toys','Interactive Toys','All Toys'] },
@@ -60,7 +60,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
     {
       key: 'pet-services',
       label: 'Pet Services',
-      icon: '/assets/images/dog/dg7.webp',
+      icon: '/assets/images/dog/dg6.webp',
       children: [
         { 
           label: 'Pet Walking', 
@@ -82,7 +82,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
     {
       key: 'pharmacy',
       label: 'Pharmacy',
-      icon: '/assets/images/dog/dg7.webp',
+      icon: '/assets/images/pharmacy/all-medicines.png',
       children: [
         { label: 'Pharmacy for Dogs', path: '/pharmacy/dogs', subs: ['Medicines for Skin','Joint & Mobility','Digestive Care','All Dog Pharmacy'] },
         { label: 'Pharmacy for Cats', path: '/pharmacy/cats', subs: ['Skin & Coat Care','Worming','Oral Care','All Cat Pharmacy'] },
@@ -290,12 +290,12 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           {/* Secondary menu items with badges */}
           <ul className="space-y-2 px-1">
             {[
-              { label: 'PET&CO Outlet Sale', path: '/shop-for-outlet', badge: '60% Off' },
-              { label: 'PET&CO Spa', path: '/spa', badge: 'App Exclusive' },
-              { label: 'PET&CO Hub', path: '/hub' },
-              { label: 'Store & Spa Locator', path: '/locator' },
-              { label: 'Become a Franchisee', path: '/franchise' },
-              { label: 'Join our Birthday Club', path: '/birthday' }
+              { label: 'PET&CO Outlet Sale', path: '/shop-for-outlet', badge: '60% Off', icon: '/assets/images/dog/b1.webp' },
+              { label: 'PET&CO Spa', path: '/spa', badge: 'App Exclusive', icon: '/assets/images/dog/grooming.webp' },
+              { label: 'PET&CO Hub', path: '/hub', icon: '/assets/images/dog/pt1.webp' },
+              { label: 'Store & Spa Locator', path: '/locator', icon: '/assets/images/essential/GPS.png' },
+              { label: 'Become a Franchisee', path: '/franchise', icon: '/assets/images/dog/dg3.webp' },
+              { label: 'Join our Birthday Club', path: '/birthday', icon: '/assets/images/essential/dog_birthday.jpg' }
             ].map((it, i) => (
               <li key={i}>
                 <button
@@ -303,7 +303,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                   className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded hover:bg-muted text-sm text-foreground"
                 >
                   <span className="flex items-center gap-3">
-                    <img src="/assets/images/dog/db1.webp" alt="icon" className="w-5 h-5 rounded" />
+                    <img src={it.icon} alt="icon" className="w-5 h-5 rounded" />
                     <span>{it.label}</span>
                   </span>
                   {it.badge && (
