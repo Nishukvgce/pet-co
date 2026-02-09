@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Lottie from "lottie-react";
 import PincodeModal from './PincodeModal';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
@@ -12,7 +13,6 @@ import AnnouncementBar from './AnnouncementBar';
 import MegaMenu from './MegaMenu';
 import CartDrawer from './CartDrawer';
 import { useCart } from '../../contexts/CartContext.jsx';
-import { resolveImageUrl } from '../../lib/imageUtils';
 
 
 const Header = ({ onSearch = () => { } }) => {
@@ -284,57 +284,15 @@ const Header = ({ onSearch = () => { } }) => {
     };
   }, [animatedText]);
 
-  // Mount Lottie paw animation into the paw container (loads lottie-web from CDN if needed)
+
+  // Mount Lottie paw animation
+  const lottieRef = useRef(null);
+
   useEffect(() => {
-    const container = pawContainerRef.current;
-    if (!container) return;
-
-    let anim = null;
-    let scriptEl = null;
-
-    const mount = () => {
-      try {
-        if (window.lottie && container) {
-          anim = window.lottie.loadAnimation({
-            container,
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            animationData: pawLottie,
-          });
-          // reduce playback speed (1.0 is normal speed). 0.5 = half speed
-          try {
-            if (anim && typeof anim.setSpeed === 'function') anim.setSpeed(0.4);
-          } catch (e) {
-            // ignore if setSpeed not available
-          }
-        }
-      } catch (err) {
-        // fail silently - keep SVG trail as fallback
-        // eslint-disable-next-line no-console
-        console.error('Failed to mount Lottie paw animation', err);
-      }
-    };
-
-    if (window.lottie) {
-      mount();
-    } else {
-      // inject CDN script
-      scriptEl = document.createElement('script');
-      scriptEl.src = 'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js';
-      scriptEl.async = true;
-      scriptEl.onload = mount;
-      scriptEl.onerror = () => {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load lottie-web from CDN');
-      };
-      document.body.appendChild(scriptEl);
+    // reduce playback speed (1.0 is normal speed). 0.5 = half speed
+    if (lottieRef.current) {
+      lottieRef.current.setSpeed(0.4);
     }
-
-    return () => {
-      if (anim && anim.destroy) anim.destroy();
-      if (scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
-    };
   }, []);
 
   // Fetch a featured product from the API to display next to the logo
@@ -578,19 +536,21 @@ const Header = ({ onSearch = () => { } }) => {
                     aria-label={featuredProduct.name || 'Featured product'}
                   >
                     <img
-                      src={resolveImageUrl(featuredProduct)}
+                      src={featuredProduct.image || featuredProduct.imageUrl || featuredProduct.thumbnailUrl || featuredProduct.image_path}
                       alt={featuredProduct.name || featuredProduct.title || 'Product'}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   </Link>
                 ) : (
                   /* Lottie paw animation container (positioned relative to the logo) */
-                  <div
-                    ref={pawContainerRef}
-                    className="pointer-events-none hidden sm:block"
-                    aria-hidden="true"
-                    style={{ position: 'absolute', left: 86, top: -6, width: 34, height: 34 }}
-                  />
+                  <div style={{ position: 'absolute', left: 86, top: -6, width: 34, height: 34 }} className="hidden sm:block pointer-events-none">
+                    <Lottie
+                      lottieRef={lottieRef}
+                      animationData={pawLottie}
+                      loop={true}
+                      className="w-full h-full"
+                    />
+                  </div>
                 )}
               </Link>
 
