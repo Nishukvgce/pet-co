@@ -120,6 +120,19 @@
 			<version>2.29.15</version>
 		</dependency>
 
+		<!-- Dotenv for local development -->
+		<dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>java-dotenv</artifactId>
+			<version>5.2.2</version>
+		</dependency>
+
+		<!-- Explicitly add Apache HttpClient to fix AWS SDK issue -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.14</version>
+		</dependency>
 	</dependencies>
 
 	<build>
