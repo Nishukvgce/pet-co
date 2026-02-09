@@ -690,12 +690,8 @@ const ProductManagement = () => {
               backendStatus === 'offline' ? 'bg-red-100 text-red-800' : 
               'bg-yellow-100 text-yellow-800'
             }`}>
-              <div className={`w-2 h-2 rounded-full ${
-                backendStatus === 'online' ? 'bg-green-600' : 
-                backendStatus === 'offline' ? 'bg-red-600' : 
-                'bg-yellow-600'
-              }`}></div>
-              <span>{backendStatus === 'online' ? 'Online' : backendStatus === 'offline' ? 'Offline' : 'Checking...'}</span>
+             
+              <span></span>
             </div>
           </div>
           <p className="text-muted-foreground">
