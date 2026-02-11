@@ -35,7 +35,7 @@ const PetWalkingPage = () => {
       </Helmet>
       <Header />
       <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50/30">
-        <section className="relative py-16 md:py-24 overflow-hidden">
+        <section className="relative py-12 md:py-24 overflow-hidden">
           {/* Professional background elements */}
           <div className="absolute inset-0">
             <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -55,7 +55,7 @@ const PetWalkingPage = () => {
                     <span className="text-sm font-bold text-slate-700 tracking-wide">INDIA'S PREMIER PET WALKING SERVICE</span>
                   </div>
                   
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight">
+                  <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight">
                     <span className="block text-slate-900">Premium Pet</span>
                     <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                       Walking Services
@@ -80,14 +80,14 @@ const PetWalkingPage = () => {
                     Book Premium Walk • ₹279
                   </Button>
                   
-                  <Button
+                  {/* <Button
                     size="lg"
                     variant="outline"
                     className="border-2 border-slate-300 hover:border-indigo-400 bg-white/90 backdrop-blur-sm px-8 py-4 md:px-12 md:py-6 text-lg font-bold hover:bg-indigo-50 transition-all duration-300 rounded-2xl group shadow-lg hover:shadow-xl"
                     iconName="Play"
                   >
                     <span className="group-hover:text-indigo-600 transition-colors text-slate-700">Watch Demo</span>
-                  </Button>
+                  </Button> */}
                 </div>
                 
                 {/* Professional trust indicators */}
@@ -159,7 +159,7 @@ const PetWalkingPage = () => {
         </section>
 
         {/* Professional Walking Options */}
-        <section className="py-16 md:py-24 bg-white relative">
+        <section className="py-12 md:py-24 bg-white relative">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16 md:mb-20">
               <div className="inline-flex items-center gap-3 bg-slate-100 px-6 py-3 rounded-full border border-slate-200 mb-6">
@@ -199,7 +199,7 @@ const PetWalkingPage = () => {
                       : 'border-slate-200 group-hover:border-blue-200'
                   }`}>
                     {/* Professional header section */}
-                    <div className={`px-8 pt-8 pb-6 ${
+                    <div className={`px-6 md:px-8 pt-8 pb-6 ${
                       option.popular 
                         ? 'bg-gradient-to-br from-orange-500/5 to-red-500/5'
                         : 'bg-gradient-to-br from-blue-500/5 to-indigo-500/5'
@@ -219,7 +219,7 @@ const PetWalkingPage = () => {
                     </div>
                     
                     {/* Professional pricing section */}
-                    <div className="px-8 pb-8">
+                    <div className="px-6 md:px-8 pb-8">
                       <div className="flex items-end justify-between mb-8">
                         <div>
                           <span className="text-4xl font-black text-slate-900">₹{option.price}</span>
@@ -254,7 +254,7 @@ const PetWalkingPage = () => {
         </section>
 
         {/* Professional Benefits Section */}
-        <section className="py-16 md:py-24 bg-gradient-to-br from-slate-50 to-blue-50/30">
+        <section className="py-12 md:py-24 bg-gradient-to-br from-slate-50 to-blue-50/30">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
             {/* Professional Image */}
@@ -264,7 +264,7 @@ const PetWalkingPage = () => {
                 <AppImage 
                   src="/assets/images/petwalking/petwalking2.png" 
                   alt="Professional dog walker with happy dog"
-                  className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover"
+                  className="w-full h-56 sm:h-64 md:h-80 lg:h-96 object-cover"
                 />
               </div>
             </div>
@@ -308,7 +308,7 @@ const PetWalkingPage = () => {
         </section>
 
         {/* Reviews & Stats - Fixed Layout */}
-        <section className="py-12 md:py-16 bg-white">
+        <section className="py-10 md:py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-orange-500 mb-3">OUR REVIEWS</h2>
@@ -403,7 +403,7 @@ const PetWalkingPage = () => {
             </div>
 
             {/* Stats Section */}
-            <div className="mt-8 md:mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="mt-10 md:mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {[
                 { value: '2,00,000+', label: 'dog walks delivered' },
                 { value: '5,000+', label: 'dogs walked' },
