@@ -389,7 +389,102 @@ public class ServiceBookingService {
         dto.setNotes(booking.getNotes());
         dto.setCreatedAt(booking.getCreatedAt());
         dto.setUpdatedAt(booking.getUpdatedAt());
+        
+        // Map service-specific fields
+        dto.setSymptoms(booking.getSymptoms());
+        dto.setMedicalHistory(booking.getMedicalHistory());
+        dto.setCurrentMedications(booking.getCurrentMedications());
+        dto.setUrgency(booking.getUrgency());
+        dto.setPreferredPlatform(booking.getPreferredPlatform());
+        dto.setHomeAddress(booking.getHomeAddress());
+        dto.setAccessInstructions(booking.getAccessInstructions());
+        dto.setWalkDuration(booking.getWalkDuration());
+        dto.setRoutePreference(booking.getRoutePreference());
+        dto.setBehaviorNotes(booking.getBehaviorNotes());
+        dto.setWalkingRules(booking.getWalkingRules());
+        dto.setCheckInDate(booking.getCheckInDate());
+        dto.setCheckOutDate(booking.getCheckOutDate());
+        dto.setCheckInTime(booking.getCheckInTime());
+        dto.setCheckOutTime(booking.getCheckOutTime());
+        dto.setDietaryRequirements(booking.getDietaryRequirements());
+        dto.setEmergencyContact(booking.getEmergencyContact());
+        dto.setVaccinationUpToDate(booking.getVaccinationUpToDate());
+        dto.setPackageType(booking.getPackageType());
+        dto.setSelectedAddOns(booking.getSelectedAddOns());
+        dto.setGroomingPreferences(booking.getGroomingPreferences());
+        dto.setTemperament(booking.getTemperament());
+        
         return dto;
+    }
+
+    // Extract service-specific fields from addOns for backward compatibility
+    @SuppressWarnings("unchecked")
+    private void extractServiceSpecificFields(ServiceBooking booking, Map<String, Object> addOns) {
+        if (addOns == null) return;
+
+        try {
+            // Extract veterinary medical data
+            Object medicalData = addOns.get("medical");
+            if (medicalData instanceof Map) {
+                Map<String, Object> medical = (Map<String, Object>) medicalData;
+                if (booking.getSymptoms() == null && medical.get("symptoms") != null) {
+                    booking.setSymptoms(medical.get("symptoms").toString());
+                }
+                if (booking.getMedicalHistory() == null && medical.get("medicalHistory") != null) {
+                    booking.setMedicalHistory(medical.get("medicalHistory").toString());
+                }
+                if (booking.getCurrentMedications() == null) {
+                    Object medications = medical.get("medications");
+                    if (medications == null) medications = medical.get("currentMedications");
+                    if (medications != null) {
+                        booking.setCurrentMedications(medications.toString());
+                    }
+                }
+                if (booking.getUrgency() == null && medical.get("urgency") != null) {
+                    booking.setUrgency(medical.get("urgency").toString());
+                }
+                if (booking.getPreferredPlatform() == null && medical.get("preferredPlatform") != null) {
+                    booking.setPreferredPlatform(medical.get("preferredPlatform").toString());
+                }
+                if (booking.getHomeAddress() == null && medical.get("homeAddress") != null) {
+                    booking.setHomeAddress(medical.get("homeAddress").toString());
+                }
+                if (booking.getAccessInstructions() == null && medical.get("accessInstructions") != null) {
+                    booking.setAccessInstructions(medical.get("accessInstructions").toString());
+                }
+            }
+
+            // Extract walking data
+            if (booking.getWalkDuration() == null && addOns.get("duration") != null) {
+                booking.setWalkDuration(addOns.get("duration").toString());
+            }
+            if (booking.getWalkingRules() == null && addOns.get("rules") instanceof Map) {
+                booking.setWalkingRules((Map<String, Object>) addOns.get("rules"));
+            }
+
+            // Extract boarding data
+            Object boardingExtras = addOns.get("boardingExtras");
+            if (boardingExtras instanceof Map) {
+                Map<String, Object> boarding = (Map<String, Object>) boardingExtras;
+                if (booking.getEmergencyContact() == null && boarding.get("emergencyContact") != null) {
+                    booking.setEmergencyContact(boarding.get("emergencyContact").toString());
+                }
+                if (booking.getVaccinationUpToDate() == null && boarding.get("vaccinationUpToDate") != null) {
+                    booking.setVaccinationUpToDate(Boolean.valueOf(boarding.get("vaccinationUpToDate").toString()));
+                }
+                if (booking.getTemperament() == null && boarding.get("temperament") != null) {
+                    booking.setTemperament(boarding.get("temperament").toString());
+                }
+            }
+
+            // Extract grooming data  
+            if (booking.getSelectedAddOns() == null && addOns.get("selectedAddOns") instanceof Map) {
+                booking.setSelectedAddOns((Map<String, Object>) addOns.get("selectedAddOns"));
+            }
+
+        } catch (Exception e) {
+            System.err.println("[WARNING] Failed to extract service-specific fields from addOns: " + e.getMessage());
+        }
     }
 
     // Convert DTO to Entity
@@ -532,6 +627,35 @@ public class ServiceBookingService {
             booking.setStatus(dto.getStatus().trim());
         } else {
             booking.setStatus("PENDING");
+        }
+
+        // Map service-specific fields
+        booking.setSymptoms(dto.getSymptoms());
+        booking.setMedicalHistory(dto.getMedicalHistory());
+        booking.setCurrentMedications(dto.getCurrentMedications());
+        booking.setUrgency(dto.getUrgency());
+        booking.setPreferredPlatform(dto.getPreferredPlatform());
+        booking.setHomeAddress(dto.getHomeAddress());
+        booking.setAccessInstructions(dto.getAccessInstructions());
+        booking.setWalkDuration(dto.getWalkDuration());
+        booking.setRoutePreference(dto.getRoutePreference());
+        booking.setBehaviorNotes(dto.getBehaviorNotes());
+        booking.setWalkingRules(dto.getWalkingRules());
+        booking.setCheckInDate(dto.getCheckInDate());
+        booking.setCheckOutDate(dto.getCheckOutDate());
+        booking.setCheckInTime(dto.getCheckInTime());
+        booking.setCheckOutTime(dto.getCheckOutTime());
+        booking.setDietaryRequirements(dto.getDietaryRequirements());
+        booking.setEmergencyContact(dto.getEmergencyContact());
+        booking.setVaccinationUpToDate(dto.getVaccinationUpToDate());
+        booking.setPackageType(dto.getPackageType());
+        booking.setSelectedAddOns(dto.getSelectedAddOns());
+        booking.setGroomingPreferences(dto.getGroomingPreferences());
+        booking.setTemperament(dto.getTemperament());
+
+        // Extract service-specific fields from addOns for backward compatibility
+        if (dto.getAddOns() != null) {
+            extractServiceSpecificFields(booking, dto.getAddOns());
         }
         
         return booking;

@@ -156,6 +156,33 @@ const BookingForm = ({ service, onClose }) => {
         petPhotoBase64: formData.petPhotoBase64 || null,
         petPhotoName: formData.petPhotoName || null,
         petPhotoType: formData.petPhotoType || null,
+
+        // Grooming-specific fields for entity
+        ...(service?.serviceType?.includes('grooming') && {
+          packageType: service?.id || formData.selectedPackage,
+          selectedAddOns: formData.addOns.reduce((acc, addon) => {
+            acc[addon.name] = {
+              name: addon.name,
+              price: addon.price
+            };
+            return acc;
+          }, {}),
+          groomingPreferences: formData.specialInstructions || null,
+          temperament: formData.temperament || null
+        }),
+
+        // Boarding-specific fields for entity  
+        ...(isBoarding && {
+          checkInDate: formData.preferredDate, // Use preferred date as check-in date
+          checkOutDate: formData.checkoutDate,
+          checkInTime: formData.preferredTime,
+          checkOutTime: formData.checkoutTime,
+          dietaryRequirements: formData.specialInstructions || null,
+          emergencyContact: formData.emergencyContact,
+          vaccinationUpToDate: !!formData.vaccinationUpToDate,
+          temperament: formData.temperament
+        }),
+
         addOns: {
           selectedAddOns: formData.addOns.reduce((acc, addon) => {
             acc[addon.name] = {

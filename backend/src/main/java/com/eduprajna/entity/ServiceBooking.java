@@ -156,6 +156,80 @@ public class ServiceBooking {
     @Column
     private OffsetDateTime updatedAt;
 
+    // Service-specific fields for different service types
+    
+    // Veterinary Service specific fields
+    @Column(columnDefinition = "TEXT")
+    private String symptoms; // Current symptoms/concerns
+
+    @Column(columnDefinition = "TEXT")
+    private String medicalHistory; // Previous medical history
+
+    @Column(columnDefinition = "TEXT")
+    private String currentMedications; // Current medications
+
+    @Column(length = 50)
+    private String urgency; // emergency, urgent, normal
+
+    @Column(length = 100)
+    private String preferredPlatform; // For video consultation: zoom, teams, etc.
+
+    @Column(columnDefinition = "TEXT")
+    private String homeAddress; // For home visit service
+
+    @Column(columnDefinition = "TEXT")
+    private String accessInstructions; // Access instructions for home visit
+
+    // Pet Walking specific fields
+    @Column(length = 50)
+    private String walkDuration; // 30min, 45min, 60min
+
+    @Column(columnDefinition = "TEXT")
+    private String routePreference; // Preferred walking routes
+
+    @Column(columnDefinition = "TEXT")
+    private String behaviorNotes; // Pet behavior notes
+
+    @Convert(converter = JsonMapConverter.class)
+    @Column(name = "walking_rules", columnDefinition = "LONGTEXT")
+    private Map<String, Object> walkingRules; // Walking specific rules and preferences
+
+    // Pet Boarding specific fields
+    @Column
+    private LocalDate checkInDate;
+
+    @Column
+    private LocalDate checkOutDate;
+
+    @Column(length = 20)
+    private String checkInTime;
+
+    @Column(length = 20)
+    private String checkOutTime;
+
+    @Column(columnDefinition = "TEXT")
+    private String dietaryRequirements; // Special dietary needs
+
+    @Column(length = 100)
+    private String emergencyContact; // Emergency contact for boarding
+
+    @Column
+    private Boolean vaccinationUpToDate; // Vaccination status
+
+    // Pet Grooming specific fields
+    @Column(length = 100)
+    private String packageType; // fresh-pack, pampered-pack, full-grooming
+
+    @Convert(converter = JsonMapConverter.class)
+    @Column(name = "selected_add_ons", columnDefinition = "LONGTEXT")
+    private Map<String, Object> selectedAddOns; // Selected grooming add-ons
+
+    @Column(columnDefinition = "TEXT")
+    private String groomingPreferences; // Special grooming requests
+
+    @Column(length = 100)
+    private String temperament; // Pet temperament notes
+
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = OffsetDateTime.now();
@@ -316,6 +390,78 @@ public class ServiceBooking {
 
     public Double getGpsLongitude() { return gpsLongitude; }
     public void setGpsLongitude(Double gpsLongitude) { this.gpsLongitude = gpsLongitude; }
+
+    // Service-specific field getters and setters
+
+    // Veterinary Service fields
+    public String getSymptoms() { return symptoms; }
+    public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
+
+    public String getMedicalHistory() { return medicalHistory; }
+    public void setMedicalHistory(String medicalHistory) { this.medicalHistory = medicalHistory; }
+
+    public String getCurrentMedications() { return currentMedications; }
+    public void setCurrentMedications(String currentMedications) { this.currentMedications = currentMedications; }
+
+    public String getUrgency() { return urgency; }
+    public void setUrgency(String urgency) { this.urgency = urgency; }
+
+    public String getPreferredPlatform() { return preferredPlatform; }
+    public void setPreferredPlatform(String preferredPlatform) { this.preferredPlatform = preferredPlatform; }
+
+    public String getHomeAddress() { return homeAddress; }
+    public void setHomeAddress(String homeAddress) { this.homeAddress = homeAddress; }
+
+    public String getAccessInstructions() { return accessInstructions; }
+    public void setAccessInstructions(String accessInstructions) { this.accessInstructions = accessInstructions; }
+
+    // Pet Walking fields  
+    public String getWalkDuration() { return walkDuration; }
+    public void setWalkDuration(String walkDuration) { this.walkDuration = walkDuration; }
+
+    public String getRoutePreference() { return routePreference; }
+    public void setRoutePreference(String routePreference) { this.routePreference = routePreference; }
+
+    public String getBehaviorNotes() { return behaviorNotes; }
+    public void setBehaviorNotes(String behaviorNotes) { this.behaviorNotes = behaviorNotes; }
+
+    public Map<String, Object> getWalkingRules() { return walkingRules; }
+    public void setWalkingRules(Map<String, Object> walkingRules) { this.walkingRules = walkingRules; }
+
+    // Pet Boarding fields
+    public LocalDate getCheckInDate() { return checkInDate; }
+    public void setCheckInDate(LocalDate checkInDate) { this.checkInDate = checkInDate; }
+
+    public LocalDate getCheckOutDate() { return checkOutDate; }
+    public void setCheckOutDate(LocalDate checkOutDate) { this.checkOutDate = checkOutDate; }
+
+    public String getCheckInTime() { return checkInTime; }
+    public void setCheckInTime(String checkInTime) { this.checkInTime = checkInTime; }
+
+    public String getCheckOutTime() { return checkOutTime; }
+    public void setCheckOutTime(String checkOutTime) { this.checkOutTime = checkOutTime; }
+
+    public String getDietaryRequirements() { return dietaryRequirements; }
+    public void setDietaryRequirements(String dietaryRequirements) { this.dietaryRequirements = dietaryRequirements; }
+
+    public String getEmergencyContact() { return emergencyContact; }
+    public void setEmergencyContact(String emergencyContact) { this.emergencyContact = emergencyContact; }
+
+    public Boolean getVaccinationUpToDate() { return vaccinationUpToDate; }
+    public void setVaccinationUpToDate(Boolean vaccinationUpToDate) { this.vaccinationUpToDate = vaccinationUpToDate; }
+
+    // Pet Grooming fields
+    public String getPackageType() { return packageType; }
+    public void setPackageType(String packageType) { this.packageType = packageType; }
+
+    public Map<String, Object> getSelectedAddOns() { return selectedAddOns; }
+    public void setSelectedAddOns(Map<String, Object> selectedAddOns) { this.selectedAddOns = selectedAddOns; }
+
+    public String getGroomingPreferences() { return groomingPreferences; }
+    public void setGroomingPreferences(String groomingPreferences) { this.groomingPreferences = groomingPreferences; }
+
+    public String getTemperament() { return temperament; }
+    public void setTemperament(String temperament) { this.temperament = temperament; }
 
     @Override
     public String toString() {

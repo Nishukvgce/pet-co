@@ -63,6 +63,38 @@ public class ServiceBookingDTO {
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
+    // Service-specific fields for different service types
+    
+    // Veterinary Service specific fields
+    private String symptoms;
+    private String medicalHistory;
+    private String currentMedications;
+    private String urgency;
+    private String preferredPlatform; // For video consultation
+    private String homeAddress; // For home visit
+    private String accessInstructions; // Access instructions for home visit
+    
+    // Pet Walking specific fields
+    private String walkDuration;
+    private String routePreference;
+    private String behaviorNotes;
+    private Map<String, Object> walkingRules;
+    
+    // Pet Boarding specific fields
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
+    private String checkInTime;
+    private String checkOutTime;
+    private String dietaryRequirements;
+    private String emergencyContact;
+    private Boolean vaccinationUpToDate;
+    
+    // Pet Grooming specific fields
+    private String packageType;
+    private Map<String, Object> selectedAddOns;
+    private String groomingPreferences;
+    private String temperament;
+
     // Constructors
     public ServiceBookingDTO() {}
 
@@ -207,4 +239,76 @@ public class ServiceBookingDTO {
 
     public Double getGpsLongitude() { return gpsLongitude; }
     public void setGpsLongitude(Double gpsLongitude) { this.gpsLongitude = gpsLongitude; }
+
+    // Service-specific field getters and setters
+    
+    // Veterinary Service fields
+    public String getSymptoms() { return symptoms; }
+    public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
+
+    public String getMedicalHistory() { return medicalHistory; }
+    public void setMedicalHistory(String medicalHistory) { this.medicalHistory = medicalHistory; }
+
+    public String getCurrentMedications() { return currentMedications; }
+    public void setCurrentMedications(String currentMedications) { this.currentMedications = currentMedications; }
+
+    public String getUrgency() { return urgency; }
+    public void setUrgency(String urgency) { this.urgency = urgency; }
+
+    public String getPreferredPlatform() { return preferredPlatform; }
+    public void setPreferredPlatform(String preferredPlatform) { this.preferredPlatform = preferredPlatform; }
+
+    public String getHomeAddress() { return homeAddress; }
+    public void setHomeAddress(String homeAddress) { this.homeAddress = homeAddress; }
+
+    public String getAccessInstructions() { return accessInstructions; }
+    public void setAccessInstructions(String accessInstructions) { this.accessInstructions = accessInstructions; }
+
+    // Pet Walking fields  
+    public String getWalkDuration() { return walkDuration; }
+    public void setWalkDuration(String walkDuration) { this.walkDuration = walkDuration; }
+
+    public String getRoutePreference() { return routePreference; }
+    public void setRoutePreference(String routePreference) { this.routePreference = routePreference; }
+
+    public String getBehaviorNotes() { return behaviorNotes; }
+    public void setBehaviorNotes(String behaviorNotes) { this.behaviorNotes = behaviorNotes; }
+
+    public Map<String, Object> getWalkingRules() { return walkingRules; }
+    public void setWalkingRules(Map<String, Object> walkingRules) { this.walkingRules = walkingRules; }
+
+    // Pet Boarding fields
+    public LocalDate getCheckInDate() { return checkInDate; }
+    public void setCheckInDate(LocalDate checkInDate) { this.checkInDate = checkInDate; }
+
+    public LocalDate getCheckOutDate() { return checkOutDate; }
+    public void setCheckOutDate(LocalDate checkOutDate) { this.checkOutDate = checkOutDate; }
+
+    public String getCheckInTime() { return checkInTime; }
+    public void setCheckInTime(String checkInTime) { this.checkInTime = checkInTime; }
+
+    public String getCheckOutTime() { return checkOutTime; }
+    public void setCheckOutTime(String checkOutTime) { this.checkOutTime = checkOutTime; }
+
+    public String getDietaryRequirements() { return dietaryRequirements; }
+    public void setDietaryRequirements(String dietaryRequirements) { this.dietaryRequirements = dietaryRequirements; }
+
+    public String getEmergencyContact() { return emergencyContact; }
+    public void setEmergencyContact(String emergencyContact) { this.emergencyContact = emergencyContact; }
+
+    public Boolean getVaccinationUpToDate() { return vaccinationUpToDate; }
+    public void setVaccinationUpToDate(Boolean vaccinationUpToDate) { this.vaccinationUpToDate = vaccinationUpToDate; }
+
+    // Pet Grooming fields
+    public String getPackageType() { return packageType; }
+    public void setPackageType(String packageType) { this.packageType = packageType; }
+
+    public Map<String, Object> getSelectedAddOns() { return selectedAddOns; }
+    public void setSelectedAddOns(Map<String, Object> selectedAddOns) { this.selectedAddOns = selectedAddOns; }
+
+    public String getGroomingPreferences() { return groomingPreferences; }
+    public void setGroomingPreferences(String groomingPreferences) { this.groomingPreferences = groomingPreferences; }
+
+    public String getTemperament() { return temperament; }
+    public void setTemperament(String temperament) { this.temperament = temperament; }
 }

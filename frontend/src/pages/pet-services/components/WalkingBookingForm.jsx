@@ -306,6 +306,12 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
         preferredTime: form.timeSlot,
         specialInstructions: form.specialInstructions || null,
 
+        // Walking-specific fields for entity
+        walkDuration: form.duration,
+        routePreference: form.specialInstructions || null, // Use special instructions as route preference
+        behaviorNotes: form.specialInstructions || null,
+        walkingRules: form.rules,
+
         // Keep addOns for backward compatibility and additional data
         addOns: {
           duration: form.duration,

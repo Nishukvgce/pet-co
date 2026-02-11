@@ -255,8 +255,27 @@ const ServiceBookingManagement = () => {
                           </td>
                           <td className="px-4 py-4">
                             <div>
-                              <div className="font-medium text-foreground">{booking.serviceName || 'N/A'}</div>
+                              <div className="flex items-center gap-2">
+                                <div className="font-medium text-foreground">{booking.serviceName || 'N/A'}</div>
+                                {/* Veterinary service indicator */}
+                                {(booking.serviceName && (booking.serviceName.toLowerCase().includes('appointment') || booking.serviceName.toLowerCase().includes('home visit') || booking.serviceName.toLowerCase().includes('video consultation') || booking.serviceName.toLowerCase().includes('veterinary'))) || (booking.serviceType && (booking.serviceType.includes('appointment') || booking.serviceType.includes('home-visit') || booking.serviceType.includes('video-consultation'))) ? (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    Medical
+                                  </span>
+                                ) : null}
+                              </div>
                               <div className="text-sm text-muted-foreground">₹{booking.totalAmount || 0}</div>
+                              {/* Show urgent indicator for veterinary services */}
+                              {((booking.additionalDetails?.urgency || booking.urgency) === 'emergency' || (booking.additionalDetails?.urgency || booking.urgency) === 'urgent') && (
+                                <div className={`text-xs font-medium mt-1 ${
+                                  (booking.additionalDetails?.urgency || booking.urgency) === 'emergency' ? 'text-red-600' : 'text-orange-600'
+                                }`}>
+                                  🚨 {((booking.additionalDetails?.urgency || booking.urgency) || '').toUpperCase()}
+                                </div>
+                              )}
                               {booking.addOns && Object.keys(booking.addOns).length > 0 && (
                                 <div className="text-xs text-muted-foreground">
                                   +{Object.keys(booking.addOns).length} add-ons
@@ -336,8 +355,24 @@ const ServiceBookingManagement = () => {
                     <div className="grid grid-cols-2 gap-4 py-3 border-t border-border">
                       <div>
                         <p className="text-xs text-muted-foreground uppercase tracking-wide">Service</p>
-                        <p className="font-medium text-sm">{booking.serviceName || 'N/A'}</p>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-medium text-sm">{booking.serviceName || 'N/A'}</p>
+                          {/* Veterinary service indicator */}
+                          {(booking.serviceName && (booking.serviceName.toLowerCase().includes('appointment') || booking.serviceName.toLowerCase().includes('home visit') || booking.serviceName.toLowerCase().includes('video consultation') || booking.serviceName.toLowerCase().includes('veterinary'))) || (booking.serviceType && (booking.serviceType.includes('appointment') || booking.serviceType.includes('home-visit') || booking.serviceType.includes('video-consultation'))) ? (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                              Medical
+                            </span>
+                          ) : null}
+                        </div>
                         <p className="text-sm text-muted-foreground">₹{booking.totalAmount || 0}</p>
+                        {/* Show urgent indicator for veterinary services */}
+                        {((booking.additionalDetails?.urgency || booking.urgency) === 'emergency' || (booking.additionalDetails?.urgency || booking.urgency) === 'urgent') && (
+                          <p className={`text-xs font-medium mt-1 ${
+                            (booking.additionalDetails?.urgency || booking.urgency) === 'emergency' ? 'text-red-600' : 'text-orange-600'
+                          }`}>
+                            🚨 {((booking.additionalDetails?.urgency || booking.urgency) || '').toUpperCase()}
+                          </p>
+                        )}
                         {booking.addOns && Object.keys(booking.addOns).length > 0 && (
                           <p className="text-xs text-muted-foreground">
                             +{Object.keys(booking.addOns).length} add-ons
@@ -461,6 +496,7 @@ const BookingDetailModal = ({ booking, onClose, onStatusUpdate }) => {
                 <div><span className="font-medium">Type:</span> {booking.petType || 'N/A'}</div>
                 {booking.petBreed && <div><span className="font-medium">Breed:</span> {booking.petBreed}</div>}
                 {booking.petAge && <div><span className="font-medium">Age:</span> {booking.petAge}</div>}
+                {booking.petWeight && <div><span className="font-medium">Weight:</span> {booking.petWeight}</div>}
                 {booking.petGender && <div><span className="font-medium">Gender:</span> {booking.petGender}</div>}
                 {booking.petDateOfBirth && <div><span className="font-medium">Date of Birth:</span> {booking.petDateOfBirth}</div>}
                 {/* Pet Image if available in any field */}
@@ -594,66 +630,268 @@ const BookingDetailModal = ({ booking, onClose, onStatusUpdate }) => {
           </div>
 
           {/* Veterinary Service Specific Information */}
-          {(booking.serviceType && (booking.serviceType.includes('appointment') || booking.serviceType.includes('home-visit') || booking.serviceType.includes('video-consultation') || (booking.serviceName && booking.serviceName.toLowerCase().includes('veterinary')))) && (
+          {(booking.serviceName && (booking.serviceName.toLowerCase().includes('appointment') || booking.serviceName.toLowerCase().includes('home visit') || booking.serviceName.toLowerCase().includes('video consultation') || booking.serviceName.toLowerCase().includes('veterinary'))) || (booking.serviceType && (booking.serviceType.includes('appointment') || booking.serviceType.includes('home-visit') || booking.serviceType.includes('video-consultation'))) ? (
             <div className="space-y-3">
-              <h3 className="font-semibold text-foreground">Medical Information</h3>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
-                {booking.additionalDetails?.symptoms && (
-                  <div>
-                    <span className="font-medium text-blue-800">Symptoms/Concerns:</span>
-                    <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.symptoms}</p>
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                Medical Information
+              </h3>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-4">
+                {/* Always show section with placeholders if no data */}
+                <div>
+                  <span className="font-medium text-blue-800">Symptoms/Concerns:</span>
+                  <div className="mt-1 p-2 bg-white rounded border border-blue-200">
+                    <p className="text-sm text-gray-700">
+                      {booking.addOns?.medical?.symptoms || booking.additionalDetails?.symptoms || booking.symptoms || 'No symptoms specified'}
+                    </p>
                   </div>
-                )}
-                {booking.additionalDetails?.medicalHistory && (
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <span className="font-medium text-blue-800">Medical History:</span>
-                    <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.medicalHistory}</p>
+                    <div className="mt-1 p-2 bg-white rounded border border-blue-200 min-h-[60px]">
+                      <p className="text-sm text-gray-700">
+                        {booking.addOns?.medical?.medicalHistory || booking.additionalDetails?.medicalHistory || booking.medicalHistory || 'No medical history provided'}
+                      </p>
+                    </div>
                   </div>
-                )}
-                {booking.additionalDetails?.currentMedications && (
                   <div>
                     <span className="font-medium text-blue-800">Current Medications:</span>
-                    <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.currentMedications}</p>
+                    <div className="mt-1 p-2 bg-white rounded border border-blue-200 min-h-[60px]">
+                      <p className="text-sm text-gray-700">
+                        {booking.addOns?.medical?.medications || booking.additionalDetails?.currentMedications || booking.currentMedications || 'No current medications'}
+                      </p>
+                    </div>
                   </div>
-                )}
-                {booking.additionalDetails?.urgency && (
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <span className="font-medium text-blue-800">Urgency Level:</span>
-                    <span className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
-                      booking.additionalDetails.urgency === 'emergency' ? 'bg-red-100 text-red-800' :
-                      booking.additionalDetails.urgency === 'urgent' ? 'bg-orange-100 text-orange-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {booking.additionalDetails.urgency.charAt(0).toUpperCase() + booking.additionalDetails.urgency.slice(1)}
+                    <div className="mt-1">
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        (booking.addOns?.medical?.urgency || booking.additionalDetails?.urgency || booking.urgency) === 'emergency' ? 'bg-red-100 text-red-800 border border-red-300' :
+                        (booking.addOns?.medical?.urgency || booking.additionalDetails?.urgency || booking.urgency) === 'urgent' ? 'bg-orange-100 text-orange-800 border border-orange-300' :
+                        'bg-gray-100 text-gray-800 border border-gray-300'
+                      }`}>
+                        {((booking.addOns?.medical?.urgency || booking.additionalDetails?.urgency || booking.urgency) || 'normal').charAt(0).toUpperCase() + ((booking.addOns?.medical?.urgency || booking.additionalDetails?.urgency || booking.urgency) || 'normal').slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <span className="font-medium text-blue-800">Service Type:</span>
+                    <div className="mt-1">
+                      <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold border border-blue-300">
+                        {booking.serviceName || booking.serviceType || 'Veterinary Service'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Service-specific information */}
+                {(booking.serviceType === 'video-consultation' || booking.serviceName?.toLowerCase().includes('video consultation')) && (
+                  <div>
+                    <span className="font-medium text-blue-800">Preferred Platform:</span>
+                    <div className="mt-1 p-2 bg-white rounded border border-blue-200">
+                      <p className="text-sm text-gray-700">
+                          {booking.addOns?.medical?.preferredPlatform || booking.additionalDetails?.preferredPlatform || 'Not specified'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {(booking.serviceType === 'home-visit' || booking.serviceName?.toLowerCase().includes('home visit')) && (
+                  <div className="space-y-3">
+                    <div>
+                      <span className="font-medium text-blue-800">Home Address for Visit:</span>
+                      <div className="mt-1 p-2 bg-white rounded border border-blue-200">
+                        <p className="text-sm text-gray-700">
+                          {booking.addOns?.medical?.homeAddress || booking.additionalDetails?.homeAddress || booking.homeAddress || 'Same as contact address'}
+                        </p>
+                      </div>
+                    </div>
+                    {(booking.addOns?.medical?.accessInstructions || booking.additionalDetails?.accessInstructions || booking.accessInstructions) && (
+                      <div>
+                        <span className="font-medium text-blue-800">Access Instructions:</span>
+                        <div className="mt-1 p-2 bg-white rounded border border-blue-200">
+                          <p className="text-sm text-gray-700">
+                            {booking.addOns?.medical?.accessInstructions || booking.additionalDetails.accessInstructions || booking.accessInstructions}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {(booking.addOns?.medical?.specialRequests || booking.additionalDetails?.specialRequests || booking.specialRequests) && (
+                  <div>
+                    <span className="font-medium text-red-800">Special Requests:</span>
+                    <div className="mt-1 p-2 bg-white rounded border border-red-200">
+                      <p className="text-sm text-gray-700">
+                        {booking.addOns?.medical?.specialRequests || booking.additionalDetails.specialRequests || booking.specialRequests}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Pet Walking Specific Information */}
+          {(booking.serviceType === 'pet-walking' || booking.serviceName?.toLowerCase().includes('walking') || booking.serviceName?.toLowerCase().includes('walk')) && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h0a2 2 0 012 2v0H8v0z" />
+                </svg>
+                Walking Information
+              </h3>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-4">
+                {booking.walkDuration && (
+                  <div>
+                    <span className="font-medium text-green-800">Walk Duration:</span>
+                    <span className="ml-2 text-gray-700">{booking.walkDuration}</span>
+                  </div>
+                )}
+                {booking.routePreference && (
+                  <div>
+                    <span className="font-medium text-green-800">Route Preference:</span>
+                    <div className="mt-1 p-2 bg-white rounded border border-green-200">
+                      <p className="text-sm text-gray-700">{booking.routePreference}</p>
+                    </div>
+                  </div>
+                )}
+                {booking.behaviorNotes && (
+                  <div>
+                    <span className="font-medium text-green-800">Behavior Notes:</span>
+                    <div className="mt-1 p-2 bg-white rounded border border-green-200">
+                      <p className="text-sm text-gray-700">{booking.behaviorNotes}</p>
+                    </div>
+                  </div>
+                )}
+                {booking.walkingRules && Object.keys(booking.walkingRules).length > 0 && (
+                  <div>
+                    <span className="font-medium text-green-800">Walking Rules:</span>
+                    <div className="mt-1 p-2 bg-white rounded border border-green-200">
+                      {Object.entries(booking.walkingRules).map(([key, value]) => (
+                        <div key={key} className="text-sm text-gray-700">
+                          <span className="font-medium">{key}:</span> {String(value)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Pet Boarding Specific Information */}
+          {(booking.serviceType === 'pet-boarding' || booking.serviceName?.toLowerCase().includes('boarding') || booking.serviceName?.toLowerCase().includes('board')) && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Boarding Information
+              </h3>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {booking.checkInDate && (
+                    <div>
+                      <span className="font-medium text-blue-800">Check-in Date:</span>
+                      <span className="ml-2 text-gray-700">{booking.checkInDate}</span>
+                    </div>
+                  )}
+                  {booking.checkOutDate && (
+                    <div>
+                      <span className="font-medium text-blue-800">Check-out Date:</span>
+                      <span className="ml-2 text-gray-700">{booking.checkOutDate}</span>
+                    </div>
+                  )}
+                  {booking.checkInTime && (
+                    <div>
+                      <span className="font-medium text-blue-800">Check-in Time:</span>
+                      <span className="ml-2 text-gray-700">{booking.checkInTime}</span>
+                    </div>
+                  )}
+                  {booking.checkOutTime && (
+                    <div>
+                      <span className="font-medium text-blue-800">Check-out Time:</span>
+                      <span className="ml-2 text-gray-700">{booking.checkOutTime}</span>
+                    </div>
+                  )}
+                </div>
+                {booking.dietaryRequirements && (
+                  <div>
+                    <span className="font-medium text-blue-800">Dietary Requirements:</span>
+                    <div className="mt-1 p-2 bg-white rounded border border-blue-200">
+                      <p className="text-sm text-gray-700">{booking.dietaryRequirements}</p>
+                    </div>
+                  </div>
+                )}
+                {booking.emergencyContact && (
+                  <div>
+                    <span className="font-medium text-blue-800">Emergency Contact:</span>
+                    <span className="ml-2 text-gray-700">{booking.emergencyContact}</span>
+                  </div>
+                )}
+                {booking.vaccinationUpToDate !== undefined && (
+                  <div>
+                    <span className="font-medium text-blue-800">Vaccinations Up-to-date:</span>
+                    <span className={`ml-2 px-2 py-1 rounded text-sm ${booking.vaccinationUpToDate ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {booking.vaccinationUpToDate ? 'Yes' : 'No'}
                     </span>
                   </div>
                 )}
-                {booking.serviceType === 'video-consultation' && booking.additionalDetails?.preferredPlatform && (
+              </div>
+            </div>
+          )}
+
+          {/* Pet Grooming Specific Information */}
+          {(booking.serviceType?.includes('grooming') || booking.serviceName?.toLowerCase().includes('grooming') || booking.serviceName?.toLowerCase().includes('pack')) && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4 4 4 0 004-4V5z" />
+                </svg>
+                Grooming Information
+              </h3>
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 space-y-4">
+                {booking.packageType && (
                   <div>
-                    <span className="font-medium text-blue-800">Preferred Platform:</span>
-                    <span className="ml-2">{booking.additionalDetails.preferredPlatform}</span>
+                    <span className="font-medium text-purple-800">Package Type:</span>
+                    <span className="ml-2 text-gray-700">{booking.packageType}</span>
                   </div>
                 )}
-                {booking.serviceType === 'home-visit' && (
-                  <>
-                    {booking.additionalDetails?.homeAddress && (
-                      <div>
-                        <span className="font-medium text-blue-800">Home Address for Visit:</span>
-                        <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.homeAddress}</p>
-                      </div>
-                    )}
-                    {booking.additionalDetails?.accessInstructions && (
-                      <div>
-                        <span className="font-medium text-blue-800">Access Instructions:</span>
-                        <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.accessInstructions}</p>
-                      </div>
-                    )}
-                  </>
-                )}
-                {booking.additionalDetails?.specialRequests && (
+                {booking.selectedAddOns && Object.keys(booking.selectedAddOns).length > 0 && (
                   <div>
-                    <span className="font-medium text-blue-800">Special Requests:</span>
-                    <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.specialRequests}</p>
+                    <span className="font-medium text-purple-800">Selected Add-ons:</span>
+                    <div className="mt-1 p-2 bg-white rounded border border-purple-200">
+                      {Object.entries(booking.selectedAddOns).map(([key, value]) => (
+                        <div key={key} className="text-sm text-gray-700">
+                          <span className="font-medium">{key}:</span> {String(value)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {booking.groomingPreferences && (
+                  <div>
+                    <span className="font-medium text-purple-800">Grooming Preferences:</span>
+                    <div className="mt-1 p-2 bg-white rounded border border-purple-200">
+                      <p className="text-sm text-gray-700">{booking.groomingPreferences}</p>
+                    </div>
+                  </div>
+                )}
+                {booking.temperament && (
+                  <div>
+                    <span className="font-medium text-purple-800">Pet Temperament:</span>
+                    <span className="ml-2 text-gray-700">{booking.temperament}</span>
                   </div>
                 )}
               </div>

@@ -106,7 +106,36 @@ const VeterinaryService = () => {
         ...formData,
         serviceName: serviceConfig[serviceType]?.title,
         serviceType: serviceType,
-        // Include all form data for admin review
+        // Map veterinary-specific fields to entity fields
+        symptoms: formData.symptoms,
+        medicalHistory: formData.medicalHistory,
+        currentMedications: formData.currentMedications,
+        urgency: formData.urgency,
+        ...(serviceType === 'video-consultation' && {
+          preferredPlatform: formData.preferredPlatform
+        }),
+        ...(serviceType === 'home-visit' && {
+          homeAddress: formData.homeAddress,
+          accessInstructions: formData.accessInstructions
+        }),
+        // Store medical data in addOns format for backward compatibility
+        addOns: {
+          medical: {
+            symptoms: formData.symptoms,
+            medicalHistory: formData.medicalHistory,
+            medications: formData.currentMedications,
+            urgency: formData.urgency,
+            specialRequests: formData.specialRequests,
+            ...(serviceType === 'video-consultation' && {
+              preferredPlatform: formData.preferredPlatform
+            }),
+            ...(serviceType === 'home-visit' && {
+              homeAddress: formData.homeAddress,
+              accessInstructions: formData.accessInstructions
+            })
+          }
+        },
+        // Also include in additionalDetails for backward compatibility
         additionalDetails: {
           symptoms: formData.symptoms,
           medicalHistory: formData.medicalHistory,
