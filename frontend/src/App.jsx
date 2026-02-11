@@ -102,6 +102,10 @@ import DigestiveSupport from './pages/pharmacy/prescription-food/digestive-suppo
 import WeightManagement from './pages/pharmacy/prescription-food/weight-management';
 import AllPrescriptionFood from './pages/pharmacy/prescription-food/all-prescription-food';
 
+// Veterinary Services
+import VeterinaryService from './pages/veterinary-service';
+import VeterinaryServicesPage from './pages/veterinary-service/VeterinaryServicesPage';
+
 // Protected Route Component
 const ProtectedAdminRoute = ({ children }) => {
   const adminUser = JSON.parse(localStorage.getItem('adminUser') || 'null');
@@ -146,6 +150,8 @@ function App() {
                 
                 {/* Pet Services */}
                 <Route path="/pet-services" element={<PetServicesPage />} />
+                <Route path="/veterinary-service" element={<VeterinaryServicesPage />} />
+                <Route path="/veterinary-service/:serviceType" element={<VeterinaryService />} />
                 <Route path="/pet-boarding" element={<PetBoardingPage />} />
                 <Route path="/pet-walking" element={<PetWalkingPage />} />
                 <Route path="/petco-outlet" element={<PetCoOutletPage />} />

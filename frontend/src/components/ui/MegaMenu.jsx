@@ -76,6 +76,11 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           label: 'Pet Grooming', 
           path: '/pet-services',
           icon: '/assets/images/dog/dg7.webp'
+        },
+        { 
+          label: 'Veterinary Service', 
+          path: '/veterinary-service',
+          icon: '/assets/images/essential/veterinary.png'
         }
       ]
     },

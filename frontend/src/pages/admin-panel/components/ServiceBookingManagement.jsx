@@ -593,6 +593,73 @@ const BookingDetailModal = ({ booking, onClose, onStatusUpdate }) => {
                     )}
           </div>
 
+          {/* Veterinary Service Specific Information */}
+          {(booking.serviceType && (booking.serviceType.includes('appointment') || booking.serviceType.includes('home-visit') || booking.serviceType.includes('video-consultation') || (booking.serviceName && booking.serviceName.toLowerCase().includes('veterinary')))) && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-foreground">Medical Information</h3>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                {booking.additionalDetails?.symptoms && (
+                  <div>
+                    <span className="font-medium text-blue-800">Symptoms/Concerns:</span>
+                    <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.symptoms}</p>
+                  </div>
+                )}
+                {booking.additionalDetails?.medicalHistory && (
+                  <div>
+                    <span className="font-medium text-blue-800">Medical History:</span>
+                    <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.medicalHistory}</p>
+                  </div>
+                )}
+                {booking.additionalDetails?.currentMedications && (
+                  <div>
+                    <span className="font-medium text-blue-800">Current Medications:</span>
+                    <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.currentMedications}</p>
+                  </div>
+                )}
+                {booking.additionalDetails?.urgency && (
+                  <div>
+                    <span className="font-medium text-blue-800">Urgency Level:</span>
+                    <span className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
+                      booking.additionalDetails.urgency === 'emergency' ? 'bg-red-100 text-red-800' :
+                      booking.additionalDetails.urgency === 'urgent' ? 'bg-orange-100 text-orange-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {booking.additionalDetails.urgency.charAt(0).toUpperCase() + booking.additionalDetails.urgency.slice(1)}
+                    </span>
+                  </div>
+                )}
+                {booking.serviceType === 'video-consultation' && booking.additionalDetails?.preferredPlatform && (
+                  <div>
+                    <span className="font-medium text-blue-800">Preferred Platform:</span>
+                    <span className="ml-2">{booking.additionalDetails.preferredPlatform}</span>
+                  </div>
+                )}
+                {booking.serviceType === 'home-visit' && (
+                  <>
+                    {booking.additionalDetails?.homeAddress && (
+                      <div>
+                        <span className="font-medium text-blue-800">Home Address for Visit:</span>
+                        <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.homeAddress}</p>
+                      </div>
+                    )}
+                    {booking.additionalDetails?.accessInstructions && (
+                      <div>
+                        <span className="font-medium text-blue-800">Access Instructions:</span>
+                        <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.accessInstructions}</p>
+                      </div>
+                    )}
+                  </>
+                )}
+                {booking.additionalDetails?.specialRequests && (
+                  <div>
+                    <span className="font-medium text-blue-800">Special Requests:</span>
+                    <p className="text-sm mt-1 text-gray-700">{booking.additionalDetails.specialRequests}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Service Info */}
           <div className="space-y-3">
             <h3 className="font-semibold text-foreground">Service Information</h3>

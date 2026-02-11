@@ -850,6 +850,14 @@ const Header = ({ onSearch = () => { } }) => {
                   <span className="bg-[#ff7a00] text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
                 </Link>
 
+                <Link 
+                  to="/veterinary-service"
+                  className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
+                >
+                  <span>Veterinary Service</span>
+                  <span className="bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
+                </Link>
+
                 <button
                   className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
                   onClick={() => {
