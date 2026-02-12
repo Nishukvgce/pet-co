@@ -57,6 +57,18 @@ const BookingForm = ({ service, onClose }) => {
     }
   }, [service]);
 
+  // Update user fields when user context changes
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        ownerName: user.name || prev.ownerName,
+        phone: user.phone || prev.phone,
+        email: user.email || prev.email
+      }));
+    }
+  }, [user]);
+
   const timeSlots = [
     '7:00 AM','7:30 AM','8:00 AM','8:30 AM',
     '9:00 AM','9:30 AM','10:00 AM','10:30 AM',

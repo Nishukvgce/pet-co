@@ -292,12 +292,34 @@ public class ServiceBookingController {
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phone) {
         try {
+            System.out.println("[DEBUG] ServiceBookingController.getBookingsForUser - Start");
+            System.out.println("[DEBUG] - Received userId: " + userId);
+            System.out.println("[DEBUG] - Received email: " + email);
+            System.out.println("[DEBUG] - Received phone: " + phone);
+            
+            // Validate that at least one search parameter is provided
+            if (userId == null && (email == null || email.trim().isEmpty()) && (phone == null || phone.trim().isEmpty())) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "At least one search parameter (userId, email, or phone) is required"
+                ));
+            }
+            
             List<ServiceBookingDTO> bookings = serviceBookingService.getBookingsForUser(userId, email, phone);
+            
+            System.out.println("[DEBUG] - Returned " + bookings.size() + " bookings");
+            for (ServiceBookingDTO booking : bookings) {
+                System.out.println("[DEBUG]   - Booking ID: " + booking.getId() + ", Service: " + booking.getServiceName() + ", Owner: " + booking.getOwnerName());
+            }
+            
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "bookings", bookings
+                    "bookings", bookings,
+                    "totalFound", bookings.size()
             ));
         } catch (Exception e) {
+            System.err.println("[ERROR] ServiceBookingController.getBookingsForUser failed: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "success", false,
                     "message", "Error fetching user bookings: " + e.getMessage()
@@ -339,6 +361,37 @@ public class ServiceBookingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                 "success", false,
                 "message", "Error searching bookings: " + e.getMessage()
+            ));
+        }
+    }
+
+    // Debug endpoint to see all bookings with user details
+    @GetMapping("/debug-all")
+    public ResponseEntity<?> debugAllBookings() {
+        try {
+            List<ServiceBookingDTO> allBookings = serviceBookingService.getAllBookings();
+            
+            System.out.println("[DEBUG] Total bookings in database: " + allBookings.size());
+            for (ServiceBookingDTO booking : allBookings) {
+                System.out.println("[DEBUG] Booking ID: " + booking.getId() + 
+                                 ", Service: " + booking.getServiceName() + 
+                                 ", Owner: " + booking.getOwnerName() + 
+                                 ", Email: " + booking.getEmail() + 
+                                 ", Phone: " + booking.getPhone() + 
+                                 ", UserId: " + booking.getUserId());
+            }
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "totalBookings", allBookings.size(),
+                "bookings", allBookings
+            ));
+        } catch (Exception e) {
+            System.err.println("[ERROR] Debug endpoint failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "success", false,
+                "message", "Error fetching all bookings: " + e.getMessage()
             ));
         }
     }

@@ -1,10 +1,13 @@
 package com.eduprajna.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -272,20 +275,54 @@ public class ServiceBookingService {
 
     // Get bookings for a user via any identifier
     public List<ServiceBookingDTO> getBookingsForUser(Long userId, String email, String phone) {
-        List<ServiceBooking> results = List.of();
+        System.out.println("[DEBUG] ServiceBookingService.getBookingsForUser - Start");
+        System.out.println("[DEBUG] - userId: " + userId);
+        System.out.println("[DEBUG] - email: " + email);
+        System.out.println("[DEBUG] - phone: " + phone);
+        
+        List<ServiceBooking> results = new ArrayList<>();
+        
+        // Prioritize userId search for authenticated users
         if (userId != null) {
-            results = serviceBookingRepository.findByUser_IdOrderByCreatedAtDesc(userId);
+            System.out.println("[DEBUG] - Searching by userId (authenticated user)");
+            List<ServiceBooking> userIdResults = serviceBookingRepository.findByUser_IdOrderByCreatedAtDesc(userId);
+            System.out.println("[DEBUG] - Found " + userIdResults.size() + " bookings by userId");
+            results.addAll(userIdResults);
+        } else {
+            // Fallback to email/phone search only when userId is not available
+            System.out.println("[DEBUG] - No userId provided, using email/phone fallback search");
+            Set<ServiceBooking> fallbackResults = new HashSet<>();
+            
+            if (email != null && !email.trim().isEmpty()) {
+                List<ServiceBooking> emailResults = serviceBookingRepository.findByEmailIgnoreCaseOrderByCreatedAtDesc(email.trim());
+                System.out.println("[DEBUG] - Found " + emailResults.size() + " bookings by email");
+                fallbackResults.addAll(emailResults);
+            }
+            
+            if (phone != null && !phone.trim().isEmpty()) {
+                List<ServiceBooking> phoneResults = serviceBookingRepository.findByPhoneOrderByCreatedAtDesc(phone.trim());
+                System.out.println("[DEBUG] - Found " + phoneResults.size() + " bookings by phone");
+                fallbackResults.addAll(phoneResults);
+            }
+            
+            results.addAll(fallbackResults);
         }
-        if ((results == null || results.isEmpty()) && email != null && !email.trim().isEmpty()) {
-            results = serviceBookingRepository.findByEmailIgnoreCaseOrderByCreatedAtDesc(email.trim());
-        }
-        if ((results == null || results.isEmpty()) && phone != null && !phone.trim().isEmpty()) {
-            results = serviceBookingRepository.findByPhoneOrderByCreatedAtDesc(phone.trim());
-        }
-        return (results == null ? List.<ServiceBooking>of() : results)
-                .stream()
+        
+        // Sort by creation date (newest first)
+        results.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+                
+        System.out.println("[DEBUG] - Total bookings found: " + results.size());
+        
+        // Convert to DTOs
+        List<ServiceBookingDTO> dtoResults = results.stream()
                 .map(this::convertToDTO)
+                .filter(dto -> dto != null)
                 .collect(Collectors.toList());
+                
+        System.out.println("[DEBUG] - Converted to " + dtoResults.size() + " DTOs");
+        System.out.println("[DEBUG] ServiceBookingService.getBookingsForUser - End");
+        
+        return dtoResults;
     }
 
     // Get bookings for a user filtered by service type keyword (walking/boarding/grooming)
@@ -552,11 +589,19 @@ public class ServiceBookingService {
         // Set user relationship if userId is provided
         if (dto.getUserId() != null) {
             try {
+                System.out.println("[DEBUG] Setting user relationship for userId: " + dto.getUserId());
                 User user = userRepository.findById(dto.getUserId()).orElse(null);
-                booking.setUser(user);
+                if (user != null) {
+                    booking.setUser(user);
+                    System.out.println("[DEBUG] Successfully set user relationship for: " + user.getEmail());
+                } else {
+                    System.err.println("[WARNING] User not found with ID: " + dto.getUserId());
+                }
             } catch (Exception e) {
-                System.err.println("[WARNING] Failed to find user with ID: " + dto.getUserId());
+                System.err.println("[ERROR] Failed to find user with ID: " + dto.getUserId() + " - " + e.getMessage());
             }
+        } else {
+            System.out.println("[DEBUG] No userId provided in DTO, user relationship not set");
         }
         
         booking.setOwnerName(dto.getOwnerName() != null && !dto.getOwnerName().trim().isEmpty() ? dto.getOwnerName().trim() : "Unknown Owner");

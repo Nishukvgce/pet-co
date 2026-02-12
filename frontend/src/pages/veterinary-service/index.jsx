@@ -25,7 +25,7 @@ const VeterinaryService = () => {
     // Owner Information
     ownerName: user?.name || '',
     email: user?.email || '',
-    phone: '',
+    phone: user?.phone || '',
     address: '',
     
     // Service Information
@@ -88,6 +88,18 @@ const VeterinaryService = () => {
     }
   }, [serviceType, navigate]);
 
+  // Update user fields when user context changes
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        ownerName: user.name || prev.ownerName,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone
+      }));
+    }
+  }, [user]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -104,6 +116,7 @@ const VeterinaryService = () => {
     try {
       const bookingData = {
         ...formData,
+        userId: user?.id || null, // Include user ID for proper identification
         serviceName: serviceConfig[serviceType]?.title,
         serviceType: serviceType,
         // Map veterinary-specific fields to entity fields

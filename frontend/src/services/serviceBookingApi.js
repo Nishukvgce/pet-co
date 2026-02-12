@@ -89,19 +89,56 @@ const serviceBookingApi = {
   // Get bookings for user (via userId/email/phone)
   getBookingsForUser: async ({ userId, email, phone }) => {
     try {
+      console.log('[DEBUG] ServiceBookingApi.getBookingsForUser - Start');
+      console.log('[DEBUG] - userId:', userId, '(type:', typeof userId, ')');
+      console.log('[DEBUG] - email:', email);
+      console.log('[DEBUG] - phone:', phone);
+      
+      // Validate that userId is a valid number if provided
+      if (userId !== null && userId !== undefined) {
+        const numericUserId = Number(userId);
+        if (isNaN(numericUserId)) {
+          console.error('[ERROR] Invalid userId provided:', userId);
+          throw new Error('Invalid user ID format');
+        }
+        userId = numericUserId;
+      }
+      
       const params = new URLSearchParams();
       if (userId) params.append('userId', userId);
       if (email) params.append('email', email);
       if (phone) params.append('phone', phone);
+      
+      console.log('[DEBUG] - API URL:', `${API_BASE_URL}/service-bookings/by-user?${params.toString()}`);
+      
       const response = await fetch(`${API_BASE_URL}/service-bookings/by-user?${params.toString()}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
+      
+      console.log('[DEBUG] - Response status:', response.status);
       const data = await response.json();
+      console.log('[DEBUG] - Response data:', data);
+      console.log('[DEBUG] - Found bookings count:', data.bookings ? data.bookings.length : 0);
+      
       if (!response.ok) throw new Error(data.message || 'Failed to fetch user bookings');
+      
+      if (data.bookings) {
+        data.bookings.forEach((booking, index) => {
+          console.log(`[DEBUG] - Booking ${index + 1}:`, {
+            id: booking.id,
+            serviceName: booking.serviceName,
+            ownerName: booking.ownerName,
+            petName: booking.petName,
+            status: booking.status,
+            userId: booking.userId
+          });
+        });
+      }
+      
       return data;
     } catch (error) {
-      console.error('Error fetching user bookings:', error);
+      console.error('[ERROR] ServiceBookingApi.getBookingsForUser failed:', error);
       throw error;
     }
   },
@@ -285,6 +322,27 @@ const serviceBookingApi = {
       return data;
     } catch (error) {
       console.error('Error deleting booking:', error);
+      throw error;
+    }
+  },
+
+  // Debug endpoint to see all bookings
+  debugAllBookings: async () => {
+    try {
+      console.log('[DEBUG] ServiceBookingApi.debugAllBookings - Start');
+      const response = await fetch(`${API_BASE_URL}/service-bookings/debug-all`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      
+      console.log('[DEBUG] - Response status:', response.status);
+      const data = await response.json();
+      console.log('[DEBUG] - Debug response:', data);
+      
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch debug data');
+      return data;
+    } catch (error) {
+      console.error('[ERROR] ServiceBookingApi.debugAllBookings failed:', error);
       throw error;
     }
   }

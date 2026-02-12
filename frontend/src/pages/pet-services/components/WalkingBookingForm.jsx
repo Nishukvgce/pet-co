@@ -104,6 +104,17 @@ const WalkingBookingForm = ({ service, options = [], onClose }) => {
   const stepForward = () => setStep((s) => Math.min(3, s + 1));
   const stepBack = () => setStep((s) => Math.max(1, s - 1));
 
+  // Update user fields when user context changes
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        recipientName: user.name || prev.recipientName,
+        contactNumber: user.phone || prev.contactNumber
+      }));
+    }
+  }, [user]);
+
   // GPS + reverse geocoding via OSM Nominatim
   const fetchCurrentAddress = async () => {
     try {

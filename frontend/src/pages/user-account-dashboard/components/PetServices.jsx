@@ -19,7 +19,90 @@ const typeIcon = (type = '') => {
   if (t.includes('walk')) return { name: 'Footprints', color: 'text-orange-500' };
   if (t.includes('board')) return { name: 'Home', color: 'text-blue-500' };
   if (t.includes('groom')) return { name: 'Scissors', color: 'text-purple-500' };
+  if (t.includes('veterinary')) return { name: 'Heart', color: 'text-red-500' };
   return { name: 'PawPrint', color: 'text-primary' };
+};
+
+const getServiceDetails = (booking) => {
+  if (!booking) return { type: 'general', icon: 'PawPrint', color: 'text-primary', bgColor: 'bg-gray-50', borderColor: 'border-gray-200', details: {} };
+  
+  const serviceType = (booking.serviceType || '').toLowerCase();
+  const serviceName = (booking.serviceName || '').toLowerCase();
+  
+  // Veterinary services
+  if (serviceType.includes('veterinary') || serviceName.includes('veterinary') || serviceName.includes('appointment') || serviceName.includes('consultation')) {
+    return {
+      type: 'veterinary',
+      icon: 'Heart',
+      color: 'text-red-500',
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-200',
+      details: {
+        symptoms: booking.symptoms || (booking.addOns?.medical?.symptoms),
+        urgency: booking.urgency || (booking.addOns?.medical?.urgency) || 'normal',
+        platform: booking.preferredPlatform || (booking.addOns?.medical?.preferredPlatform),
+        homeAddress: booking.homeAddress || (booking.addOns?.medical?.homeAddress)
+      }
+    };
+  }
+  
+  // Walking services  
+  if (serviceType.includes('walk') || serviceName.includes('walk')) {
+    return {
+      type: 'walking',
+      icon: 'Footprints', 
+      color: 'text-orange-500',
+      bgColor: 'bg-orange-50',
+      borderColor: 'border-orange-200',
+      details: {
+        duration: booking.walkDuration || (booking.addOns?.duration),
+        routePreference: booking.routePreference,
+        walkingRules: booking.walkingRules || (booking.addOns?.rules)
+      }
+    };
+  }
+  
+  // Boarding services
+  if (serviceType.includes('board') || serviceName.includes('board')) {
+    return {
+      type: 'boarding',
+      icon: 'Home',
+      color: 'text-blue-500', 
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
+      details: {
+        checkInDate: booking.checkInDate,
+        checkOutDate: booking.checkOutDate,
+        emergencyContact: booking.emergencyContact || (booking.addOns?.boardingExtras?.emergencyContact),
+        vaccination: booking.vaccinationUpToDate || (booking.addOns?.boardingExtras?.vaccinationUpToDate)
+      }
+    };
+  }
+  
+  // Grooming services
+  if (serviceType.includes('groom') || serviceName.includes('groom') || serviceName.includes('pack')) {
+    return {
+      type: 'grooming',
+      icon: 'Scissors',
+      color: 'text-purple-500',
+      bgColor: 'bg-purple-50', 
+      borderColor: 'border-purple-200',
+      details: {
+        packageType: booking.packageType,
+        selectedAddOns: booking.selectedAddOns || (booking.addOns?.selectedAddOns),
+        temperament: booking.temperament || (booking.addOns?.boardingExtras?.temperament)
+      }
+    };
+  }
+  
+  return {
+    type: 'general',
+    icon: 'PawPrint',
+    color: 'text-primary',
+    bgColor: 'bg-gray-50',
+    borderColor: 'border-gray-200',
+    details: {}
+  };
 };
 
 const normalize = (raw = {}) => ({
@@ -52,19 +135,36 @@ export default function PetServices({ user }) {
   const [error, setError] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
-  const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
     const load = async () => {
-      if (!user) return;
+      if (!user) {
+        console.log('[DEBUG] PetServices: No user provided, skipping load');
+        return;
+      }
+      
+      console.log('[DEBUG] PetServices: Loading bookings for user:', {
+        id: user?.id,
+        email: user?.email,
+        phone: user?.phone,
+        name: user?.name
+      });
+      
       setLoading(true);
       setError(null);
       try {
-        const resp = await serviceBookingApi.getBookingsForUser({ userId: user?.id, email: user?.email, phone: user?.phone });
+        const resp = await serviceBookingApi.getBookingsForUser({ 
+          userId: user?.id, 
+          email: user?.email, 
+          phone: user?.phone 
+        });
+        
+        console.log('[DEBUG] PetServices: API response:', resp);
         let results = (resp?.bookings || []).map(normalize);
+        console.log('[DEBUG] PetServices: Normalized results:', results);
         setBookings(results.sort(sortByDateTime));
       } catch (e) {
-        console.error('Failed to load bookings', e);
+        console.error('[ERROR] PetServices: Failed to load bookings', e);
         setError(e.message || 'Failed to load pet services');
       } finally {
         setLoading(false);
@@ -78,6 +178,7 @@ export default function PetServices({ user }) {
     { id: 'walking', label: 'Walking' },
     { id: 'boarding', label: 'Boarding' },
     { id: 'grooming', label: 'Grooming' },
+    { id: 'veterinary', label: 'Veterinary' },
   ];
 
   const filtered = useMemo(() => {
@@ -87,17 +188,19 @@ export default function PetServices({ user }) {
       if (activeTab === 'walking') return t.includes('walk');
       if (activeTab === 'boarding') return t.includes('board');
       if (activeTab === 'grooming') return t.includes('groom');
+      if (activeTab === 'veterinary') return t.includes('veterinary') || t.includes('appointment') || t.includes('consultation');
       return true;
     });
   }, [bookings, activeTab]);
 
   const counts = useMemo(() => {
-    const c = { all: bookings.length, walking: 0, boarding: 0, grooming: 0 };
+    const c = { all: bookings.length, walking: 0, boarding: 0, grooming: 0, veterinary: 0 };
     bookings.forEach(b => {
       const t = `${b.serviceType} ${b.serviceName}`.toLowerCase();
       if (t.includes('walk')) c.walking++;
       else if (t.includes('board')) c.boarding++;
       else if (t.includes('groom')) c.grooming++;
+      else if (t.includes('veterinary') || t.includes('appointment') || t.includes('consultation')) c.veterinary++;
     });
     return c;
   }, [bookings]);
@@ -109,6 +212,8 @@ export default function PetServices({ user }) {
           <h2 className="text-2xl font-heading font-bold text-foreground">My Pet Services</h2>
           <p className="text-sm text-muted-foreground">View your walking, boarding, and grooming bookings in one place.</p>
         </div>
+        
+        {/* Desktop tabs */}
         <div className="hidden md:flex gap-2">
           {tabs.map(t => (
             <button
@@ -157,49 +262,90 @@ export default function PetServices({ user }) {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {filtered.map(b => {
-            const ic = typeIcon(`${b.serviceType} ${b.serviceName}`);
-            return (
-              <div key={b.id} className="bg-white rounded-xl border border-border p-4 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-full bg-muted flex items-center justify-center ${ic.color}`}>
-                      <Icon name={ic.name} size={18} />
+          {filtered.map((b, index) => {
+            try {
+              const serviceInfo = getServiceDetails(b);
+              
+              return (
+              <div key={b.id} className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-all ${serviceInfo.borderColor}`}>
+                {/* Main card content */}
+                <div className={`p-4 ${serviceInfo.bgColor}`}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`h-10 w-10 rounded-full bg-white flex items-center justify-center ${serviceInfo.color} border-2`}>
+                        <Icon name={serviceInfo.icon} size={18} />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-foreground">{b.serviceName}</div>
+                        <div className="text-xs text-muted-foreground">For {b.petName}{b.petBreed?` • ${b.petBreed}`:''}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-semibold text-foreground">{b.serviceName}</div>
-                      <div className="text-xs text-muted-foreground">For {b.petName}{b.petBreed?` • ${b.petBreed}`:''}</div>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusChip(b.status)}`}>{b.status?.replace('_',' ')}</span>
+                  </div>
+                  
+                  <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground"><Icon name="Calendar" size={16} /><span>{b.preferredDate || '—'}</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><Icon name="Clock" size={16} /><span>{b.preferredTime || '—'}</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><Icon name="IndianRupee" size={16} /><span>₹{b.totalAmount}</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><Icon name="User" size={16} /><span>{b.ownerName}</span></div>
+                  </div>
+                  
+                  {/* Service-specific quick info */}
+                  <div className="mt-3">
+                    {serviceInfo.type === 'veterinary' && serviceInfo.details.symptoms && (
+                      <div className="flex items-center gap-2 text-sm text-red-600">
+                        <Icon name="AlertTriangle" size={16} />
+                        <span className="font-medium">Symptoms:</span> 
+                        <span className="truncate">{serviceInfo.details.symptoms}</span>
+                      </div>
+                    )}
+                    {serviceInfo.type === 'walking' && serviceInfo.details.duration && (
+                      <div className="flex items-center gap-2 text-sm text-orange-600">
+                        <Icon name="Clock" size={16} />
+                        <span className="font-medium">Duration:</span> {serviceInfo.details.duration}
+                      </div>
+                    )}
+                    {serviceInfo.type === 'boarding' && serviceInfo.details.checkInDate && (
+                      <div className="flex items-center gap-2 text-sm text-blue-600">
+                        <Icon name="Calendar" size={16} />
+                        <span className="font-medium">Check-in:</span> {serviceInfo.details.checkInDate}
+                      </div>
+                    )}
+                    {serviceInfo.type === 'grooming' && serviceInfo.details.packageType && (
+                      <div className="flex items-center gap-2 text-sm text-purple-600">
+                        <Icon name="Package" size={16} />
+                        <span className="font-medium">Package:</span> {serviceInfo.details.packageType}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="text-xs text-muted-foreground">
+                      Created: {(() => {
+                        try {
+                          return new Date(b.createdAt).toLocaleDateString();
+                        } catch {
+                          return 'N/A';
+                        }
+                      })()}
+                    </div>
+                    <div className={`px-2 py-1 rounded text-xs font-medium ${serviceInfo.color}`} style={{backgroundColor: serviceInfo.bgColor}}>
+                      {serviceInfo.type.charAt(0).toUpperCase() + serviceInfo.type.slice(1)}
                     </div>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusChip(b.status)}`}>{b.status?.replace('_',' ')}</span>
                 </div>
-                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center gap-2 text-muted-foreground"><Icon name="Calendar" size={16} /><span>{b.preferredDate || '—'}</span></div>
-                  <div className="flex items-center gap-2 text-muted-foreground"><Icon name="Clock" size={16} /><span>{b.preferredTime || '—'}</span></div>
-                  <div className="flex items-center gap-2 text-muted-foreground"><Icon name="IndianRupee" size={16} /><span>₹{b.totalAmount}</span></div>
-                  <div className="flex items-center gap-2 text-muted-foreground"><Icon name="User" size={16} /><span>{b.ownerName}</span></div>
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  {/* <button className="text-sm text-primary hover:underline" onClick={() => setExpanded(expanded===b.id?null:b.id)}>
-                    {expanded===b.id? 'Hide details' : 'View details'}
-                  </button> */}
-                  {/* Placeholder actions */}
-                  {/* <div className="flex gap-2">
-                    {b.status === 'PENDING' && <Button size="sm" variant="outline" iconName="X">Cancel</Button>}
-                    <Button size="sm" variant="outline" iconName="Download">Invoice</Button>
-                  </div> */}
-                </div>
-                {expanded===b.id && (
-                  <div className="mt-3 p-3 bg-muted/40 rounded-lg text-sm">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-muted-foreground">
-                      <div>Phone: <span className="text-foreground">{b.phone || '—'}</span></div>
-                      <div>Email: <span className="text-foreground">{b.email || '—'}</span></div>
-                      <div>Notes: <span className="text-foreground">{(b.addOns?.notes || b.notes || '—')}</span></div>
-                    </div>
-                  </div>
-                )}
               </div>
             );
+            } catch (renderError) {
+              console.error('Error rendering booking:', renderError, b);
+              return (
+                <div key={b?.id || index} className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <div className="text-red-600 font-medium">Error displaying service</div>
+                  <div className="text-sm text-red-500 mt-1">Service: {b?.serviceName || 'Unknown'}</div>
+                  <div className="text-xs text-red-400 mt-2">Please refresh the page or contact support if this persists.</div>
+                </div>
+              );
+            }
           })}
         </div>
       </div>

@@ -150,10 +150,40 @@ function App() {
                 
                 {/* Pet Services */}
                 <Route path="/pet-services" element={<PetServicesPage />} />
-                <Route path="/veterinary-service" element={<VeterinaryServicesPage />} />
-                <Route path="/veterinary-service/:serviceType" element={<VeterinaryService />} />
-                <Route path="/pet-boarding" element={<PetBoardingPage />} />
-                <Route path="/pet-walking" element={<PetWalkingPage />} />
+                
+                {/* Protected Service Booking Routes - Require Authentication */}
+                <Route 
+                  path="/veterinary-service" 
+                  element={
+                    <ProtectedRoute message="Please sign in to access veterinary services">
+                      <VeterinaryServicesPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/veterinary-service/:serviceType" 
+                  element={
+                    <ProtectedRoute message="Please sign in to book veterinary services">
+                      <VeterinaryService />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/pet-boarding" 
+                  element={
+                    <ProtectedRoute message="Please sign in to book pet boarding services">
+                      <PetBoardingPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/pet-walking" 
+                  element={
+                    <ProtectedRoute message="Please sign in to book pet walking services">
+                      <PetWalkingPage />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="/petco-outlet" element={<PetCoOutletPage />} />
                 {/* Shop by brand */}
                 <Route path="/brand/:brandSlug" element={<BrandCollection />} />

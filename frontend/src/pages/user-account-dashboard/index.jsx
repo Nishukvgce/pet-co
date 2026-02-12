@@ -644,7 +644,8 @@ const UserAccountDashboard = () => {
       case 'orders':
         return <OrderHistory orders={orders} />;
       case 'pet-services':
-        return <PetServices user={user} />;
+        // Pass the authenticated user from AuthContext to ensure proper ID is available
+        return <PetServices user={authUser} />;
       case 'profile':
         return <ProfileManagement user={user} onUpdateProfile={handleUpdateProfile} />;
       case 'addresses':
