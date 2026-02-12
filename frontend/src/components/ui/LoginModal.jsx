@@ -98,7 +98,7 @@ const LoginModal = ({ onClose }) => {
                 Register
               </button>
             </div>
-            <p className="text-xs text-gray-400 mt-4 text-center">Or continue as guest</p>
+            <p className="text-xs text-gray-400 mt-4 text-center"></p>
           </div>
         )}
 
