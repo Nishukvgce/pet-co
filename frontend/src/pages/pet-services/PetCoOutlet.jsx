@@ -10,134 +10,8 @@ import productApi from '../../services/productApi';
 import apiClient from '../../services/api';
 import { useCart } from '../../contexts/CartContext';
 
-const resolveImage = (product) => {
-  // Prefer images array, then explicit URL, then filename -> server path
-  let candidate = product?.images?.[0]?.url || product?.imageUrl || product?.image || '';
-  if (!candidate) return '/assets/images/no_image.png';
-  if (/^(https?:)?\/\//i.test(candidate) || candidate.startsWith('data:')) return candidate;
-  // If Windows-like or plain filename, map to admin images route
-  if (/^[a-zA-Z]:\\/.test(candidate) || candidate.includes('\\')) {
-    const parts = candidate.split(/\\|\//);
-    candidate = parts[parts.length - 1];
-  }
-  if (/^[^/]+\.[a-zA-Z0-9]+$/.test(candidate)) {
-    candidate = `/admin/products/images/${candidate}`;
-  }
-  const base = apiClient?.defaults?.baseURL || '';
-  return candidate.startsWith('http') ? candidate : `${base}${candidate.startsWith('/') ? candidate : `/${candidate}`}`;
-};
-
-const ProductCard = ({ product }) => {
-  const { addToCart } = useCart();
-  const img = resolveImage(product);
-  const name = product?.name || 'Unnamed Product';
-  const brand = product?.brand || '';
-  const rating = product?.rating || 4.5;
-  const variants = Array.isArray(product?.variants) && product.variants.length > 0
-    ? product.variants
-    : [{ id: 'default', weight: product?.weight || product?.size || 'Default', price: product?.price ?? product?.mrp ?? 0, originalPrice: product?.originalPrice || product?.mrp }];
-  const [variantIdx, setVariantIdx] = useState(0);
-  const v = variants[variantIdx] || variants[0];
-  const currentPrice = Number(v?.price ?? product?.price ?? 0);
-  const originalPrice = Number(v?.originalPrice ?? product?.originalPrice ?? 0);
-  const discount = originalPrice > currentPrice ? Math.round(100 - (currentPrice / originalPrice) * 100) : 0;
-  const inStock = product?.inStock !== false;
-
-  const onAdd = () => {
-    try {
-      const variantLabel = v?.weight || v?.size || v?.label || '';
-      addToCart({
-        id: product.id,
-        productId: product.id,
-        variantId: v?.id || `v${variantIdx}`,
-        name: product.name,
-        variant: variantLabel,
-        price: currentPrice,
-        image: img,
-        category: product.category,
-        subcategory: product.subcategory,
-        brand: product.brand
-      }, 1);
-    } catch (e) {
-      console.warn('Add to cart failed', e);
-    }
-  };
-
-  return (
-    <article className="bg-white rounded-lg border border-border overflow-hidden shadow hover:shadow-lg transition-shadow">
-      <div className="p-3">
-        <div className="relative">
-          <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
-            {discount > 0 && (
-              <div className="bg-red-600 text-white text-[11px] px-2 py-0.5 rounded">{discount}% OFF</div>
-            )}
-            <div className="bg-amber-500 text-white text-[11px] px-2 py-0.5 rounded">OUTLET</div>
-            {!inStock && (
-              <div className="bg-gray-500 text-white text-[11px] px-2 py-0.5 rounded">Out of Stock</div>
-            )}
-          </div>
-          <div className="mt-2 h-56 md:h-64 flex items-center justify-center bg-[#f6f8fb] rounded-lg overflow-hidden shadow-sm">
-            {img && <img src={img} alt={name} className="max-h-56 md:max-h-64 object-contain relative z-0" onError={(e)=>{e.currentTarget.src='/assets/images/no_image.png';}} />}
-            <Link to={`/product-full/${product.id}`} className="absolute inset-0 z-10" aria-label={`Open ${name} full page`} />
-          </div>
-        </div>
-
-        <div className="mt-3">
-          <h3 className="text-sm font-semibold text-foreground line-clamp-2">{name}</h3>
-          <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
-            {brand && <span>by {brand}</span>}
-            {(product?.subcategory || product?.sub) && (
-              <span className="text-right">{product.subcategory || product.sub}</span>
-            )}
-          </div>
-
-          <div className="mt-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center text-yellow-500">
-                <Star size={14} />
-                <span className="text-sm text-foreground ml-1">{rating}</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-bold">₹{currentPrice.toFixed(2)}</div>
-              {originalPrice > currentPrice && (
-                <div className="text-sm text-muted-foreground line-through">₹{originalPrice.toFixed(2)}</div>
-              )}
-            </div>
-          </div>
-
-          {variants.length > 1 && (
-            <div className="mt-3">
-              <div className="text-xs text-muted-foreground mb-2">Available sizes/weights:</div>
-              <div className="flex flex-wrap gap-2">
-                {variants.map((opt, i) => {
-                  const label = opt?.weight || opt?.size || opt?.label || `#${i+1}`;
-                  const p = Number(opt?.price ?? currentPrice);
-                  const active = i === variantIdx;
-                  return (
-                    <button key={i} onClick={() => setVariantIdx(i)}
-                      className={`text-[12px] px-3 py-1 border rounded flex flex-col items-center ${active ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-foreground border-border hover:border-orange-300'}`}>
-                      <span>{label}</span>
-                      {!!p && <span className="text-[10px] font-semibold">₹{p.toFixed(0)}</span>}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-4 flex items-center justify-between">
-            <button onClick={onAdd} disabled={!inStock}
-              className={`px-4 py-2 rounded-full text-sm shadow ${inStock ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
-              {inStock ? 'Add to Cart' : 'Out of Stock'}
-            </button>
-            <Link to={`/product-full/${product.id}`} className="text-xs text-primary hover:underline ml-4">View details</Link>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-};
+import ProductCard from '../../components/ui/ProductCard';
+import { resolveImageUrl } from '../../lib/imageUtils';
 
 const PetCoOutletPage = () => {
   const [products, setProducts] = useState([]);
@@ -276,7 +150,7 @@ const PetCoOutletPage = () => {
                           return true;
                         })
                         .map((p) => (
-                          <ProductCard key={p.id || p.sku || p.name} product={p} />
+                          <ProductCard key={p.id || p.sku || p.name} p={{...p, image: resolveImageUrl(p)}} />
                         ))}
                     </div>
                   )}

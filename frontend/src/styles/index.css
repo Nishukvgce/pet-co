@@ -153,3 +153,21 @@ img {
 .shadow-3xl {
   box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
 }
+
+/* Thin Gold Scrollbar */
+.thin-gold-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.thin-gold-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.thin-gold-scroll::-webkit-scrollbar-thumb {
+  background-color: #fbbf24;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.thin-gold-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #fbbf24 transparent;
+}

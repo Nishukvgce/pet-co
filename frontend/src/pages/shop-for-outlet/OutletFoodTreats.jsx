@@ -1,17 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import Header from '../../components/ui/Header';
-import { useCart } from '../../contexts/CartContext';
 import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
+import { useCart } from '../../contexts/CartContext';
 import productApi from '../../services/productApi';
-import { normalizePrice } from '../../utils/priceNormalization';
+import ProductCard from '../../components/ui/ProductCard';
 import FilterDrawer from '../../components/FilterDrawer';
 import { getFilterSections } from '../../data/categoryFilters';
-import MobileCategorySidebar from '../../components/MobileCategorySidebar';
 
-// Outlet Food & Treats categories - matching backend subcategory names
+// Outlet Food & Treats categories
 const categories = [
   { id: 'raw-hide-bones', label: 'Raw Hide Bones', img: '/assets/images/outlet/row-hided-bones.png' },
   { id: 'knotted-bones', label: 'Knotted Bones', img: '/assets/images/outlet/knotted-bones.png' },
@@ -25,215 +24,39 @@ const categories = [
   { id: 'all', label: 'All Food & Treats', img: '/assets/images/outlet/all-food-treats.png' }
 ];
 
-const ProductCard = ({ p }) => {
-  const { addToCart } = useCart();
-  const [variantIdx, setVariantIdx] = useState(0);
-  const variants = p.variants || [{ weight: 'Default', price: p.price, originalPrice: p.original, stock: 1 }];
-  const currentVariant = variants[variantIdx];
-  const currentPrice = currentVariant.price || p.price || 0;
-  const originalPrice = currentVariant.originalPrice || p.original || 0;
-  const discount = originalPrice > currentPrice ? Math.round(100 - (currentPrice / originalPrice) * 100) : 0;
-  const isInStock = currentVariant.stock > 0;
-
-  // Handle backend image URLs
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return '/assets/images/no_image.png';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    if (imageUrl.startsWith('/admin/')) {
-      // Backend image path - construct full URL
-      return `http://localhost:8080${imageUrl}`;
-    }
-    return imageUrl;
-  };
-
-  const handleAddToCart = () => {
-    if (!isInStock) return;
-    
-    (async () => {
-      try {
-        const variantId = currentVariant?.id || `v${variantIdx}`;
-        await addToCart({
-          productId: p.id,
-          id: p.id,
-          variantId,
-          name: p.name,
-          image: getImageUrl(p.image),
-          price: currentPrice,
-          originalPrice: originalPrice,
-          variant: currentVariant.weight ? `${currentVariant.weight}${currentVariant.weightUnit || ''}` : 'Default',
-          quantity: 1,
-          category: 'Outlet Food & Treats'
-        });
-      } catch (e) {}
-    })();
-  };
-
-  return (
-    <article className={`bg-white rounded-xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 ${
-      !isInStock ? 'opacity-75' : ''
-    }`}>
-      <div className="p-3 md:p-4">
-        {/* Badge and discount */}
-        <div className="h-6 flex items-center justify-between mb-3">
-          <div className={`text-xs font-semibold px-3 py-1 rounded-full ${
-            isInStock ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'
-          }`}>
-            {!isInStock ? 'Out of Stock' : (p.badges?.[0] || 'Outlet')}
-          </div>
-          {discount > 0 && (
-            <div className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-              {discount}% OFF
-            </div>
-          )}
-        </div>
-
-        {/* Product Image */}
-        <div className="relative mb-4">
-          <div className="h-40 md:h-48 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
-            <img 
-              src={getImageUrl(p.image)} 
-              alt={p.name} 
-              className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
-                e.target.src = '/assets/images/no_image.png';
-              }}
-            />
-          </div>
-          {!isInStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg">
-              <span className="text-white font-bold text-sm">Out of Stock</span>
-            </div>
-          )}
-        </div>
-        
-        {/* Product Name */}
-        <h3 className="text-sm md:text-base font-semibold text-foreground mb-3 line-clamp-2 leading-tight overflow-hidden" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>{p.name}</h3>
-
-        {/* Variant chips */}
-        {variants.length > 1 && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {variants.map((v, i) => (
-              <span 
-                key={i} 
-                onClick={() => setVariantIdx(i)}
-                className={`text-xs font-medium px-3 py-1.5 border rounded-full cursor-pointer transition-all duration-200 ${
-                  i === variantIdx 
-                    ? 'border-orange-500 bg-orange-50 text-orange-600' 
-                    : 'border-border hover:border-orange-300 hover:bg-orange-50'
-                }`}
-              >
-                {v.weight ? `${v.weight}${v.weightUnit || ''}` : 'Default'}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Price and Add to Cart */}
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <div className="text-lg md:text-xl font-bold text-foreground">₹{currentPrice}</div>
-            {originalPrice > currentPrice && (
-              <div className="text-sm text-muted-foreground line-through">₹{originalPrice}</div>
-            )}
-          </div>
-          <button 
-            onClick={handleAddToCart}
-            disabled={!isInStock}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-              isInStock 
-                ? 'bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white hover:shadow-md'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {isInStock ? 'Add' : 'Unavailable'}
-          </button>
-        </div>
-      </div>
-    </article>
-  );
-};
-
 const OutletFoodTreats = ({ initialActive = 'All Food & Treats' }) => {
   const [active, setActive] = useState(initialActive);
   const { getCartItemCount } = useCart();
   const navigate = useNavigate();
-  const location = useLocation();
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Layout refs
+  const leftRef = useRef(null);
+  const rightRef = useRef(null);
+  const topRef = useRef(null);
+
+  // Filters
   const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedTopFilter, setSelectedTopFilter] = useState('Brand'); // Default
   const [selectedFilters, setSelectedFilters] = useState({});
   const [appliedFilters, setAppliedFilters] = useState({});
 
   const sections = getFilterSections('outlet', 'food');
+  // Dynamic top filters from sections
+  const topFilters = sections.map(s => s.label);
 
-  // Load products
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        // Get all outlet products first; include applied filters
-        const params = { type: 'Outlet', ...appliedFilters };
-        const apiData = await productApi.getCustomerProducts(params);
+  // Scroll handlers
+  const handleLeftWheel = (e) => { if (leftRef.current) { e.preventDefault(); leftRef.current.scrollTop += e.deltaY; } };
+  const handleRightWheel = (e) => { if (rightRef.current) { e.preventDefault(); rightRef.current.scrollTop += e.deltaY; } };
+  const scrollTopLeft = () => { if (topRef.current) topRef.current.scrollBy({ left: -220, behavior: 'smooth' }); };
+  const scrollTopRight = () => { if (topRef.current) topRef.current.scrollBy({ left: 220, behavior: 'smooth' }); };
 
-        // Filter products based on category and subcategory
-        let filteredProducts = (apiData || []).filter(item => {
-          // Check if item has the correct category
-          const categoryMatch = item?.category?.toUpperCase() === 'OUTLET FOOD & TREATS' || 
-                               item?.category?.toUpperCase() === 'FOOD & TREATS';
-          
-          if (!categoryMatch) return false;
-          
-          // If "All Food & Treats" is selected, show all food & treats products
-          if (active === 'All Food & Treats') {
-            return true;
-          }
-          
-          // Otherwise, filter by subcategory
-          const subcategoryMatch = item?.subcategory === active;
-          return subcategoryMatch;
-        });
-
-        // Normalize the filtered products
-        const normalized = filteredProducts.map(item => {
-          const variants = item?.variants || [];
-          const hasValidVariants = variants.length > 0;
-          
-          // Get the primary image
-          const primaryImage = item?.imageUrl || 
-                               (item?.images && item.images.length > 0 ? item.images[0] : null) || 
-                               '/assets/images/no_image.png';
-          
-          return {
-            id: item?.id,
-            name: item?.name,
-            image: primaryImage,
-            badges: item?.badges || ['Outlet'],
-            variants: hasValidVariants ? variants : [{
-              weight: 'Default',
-              price: Number(item?.price || 0),
-              originalPrice: Number(item?.originalPrice || item?.mrp || 0),
-              stock: item?.stockQuantity || 0
-            }],
-            price: Number(item?.price || 0),
-            original: Number(item?.originalPrice || item?.mrp || 0) || null,
-            category: item?.category || '',
-            subcategory: item?.subcategory || '',
-            stockQuantity: item?.stockQuantity || 0
-          };
-        });
-
-        console.log('Filtered products for', active, ':', normalized);
-        setProducts(normalized);
-      } catch (err) {
-        console.error('Outlet Food & Treats: load failed', err);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, [active, appliedFilters]);
+  const openFilterAndScroll = (label) => {
+    setSelectedTopFilter(label);
+    setFilterOpen(true);
+  };
 
   const toggleFilterOption = (sectionId, option) => {
     setSelectedFilters(prev => {
@@ -254,27 +77,76 @@ const OutletFoodTreats = ({ initialActive = 'All Food & Treats' }) => {
     setFilterOpen(false);
   };
 
+  // Load products
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const params = { type: 'Outlet', ...appliedFilters };
+        const apiData = await productApi.getCustomerProducts(params);
+
+        // Normalize
+        const normalized = (apiData || []).map(item => ({
+          id: item?.id,
+          name: item?.name,
+          image: item?.imageUrl || (item?.images?.[0]) || '/assets/images/no_image.png',
+          badges: item?.badges || ['Outlet'],
+          variants: item?.variants?.length ? item.variants : [{
+            weight: 'Default',
+            price: Number(item?.price || 0),
+            originalPrice: Number(item?.originalPrice || item?.mrp || 0),
+            stock: item?.stockQuantity || 0
+          }],
+          price: Number(item?.price || 0),
+          original: Number(item?.originalPrice || item?.mrp || 0) || null,
+          category: item?.category || '',
+          subcategory: item?.subcategory || '',
+          brand: item?.brand || '',
+          stockQuantity: item?.stockQuantity || 0
+        }));
+        
+        setProducts(normalized);
+      } catch (err) {
+        console.error('Outlet Food & Treats: load failed', err);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [appliedFilters]);
+
+  // Filter products locally by active category
+  useEffect(() => {
+    let working = products;
+
+    // Category filter
+    if (active !== 'All Food & Treats') {
+      working = working.filter(p => !active || p.subcategory === active || (p.category === active));
+    } else {
+       // Filter for food/treats general
+       working = working.filter(p => {
+          const cat = (p.category || '').toLowerCase();
+          const sub = (p.subcategory || '').toLowerCase();
+          return cat.includes('food') || cat.includes('treat') || cat.includes('outlet') || sub.includes('food') || sub.includes('treat');
+       });
+    }
+
+    setFilteredProducts(working);
+  }, [products, active]);
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Outlet Food & Treats - Pet & Co</title>
-        <meta name="description" content="Discounted food and treats for dogs and cats at Pet & Co Outlet" />
       </Helmet>
-
       <Header />
 
-      <div className="container mx-auto px-4 py-6 pb-24">
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Outlet Food & Treats</h1>
-          <p className="text-sm text-muted-foreground mt-2">
-            Discounted food and treats for your pets - same quality, better prices!
-          </p>
-        </div>
-
+      <div className="container mx-auto px-4 py-8">
         {/* Mobile horizontal categories */}
         <div className="md:hidden mb-6">
           <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
-            {categories.map((c, idx) => (
+            {categories.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setActive(c.label)}
@@ -285,113 +157,75 @@ const OutletFoodTreats = ({ initialActive = 'All Food & Treats' }) => {
                 <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${
                   active === c.label ? 'ring-2 ring-orange-400' : ''
                 }`}>
-                  <img 
-                    src={c.img} 
-                    alt={c.label} 
-                    className="w-8 h-8 object-cover"
-                    onError={(e) => e.target.src = '/assets/images/no_image.png'}
-                  />
+                  <img src={c.img} alt={c.label} className="w-8 h-8 object-cover" onError={(e) => e.target.src = '/assets/images/no_image.png'} />
                 </div>
-                <span className={`text-xs font-medium text-center leading-tight ${
-                  active === c.label ? 'text-orange-600' : 'text-gray-600'
-                }`}>
-                  {c.label}
-                </span>
+                <span className={`text-xs font-medium text-center leading-tight ${active === c.label ? 'text-orange-600' : 'text-gray-600'}`}>{c.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Category Sidebar (desktop) */}
+          {/* Sidebar */}
           <div className="hidden md:block md:col-span-3 space-y-3">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Categories</h3>
-            {categories.map(c => (
-              <button
-                key={c.id}
-                onClick={() => setActive(c.label)}
-                className={`w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all duration-200 hover:shadow-md ${
-                  active === c.label
-                    ? 'bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-orange-500 shadow-md'
-                    : 'bg-white hover:bg-gray-50 border border-border shadow-sm'
-                }`}
-              >
-                <div className="flex-shrink-0">
-                  <img 
-                    src={c.img} 
-                    alt={c.label} 
-                    className="w-14 h-14 object-cover rounded-lg shadow-sm"
-                    onError={(e) => {
-                      e.target.src = '/assets/images/no_image.png';
-                    }}
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className={`font-semibold text-sm ${
-                    active === c.label ? 'text-orange-600' : 'text-foreground'
-                  }`}>
-                    {c.label}
-                  </div>
-                  {active === c.label && (
-                    <div className="text-xs text-orange-500 mt-1">Currently viewing</div>
-                  )}
-                </div>
-                {active === c.label && (
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                )}
-              </button>
-            ))}
+            <div ref={leftRef} onWheel={handleLeftWheel} className="bg-white rounded border border-border overflow-hidden thin-gold-scroll" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}>
+              <ul className="divide-y">
+                {categories.map((c) => (
+                  <li key={c.id} className={`relative border-b ${active === c.label ? 'bg-[#fff6ee]' : ''}`}>
+                    <button onClick={() => setActive(c.label)} className="w-full text-center flex flex-col items-center gap-1 p-2 md:flex-row md:text-left md:items-center md:gap-3 md:p-4 transition-colors hover:bg-orange-50">
+                      <div className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center border ${active === c.label ? 'ring-2 ring-orange-400' : 'border-gray-100'}`}>
+                        <img src={c.img} alt={c.label} className="w-full h-full object-cover" onError={(e)=>e.target.src='/assets/images/no_image.png'} />
+                      </div>
+                      <span className="text-xs md:text-sm font-medium text-gray-800 mt-1 md:mt-0">{c.label}</span>
+                    </button>
+                    {active === c.label && <div className="absolute right-0 top-0 h-full w-1 bg-orange-400" />}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          {/* Products Grid */}
-          <div className="col-span-1 md:col-span-9">
-            <div className="mb-6 bg-white rounded-lg p-4 border border-border">
-              <h2 className="text-2xl font-bold text-foreground mb-2">{active}</h2>
-              <div className="flex items-center gap-4">
-                <p className="text-sm text-muted-foreground">
-                  {loading ? 'Loading...' : `${products.length} products found`}
-                </p>
-                <button onClick={() => setFilterOpen(true)} className="ml-2 inline-flex items-center gap-2 px-3 py-1.5 border border-border rounded text-sm bg-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 019 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
-                  </svg>
-                  <span>Filter</span>
+          {/* Main Content */}
+          <main ref={rightRef} onWheel={handleRightWheel} className="col-span-12 md:col-span-9" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}>
+
+            {/* Top Filters */}
+            <div className="mb-4 flex items-center justify-between">
+              <div className="relative flex-1 overflow-hidden">
+                <button onClick={scrollTopLeft} className="hidden md:inline-flex items-center justify-center border border-border bg-white ml-1 mr-2 absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-6 h-6 rounded-full shadow-sm hover:bg-gray-50">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 </button>
-                {/* {products.length > 0 && !loading && (
-                  <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                    Live inventory
+
+                <div ref={topRef} className="hide-scrollbar overflow-x-auto pl-8 pr-8" style={{ whiteSpace: 'nowrap' }}>
+                  <div className="inline-flex items-center gap-2">
+                    {topFilters.map((t) => (
+                      <button key={t} onClick={() => openFilterAndScroll(t)} className={`flex items-center gap-2 text-sm px-4 py-1.5 border border-border rounded-full bg-white hover:bg-gray-50 transition-colors ${selectedTopFilter === t ? 'ring-1 ring-orange-300' : ''}`}>
+                        {selectedTopFilter === t ? <span className="w-2 h-2 bg-green-500 rounded-full" /> : null}
+                        <span>{t}</span>
+                      </button>
+                    ))}
                   </div>
-                )} */}
+                </div>
+
+                <button onClick={scrollTopRight} className="hidden md:inline-flex items-center justify-center border border-border bg-white ml-2 mr-1 absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-6 h-6 rounded-full shadow-sm hover:bg-gray-50">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </button>
               </div>
             </div>
 
+            {/* Product Grid */}
             {loading ? (
-              <div className="flex items-center justify-center h-64 bg-white rounded-lg border border-border">
-                <div className="text-center">
-                  <div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <div className="text-muted-foreground">Loading products...</div>
-                </div>
-              </div>
-            ) : products.length === 0 ? (
-              <div className="flex items-center justify-center h-64 bg-white rounded-lg border border-border">
-                <div className="text-center">
-                  <div className="text-6xl mb-4">🍖</div>
-                  <div className="text-foreground font-semibold mb-2">No products found in "{active}"</div>
-                  <div className="text-sm text-muted-foreground mb-4">
-                    Check other categories or try again later.
-                  </div>
-
-                </div>
-              </div>
+              <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full"></div></div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6">
-                {products.map(p => (
-                  <ProductCard key={p.id} p={p} />
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                {filteredProducts.map(p => (
+                   <ProductCard key={p.id} p={p} />
                 ))}
+                {filteredProducts.length === 0 && (
+                   <div className="col-span-full text-center py-10 text-muted-foreground">No products found.</div>
+                )}
               </div>
             )}
-          </div>
+          </main>
         </div>
       </div>
 
@@ -405,6 +239,7 @@ const OutletFoodTreats = ({ initialActive = 'All Food & Treats' }) => {
         onApply={applyFilters}
         total={products.length}
       />
+
       <Footer />
       <MobileBottomNav />
     </div>

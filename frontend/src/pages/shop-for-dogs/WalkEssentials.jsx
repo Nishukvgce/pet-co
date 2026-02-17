@@ -26,38 +26,7 @@ const sampleProducts = [
   { id: 'w3', name: 'Soft Harness', image: '/assets/images/walk/harness1.webp', badges: ['Comfort'], variants: ['M','L'], price: 499 }
 ];
 
-const ProductCard = ({p}) => {
-  const [qty] = useState(1);
-  return (
-    <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm">
-      <div className="p-2 md:p-3">
-        {/* green badge */}
-        <div className="h-6 flex items-center justify-start">
-          <div className="bg-green-500 text-white text-[11px] px-2 py-0.5 rounded-t-md">{p.badges?.[0]}</div>
-        </div>
-        <div className="mt-2 h-36 md:h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
-          <img src={p.image} alt={p.name} className="max-h-32 md:max-h-40 object-contain" />
-        </div>
-        <h3 className="mt-2 text-xs md:text-sm font-semibold text-foreground">{p.name}</h3>
-
-        {/* variant chips */}
-        <div className="mt-2 flex flex-wrap gap-2">
-          {p.variants.map((v,i)=>(
-            <span key={i} className="text-[11px] px-2 py-0.5 border border-border rounded">{v}</span>
-          ))}
-        </div>
-
-        <div className="mt-3 flex items-center justify-between">
-          <div>
-            <div className="text-base md:text-lg font-bold">₹{p.price.toFixed(2)}</div>
-            {p.original && <div className="text-sm text-muted-foreground line-through">₹{p.original}</div>}
-          </div>
-          <button className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm">Add</button>
-        </div>
-      </div>
-    </article>
-  );
-}
+import ProductCard from '../../components/ui/ProductCard';
 export default function WalkEssentials({ initialActive = 'All Walk Essentials' }) {
   const [active, setActive] = useState(initialActive);
   const { getCartItemCount, cartItems } = useCart();

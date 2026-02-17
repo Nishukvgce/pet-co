@@ -9,6 +9,7 @@ import { getFilterConfig, getSortOptions } from '../../data/categoryFilters';
 import productApi from '../../services/productApi';
 import apiClient from '../../services/api';
 import MobileCategorySidebar from '../../components/MobileCategorySidebar';
+import ProductCard from '../../components/ui/ProductCard';
 
 const slugify = (s = '') => String(s || '').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
@@ -443,108 +444,7 @@ const PharmacyCollectionPage = ({ subLabel }) => {
     setFilterOpen(false);
   };
 
-  const ProductCard = ({ p }) => {
-    const [selectedVariant, setSelectedVariant] = useState((p.variants && p.variants[0]) || { label: null, price: null });
-    const inWishlist = isInWishlist(p.id);
-    const displayPrice = (selectedVariant && selectedVariant.price != null) ? selectedVariant.price : Number(p.price || 0);
-    const discountPerc = p.original ? Math.round(((Number(p.original) - displayPrice) / Number(p.original)) * 100) : 0;
-
-    return (
-      <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm relative flex flex-col h-full">
-        {/* Discount badge */}
-        {p.original && discountPerc > 0 && (
-          <div className="absolute left-2 top-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded z-10">{discountPerc}% OFF</div>
-        )}
-
-        {/* Wishlist icon */}
-        <button
-          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-          onClick={(e) => { e.stopPropagation(); e.preventDefault(); if (inWishlist) removeFromWishlist(p.id); else addToWishlist({ id: p.id, name: p.name, price: p.price }); }}
-          className="absolute right-2 top-2 text-gray-500 hover:text-orange-500 bg-white/90 rounded-full p-1.5 shadow-sm z-10"
-        >
-          {inWishlist ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 20.657l-8.828-8.829a4 4 0 010-5.656z" />
-            </svg>
-          )}
-        </button>
-
-        <div className="p-2 md:p-3 flex-1 flex flex-col">
-          {/* Top badge (first badge) */}
-          {p.badges?.[0] && (
-            <div className="h-6 flex items-center justify-start">
-              <div className="bg-green-500 text-white text-[11px] px-2 py-0.5 rounded-t-md">{p.badges?.[0]}</div>
-            </div>
-          )}
-
-          {/* Image */}
-          <div className="mt-2 h-32 md:h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
-            <Link to={`/product-full/${p.id}`} aria-label={`Open ${p.name} full page`} className="block w-full h-full flex items-center justify-center">
-              <img src={p.image} alt={p.name} className="max-h-32 md:max-h-40 object-contain" onError={(e) => { e.target.src = '/assets/images/no_image.png'; }} />
-            </Link>
-          </div>
-
-          {/* Title / Type */}
-          <h3 className="mt-2 text-sm md:text-sm font-semibold text-foreground leading-tight">{p.name}</h3>
-
-          {/* Secondary info: petType / subcategory if available */}
-          <div className="mt-1 text-xs text-muted-foreground flex flex-wrap items-center gap-2">
-            {p.petType && <span className="px-2 py-0.5 bg-gray-100 rounded text-[11px]">{p.petType}</span>}
-            {p.subcategory && <span className="px-2 py-0.5 bg-gray-100 rounded text-[11px]">{p.subcategory}</span>}
-            {/* Pharmacy-specific quick info */}
-            {p.pharmacy?.dosageForm && <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[11px]">{p.pharmacy.dosageForm}</span>}
-            {p.pharmacy?.strength && <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[11px]">{p.pharmacy.strength}</span>}
-          </div>
-
-          {/* Variants */}
-          <div className="mt-2 flex flex-wrap gap-2">
-            {Array.isArray(p.variants) && p.variants.map((v, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedVariant(v)}
-                className={`text-xs px-2 py-1 border border-border rounded ${selectedVariant && selectedVariant.label === v.label ? 'bg-orange-500 text-white' : 'bg-white'}`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="leading-tight">{v.label}</span>
-                  {v.price != null && <span className="text-[11px] text-muted-foreground">₹{Number(v.price).toFixed(0)}</span>}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer: price + add button fixed to bottom of card */}
-        <div className="p-2 md:p-3 border-t bg-white flex items-center justify-between">
-          <div>
-            <div className="text-base md:text-lg font-bold">₹{Number(displayPrice || 0).toFixed(2)}</div>
-            {p.original ? <div className="text-sm text-muted-foreground line-through">₹{Number(p.original).toFixed(2)}</div> : null}
-          </div>
-
-          <button
-            onClick={() => addToCart({
-              id: p.id,
-              productId: p.id,
-              variantId: selectedVariant?.originalVariant?.id || selectedVariant?.id || 'default',
-              name: p.name,
-              image: p.image,
-              price: displayPrice,
-              originalPrice: p.original || displayPrice,
-              variant: selectedVariant?.label || 'Default',
-              category: 'Pharmacy',
-              brand: p.brand || ''
-            }, 1)}
-            className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm shadow-md"
-          >
-            Add
-          </button>
-        </div>
-      </article>
-    );
-  };
+// ProductCard is now imported from components/ui/ProductCard
 
   return (
     <>

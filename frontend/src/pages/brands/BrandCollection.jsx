@@ -30,115 +30,8 @@ const resolveCanonicalBrand = (slugOrName='') => {
   return BRAND_SYNONYMS[slug] || slugOrName;
 };
 
-const resolveImage = (product) => {
-  let candidate = product?.images?.[0]?.url || product?.imageUrl || product?.image || '';
-  if (!candidate) return '/assets/images/no_image.png';
-  if (/^(https?:)?\/\//i.test(candidate) || candidate.startsWith('data:')) return candidate;
-  if (/^[a-zA-Z]:\\/.test(candidate) || candidate.includes('\\')) {
-    const parts = candidate.split(/\\|\//);
-    candidate = parts[parts.length - 1];
-  }
-  if (/^[^/]+\.[a-zA-Z0-9]+$/.test(candidate)) candidate = `/admin/products/images/${candidate}`;
-  const base = apiClient?.defaults?.baseURL || '';
-  return candidate.startsWith('http') ? candidate : `${base}${candidate.startsWith('/') ? candidate : `/${candidate}`}`;
-};
-
-const ProductCard = ({ p }) => {
-  const { addToCart } = useCart();
-  const img = resolveImage(p);
-  const name = p?.name || 'Unnamed Product';
-  const brand = p?.brand || p?.metadata?.brand || '';
-  const variants = Array.isArray(p?.variants) && p.variants.length ? p.variants : [{ id:'default', weight: p?.weight || p?.size || 'Default', price: p?.price ?? p?.mrp ?? 0, originalPrice: p?.originalPrice || p?.mrp }];
-  const [idx, setIdx] = useState(0);
-  const v = variants[idx] || variants[0];
-  const currentPrice = Number(v?.price ?? p?.price ?? 0);
-  const originalPrice = Number(v?.originalPrice ?? p?.originalPrice ?? 0);
-  const discount = originalPrice > currentPrice ? Math.round(100 - (currentPrice / originalPrice) * 100) : 0;
-  // Ratings: prefer backend-provided fields; avoid hard-coded fallback
-  const ratingValue = (
-    typeof p?.rating === 'number' ? p.rating :
-    typeof p?.averageRating === 'number' ? p.averageRating :
-    (p?.reviews && typeof p.reviews?.avg === 'number' ? p.reviews.avg : null)
-  );
-  const ratingCount = (
-    typeof p?.ratingCount === 'number' ? p.ratingCount :
-    (Array.isArray(p?.reviews) ? p.reviews.length :
-      (p?.reviews && typeof p.reviews?.count === 'number' ? p.reviews.count : null))
-  );
-  const inStock = p?.inStock !== false;
-
-  const onAdd = () => {
-    try {
-      addToCart({ id: p.id, productId: p.id, variantId: v?.id || `v${idx}`, name: p.name, variant: v?.weight || v?.size || '', price: currentPrice, image: img, category: p.category, subcategory: p.subcategory, brand: p.brand }, 1);
-    } catch {}
-  };
-
-  return (
-    <article className="bg-white rounded-lg border border-border overflow-hidden shadow hover:shadow-lg transition-shadow">
-      <div className="p-3">
-        <div className="relative">
-          <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
-            {discount > 0 && <div className="bg-red-600 text-white text-[11px] px-2 py-0.5 rounded">{discount}% OFF</div>}
-          </div>
-          <div className="mt-2 h-56 md:h-64 flex items-center justify-center bg-[#f6f8fb] rounded-lg overflow-hidden shadow-sm">
-            {img && <img src={img} alt={name} className="max-h-56 md:max-h-64 object-contain relative z-0" onError={(e)=>{e.currentTarget.src='/assets/images/no_image.png';}} />}
-            <Link to={`/product-full/${p.id}`} className="absolute inset-0 z-10" aria-label={`Open ${name} full page`} />
-          </div>
-        </div>
-        <div className="mt-3">
-          <h3 className="text-sm font-semibold text-foreground line-clamp-2">{name}</h3>
-          <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
-            {brand && <span>by {brand}</span>}
-            {p.subcategory && <span className="text-right">{p.subcategory}</span>}
-          </div>
-          <div className="mt-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {ratingValue != null && (
-                <div className="flex items-center text-yellow-500">
-                  <Star size={14} />
-                  <span className="text-sm text-foreground ml-1">{Number(ratingValue).toFixed(1)}</span>
-                  {ratingCount != null && (
-                    <span className="text-xs text-muted-foreground ml-2">({ratingCount})</span>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-bold">₹{currentPrice.toFixed(2)}</div>
-              {originalPrice > currentPrice && (
-                <div className="text-sm text-muted-foreground line-through">₹{originalPrice.toFixed(2)}</div>
-              )}
-            </div>
-          </div>
-          {variants.length > 1 && (
-            <div className="mt-3">
-              <div className="text-xs text-muted-foreground mb-2">Available sizes/weights:</div>
-              <div className="flex flex-wrap gap-2">
-                {variants.map((opt, i) => {
-                  const label = opt?.weight || opt?.size || opt?.label || `#${i+1}`;
-                  const pz = Number(opt?.price ?? currentPrice);
-                  const active = i === idx;
-                  return (
-                    <button key={i} onClick={()=>setIdx(i)} className={`text-[12px] px-3 py-1 border rounded flex flex-col items-center ${active ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-foreground border-border hover:border-orange-300'}`}>
-                      <span>{label}</span>
-                      {!!pz && <span className="text-[10px] font-semibold">₹{pz.toFixed(0)}</span>}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-          <div className="mt-4 flex items-center justify-between">
-            <button onClick={onAdd} disabled={!inStock} className={`px-4 py-2 rounded-full text-sm shadow ${inStock ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
-              {inStock ? 'Add to Cart' : 'Out of Stock'}
-            </button>
-            <Link to={`/product-full/${p.id}`} className="text-xs text-primary hover:underline ml-4">View details</Link>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-};
+import ProductCard from '../../components/ui/ProductCard';
+import { resolveImageUrl } from '../../lib/imageUtils';
 
 const BrandCollection = () => {
   const { brandSlug } = useParams();
@@ -161,7 +54,10 @@ const BrandCollection = () => {
         const filtered = (Array.isArray(data) ? data : []).filter(p => {
           const b = p?.brand || p?.metadata?.brand || (p?.filters?.brands?.[0]) || '';
           return norm(b) === wanted;
-        });
+        }).map(p => ({
+          ...p,
+          image: resolveImageUrl(p)
+        }));
         if (mounted) setItems(filtered);
       } catch (e) {
         setError(e.message || 'Failed to load products');

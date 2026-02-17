@@ -24,34 +24,7 @@ const sampleProducts = [
   { id: 'b3', name: 'Plush Blanket', image: '/assets/images/bedding/blanket1.webp', badges: ['Soft'], variants: ['One Size'], price: 299 }
 ];
 
-const ProductCard = ({ p }) => {
-  const [qty] = useState(1);
-  return (
-    <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm">
-      <div className="p-3">
-        <div className="h-8 flex items-center justify-start">
-          <div className="bg-green-500 text-white text-xs px-3 py-1 rounded-t-md">{p.badges?.[0]}</div>
-        </div>
-        <div className="mt-3 h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
-          <img src={resolveImageUrl(p.image) || '/assets/images/no_image.png'} alt={p.name} className="max-h-40 object-contain" />
-        import { resolveImageUrl } from '../../lib/imageUtils';
-        </div>
-        <h3 className="mt-3 text-sm font-semibold text-foreground">{p.name}</h3>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {p.variants.map((v, i) => (
-            <span key={i} className="text-xs px-2 py-1 border border-border rounded">{v}</span>
-          ))}
-        </div>
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <div className="text-lg font-bold">₹{p.price.toFixed(2)}</div>
-          </div>
-          <button className="bg-orange-500 text-white px-4 py-2 rounded-full">Add</button>
-        </div>
-      </div>
-    </article>
-  );
-};
+import ProductCard from '../../components/ui/ProductCard';
 
 export default function DogBedding({ initialActive = 'All Dog Bedding' }) {
   const [active, setActive] = useState(initialActive);

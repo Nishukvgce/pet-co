@@ -336,6 +336,34 @@ const outletTrainingSections = [
   buildSection('materials', 'Material', ['Plastic', 'Metal', 'Wood', 'Rubber'])
 ];
 
+const outletGroomingSections = [
+  buildSection('brands', 'Brand', ['Trixie', 'Wahl', 'Andis', 'Bio-Groom', 'Pet and Co']),
+  buildSection('productTypes', 'Type', ['Brush', 'Comb', 'Shampoo', 'Conditioner', 'Tool']),
+  buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+'])
+];
+
+const outletFeedingSections = [
+  buildSection('brands', 'Brand', ['Trixie', 'Outward Hound', 'Loving Pets', 'Pet and Co']),
+  buildSection('materials', 'Material', ['Stainless Steel', 'Plastic', 'Ceramic', 'Silicone']),
+  buildSection('sizes', 'Size', ['S', 'M', 'L', 'XL']),
+  buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+'])
+];
+
+const outletBedsSections = [
+  buildSection('brands', 'Brand', ['Trixie', 'PawHut', 'Best Friends', 'Pet and Co']),
+  buildSection('materials', 'Material', ['Plush', 'Memory Foam', 'Cotton', 'Polyester']),
+  buildSection('sizes', 'Size', ['S', 'M', 'L', 'XL', 'XXL']),
+  buildSection('priceRanges', 'Price', ['INR 500 - INR 1500', 'INR 1501 - INR 3000', 'INR 3000+'])
+];
+
+const outletWalkingSections = [
+  buildSection('brands', 'Brand', ['Trixie', 'Flexi', 'Julius-K9', 'Pet and Co']),
+  buildSection('productTypes', 'Type', ['Collar', 'Leash', 'Harness']),
+  buildSection('materials', 'Material', ['Nylon', 'Leather', 'Polyester', 'Metal']),
+  buildSection('sizes', 'Size', ['XS', 'S', 'M', 'L', 'XL']),
+  buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+'])
+];
+
 export const CATEGORY_FILTERS = {
   dogs: {
     label: 'Dogs',
@@ -390,12 +418,13 @@ export const CATEGORY_FILTERS = {
       food: buildSubcategoryConfig('Outlet Food', outletFoodSections),
       toys: buildSubcategoryConfig('Outlet Toys', outletToysSections),
       training: buildSubcategoryConfig('Outlet Training', outletTrainingSections),
-      feeding: buildSubcategoryConfig('Outlet Feeding', dogBowlsSections),
-      beds: buildSubcategoryConfig('Outlet Beds', dogBedsSections),
+      feeding: buildSubcategoryConfig('Outlet Feeding', outletFeedingSections),
+      beds: buildSubcategoryConfig('Outlet Beds', outletBedsSections),
       travel: buildSubcategoryConfig('Outlet Travel', dogTravelSections),
       accessories: buildSubcategoryConfig('Outlet Accessories', catCollarsAccessorySections),
-      walking: buildSubcategoryConfig('Outlet Walking', dogWalkSections),
-      grooming: buildSubcategoryConfig('Outlet Grooming', dogGroomingSections),
+      walking: buildSubcategoryConfig('Outlet Walking', outletWalkingSections),
+      grooming: buildSubcategoryConfig('Outlet Grooming', outletGroomingSections),
+      litter: buildSubcategoryConfig('Outlet Litter', catLitterSuppliesSections),
       all: buildSubcategoryConfig('All Outlet', outletFoodSections)
     }
   }

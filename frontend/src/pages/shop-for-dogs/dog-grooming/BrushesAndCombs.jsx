@@ -8,20 +8,7 @@ const sampleProducts = [
   { id: 'g5', name: 'Round Slicker Brush', image: '/assets/images/grooming/brush-product.webp', badges: [], variants: ['Medium'], price: 349 }
 ];
 
-const ProductCard = ({ p }) => (
-  <article className="bg-white rounded-lg border border-border overflow-hidden shadow-sm">
-    <div className="p-2 md:p-3">
-      <div className="mt-2 h-36 md:h-44 flex items-center justify-center bg-[#f6f8fb] rounded">
-        <img src={p.image} alt={p.name} className="max-h-32 md:max-h-40 object-contain" />
-      </div>
-      <h3 className="mt-2 text-xs md:text-sm font-semibold text-foreground">{p.name}</h3>
-      <div className="mt-3 flex items-center justify-between">
-        <div className="text-base md:text-lg font-bold">₹{p.price.toFixed(2)}</div>
-        <button className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm">Add</button>
-      </div>
-    </div>
-  </article>
-);
+import ProductCard from '../../../components/ui/ProductCard';
 
 export default function BrushesAndCombs() {
   const { getCartItemCount, cartItems } = useCart();
