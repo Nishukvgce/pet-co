@@ -173,7 +173,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-[#0b1620] p-6 rounded">
             <h3 className="text-center font-semibold text-lg">Free Shipping</h3>
-            <p className="text-center text-sm text-orange-500 mt-2">On all orders above ₹699</p>
+            <p className="text-center text-sm text-orange-500 mt-2">On all orders above ₹499</p>
           </div>
           <div className="bg-[#0b1620] p-6 rounded">
             <h3 className="text-center font-semibold text-lg">Free Returns</h3>

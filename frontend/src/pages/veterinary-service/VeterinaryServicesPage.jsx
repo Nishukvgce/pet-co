@@ -5,9 +5,11 @@ import Header from '../../components/ui/Header';
 import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import Icon from '../../components/AppIcon';
+import { useAuth } from '../../contexts/AuthContext';
 
 const VeterinaryServicesPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const veterinaryServices = [
     {
@@ -70,6 +72,17 @@ const VeterinaryServicesPage = () => {
   ];
 
   const handleServiceSelect = (service) => {
+    // Check if user is authenticated before allowing booking
+    if (!user) {
+      navigate('/user-login', {
+        state: {
+          from: '/veterinary-service',
+          message: 'Please sign in to access veterinary services'
+        }
+      });
+      return;
+    }
+    
     navigate(service.path);
   };
 

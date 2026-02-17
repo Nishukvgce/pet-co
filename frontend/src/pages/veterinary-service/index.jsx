@@ -110,6 +110,18 @@ const VeterinaryService = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if user is authenticated before allowing form submission
+    if (!user) {
+      navigate('/user-login', {
+        state: {
+          from: `/veterinary-service/${serviceType}`,
+          message: 'Please sign in to book veterinary services'
+        }
+      });
+      return;
+    }
+    
     setLoading(true);
     setError('');
 

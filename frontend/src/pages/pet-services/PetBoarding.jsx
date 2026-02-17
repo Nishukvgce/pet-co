@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
@@ -8,10 +9,13 @@ import Button from '../../components/ui/Button';
 import BookingForm from './components/BookingForm';
 import BoardingPlanCard from './components/BoardingPlanCard';
 import AppImage from '../../components/AppImage';
+import { useAuth } from '../../contexts/AuthContext';
 
 const PetBoardingPage = () => {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const defaultService = {
     name: 'Pet Boarding',
@@ -62,6 +66,17 @@ const PetBoardingPage = () => {
                 { name: 'Overnight', subtitle: 'Upto 24 hours', price: 899, petType: 'dog', duration: 'Up to 24 hours' },
               ]}
               onSelectPlan={(p) => {
+                // Check if user is authenticated before allowing booking
+                if (!user) {
+                  navigate('/user-login', {
+                    state: {
+                      from: '/pet-boarding',
+                      message: 'Please sign in to book pet boarding services'
+                    }
+                  });
+                  return;
+                }
+                
                 setSelectedPlan({
                   name: `${p.petType === 'cat' ? 'Cat' : 'Dog'} Boarding - ${p.name}`,
                   serviceType: `${p.petType}-boarding`,
@@ -83,6 +98,17 @@ const PetBoardingPage = () => {
                 { name: 'Overnight', subtitle: 'Upto 24 hours', price: 649, petType: 'cat', duration: 'Up to 24 hours' },
               ]}
               onSelectPlan={(p) => {
+                // Check if user is authenticated before allowing booking
+                if (!user) {
+                  navigate('/user-login', {
+                    state: {
+                      from: '/pet-boarding',
+                      message: 'Please sign in to book pet boarding services'
+                    }
+                  });
+                  return;
+                }
+                
                 setSelectedPlan({
                   name: `${p.petType === 'cat' ? 'Cat' : 'Dog'} Boarding - ${p.name}`,
                   serviceType: `${p.petType}-boarding`,
@@ -219,6 +245,17 @@ const PetBoardingPage = () => {
               size="lg"
               iconName="Calendar"
               onClick={() => {
+                // Check if user is authenticated before allowing booking
+                if (!user) {
+                  navigate('/user-login', {
+                    state: {
+                      from: '/pet-boarding',
+                      message: 'Please sign in to book pet boarding services'
+                    }
+                  });
+                  return;
+                }
+                
                 setSelectedPlan(selectedPlan || defaultService);
                 setShowBookingForm(true);
               }}

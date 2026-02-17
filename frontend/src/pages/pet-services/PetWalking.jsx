@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
@@ -7,11 +8,14 @@ import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import AppImage from '../../components/AppImage';
 import WalkingBookingForm from './components/WalkingBookingForm';
+import { useAuth } from '../../contexts/AuthContext';
 
 const PetWalkingPage = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [expandedReviews, setExpandedReviews] = useState({});
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
   const walkingOptions = [
     { name: 'Quick Walk - 30 mins', serviceType: 'pet-walking', price: 199, duration: '30 minutes', description: 'Perfect for busy schedules' },
@@ -19,7 +23,23 @@ const PetWalkingPage = () => {
     { name: 'Extended Walk - 60 mins', serviceType: 'pet-walking', price: 349, duration: '60 minutes', description: 'Maximum exercise & exploration' },
   ];
   
-  const handleBook = (service) => { setSelectedService(service); setShowBookingForm(true); };
+  const handleBook = (service) => { 
+    // Check if user is authenticated before allowing booking
+    if (!user) {
+      // Redirect to login with return URL and custom message
+      navigate('/user-login', {
+        state: {
+          from: '/pet-walking',
+          message: 'Please sign in to book pet walking services',
+          serviceToBook: service
+        }
+      });
+      return;
+    }
+    
+    setSelectedService(service); 
+    setShowBookingForm(true); 
+  };
   const toggleReviewExpansion = (index) => {
     setExpandedReviews(prev => ({
       ...prev,

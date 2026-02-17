@@ -295,12 +295,12 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           {/* Secondary menu items with badges */}
           <ul className="space-y-2 px-1">
             {[
-              { label: 'PET&CO Outlet Sale', path: '/shop-for-outlet', badge: '60% Off', icon: '/assets/images/dog/b1.webp' },
+              // { label: 'PET&CO Outlet Sale', path: '/shop-for-outlet', badge: '60% Off', icon: '/assets/images/dog/b1.webp' },
               { label: 'PET&CO Spa', path: '/spa', badge: 'App Exclusive', icon: '/assets/images/dog/grooming.webp' },
               { label: 'PET&CO Hub', path: '/hub', icon: '/assets/images/dog/pt1.webp' },
               { label: 'Store & Spa Locator', path: '/locator', icon: '/assets/images/essential/GPS.png' },
               { label: 'Become a Franchisee', path: '/franchise', icon: '/assets/images/dog/dg3.webp' },
-              { label: 'Join our Birthday Club', path: '/birthday', icon: '/assets/images/essential/dog_birthday.jpg' }
+              // { label: 'Join our Birthday Club', path: '/birthday', icon: '/assets/images/essential/dog_birthday.jpg' }
             ].map((it, i) => (
               <li key={i}>
                 <button
@@ -333,7 +333,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           <div className="mt-6 px-3 pb-6 border-t border-border">
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="/adopt-a-pet" onClick={onClose}>Adopt a Pet</a></li>
-              <li><a href="/track-order" onClick={onClose}>Track Order</a></li>
+              {/* <li><a href="/track-order" onClick={onClose}>Track Order</a></li> */}
               <li><a href="/contact" onClick={onClose}>Contact Us</a></li>
               <li><a href="/faqs" onClick={onClose}>FAQs & Exchange Policy</a></li>
             </ul>

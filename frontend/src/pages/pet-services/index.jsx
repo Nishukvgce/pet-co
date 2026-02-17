@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Footer from '../homepage/components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
@@ -8,12 +9,28 @@ import ServicePackages from './components/ServicePackages';
 import BookingForm from './components/BookingForm';
 import ServiceHero from './components/ServiceHero';
 import AdditionalServices from './components/AdditionalServices';
+import { useAuth } from '../../contexts/AuthContext';
 
 const PetServicesPage = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleBookService = (service) => {
+    // Check if user is authenticated before allowing booking
+    if (!user) {
+      // Redirect to login with return URL and custom message
+      navigate('/user-login', {
+        state: {
+          from: '/pet-services',
+          message: 'Please sign in to book pet grooming services',
+          serviceToBook: service
+        }
+      });
+      return;
+    }
+    
     setSelectedService(service);
     setShowBookingForm(true);
   };
@@ -151,7 +168,18 @@ const PetServicesPage = () => {
                 Call 90080 03096⁩
               </a>
               <button 
-                onClick={() => setShowBookingForm(true)}
+                onClick={() => {
+                  if (!user) {
+                    navigate('/user-login', {
+                      state: {
+                        from: '/pet-services',
+                        message: 'Please sign in to book pet grooming services'
+                      }
+                    });
+                    return;
+                  }
+                  setShowBookingForm(true);
+                }}
                 className="flex items-center gap-2 border border-primary text-primary px-6 py-3 rounded-lg hover:bg-primary/10 transition-colors"
               >
                 <Icon name="Calendar" size={18} />
