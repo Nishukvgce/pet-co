@@ -57,6 +57,7 @@ import PetBoardingPage from './pages/pet-services/PetBoarding';
 import PetWalkingPage from './pages/pet-services/PetWalking';
 import PetCoOutletPage from './pages/pet-services/PetCoOutlet';
 import BrandCollection from './pages/brands/BrandCollection';
+import FranchiseDetails from './pages/franchise-details';
 
 // Outlet components
 import ShopForOutletIndex from './pages/shop-for-outlet/ShopForOutletIndex';
@@ -547,7 +548,8 @@ function App() {
                 <Route path="/spa" element={<ComingSoon title="PET&CO Spa" message="Pet grooming and spa services coming soon!" />} />
                 <Route path="/hub" element={<ComingSoon title="PET&CO Hub" message="Community hub for pet lovers coming soon!" />} />
                 <Route path="/locator" element={<ComingSoon title="Store & Spa Locator" message="Find stores and spa locations near you - coming soon!" />} />
-                <Route path="/franchise" element={<ComingSoon title="Become a Franchisee" message="Franchise opportunities coming soon!" />} />
+                <Route path="/locator" element={<ComingSoon title="Store & Spa Locator" message="Find stores and spa locations near you - coming soon!" />} />
+                <Route path="/franchise-details" element={<FranchiseDetails />} />
                 <Route path="/birthday" element={<ComingSoon title="Birthday Club" message="Join our birthday club for special treats - coming soon!" />} />
                 {/* replaced by dedicated PetBoardingPage route above */}
                 <Route path="/adopt-a-pet" element={<ComingSoon title="Adopt a Pet" message="Pet adoption services coming soon!" />} />

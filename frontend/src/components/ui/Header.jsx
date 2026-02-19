@@ -408,11 +408,11 @@ const Header = ({ onSearch = () => { } }) => {
         <div className={`hidden lg:block bg-[#d4af37] text-[#0f1724] py-2 text-sm`}>
           <div className="container mx-auto px-4 flex items-center justify-between">
             <div className="flex items-center space-x-6">
-              <a className="hover:underline" href="#">Become a Franchisee</a>
+              <Link className="hover:underline" to="/franchise-details">Become a Franchisee</Link>
               <span className="text-white/60">|</span>
-              <a className="hover:underline" href="#">Store Locator</a>
+              <Link className="hover:underline" to="/locator">Store Locator</Link>
               <span className="text-white/60">|</span>
-              <a className="hover:underline" href="#">Track Order</a>
+              <Link className="hover:underline" to="/track-order">Track Order</Link>
             </div>
             <div className="hidden sm:flex items-center text-sm font-medium">
               <span>GST 2.0 Reforms</span>
