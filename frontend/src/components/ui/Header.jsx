@@ -858,6 +858,35 @@ const Header = ({ onSearch = () => { } }) => {
                   <span className="bg-[#ff7a00] text-white text-xs font-semibold px-2 py-0.5 rounded">60% Off</span>
                   <Icon name={isMegaMenuOpen && activeMegaCategory === 'outlet' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
+
+                <button
+                  className={`flex items-center gap-1 text-sm font-medium ${activeMegaCategory === 'hub' ? 'text-primary' : 'text-foreground'} hover:text-primary`}
+                  onClick={() => {
+                    const willOpen = !(isMegaMenuOpen && activeMegaCategory === 'hub');
+                    setActiveMegaCategory(willOpen ? 'hub' : null);
+                    setIsMegaMenuOpen(willOpen);
+                  }}
+                >
+                  <span>PET&CO Hub</span>
+                  <Icon name={isMegaMenuOpen && activeMegaCategory === 'hub' ? 'ChevronUp' : 'ChevronDown'} size={16} />
+                </button>
+
+                <Link 
+                  to="/pet-spa"
+                  className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
+                >
+                  <span>PET&CO Spa</span>
+                  <span className="bg-[#ff7a00] text-white text-xs font-semibold px-2 py-0.5 rounded">App Exclusive</span>
+                </Link>
+
+                <Link 
+                  to="/birthday-club"
+                  className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
+                >
+                  <span>Join our Birthday Club</span>
+                </Link>
+
+               
               </div>
 
               {/* Brand badges removed as requested */}

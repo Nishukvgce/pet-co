@@ -95,6 +95,55 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
         { label: 'Supplements', path: '/pharmacy/supplements', subs: ['Vitamins & Minerals','Joint Supplements','Probiotics & Gut Health','Skin & Coat Supplements','All Supplements'] },
         { label: 'Prescription Food', path: '/pharmacy/prescription-food', subs: ['Renal Support','Hypoallergenic Diets','Digestive Support','Weight Management','All Prescription Food'] }
       ]
+    },
+    {
+      key: 'hub',
+      label: 'PET&CO Hub',
+      icon: '/assets/images/dog/dg5.webp',
+      children: [
+        { 
+          label: 'Adopt a Pet', 
+          path: '/adopt-pet',
+          icon: '/assets/images/dog/dg1.webp',
+          description: 'Find your forever friend and give them a loving home'
+        },
+        { 
+          label: 'PET&CO Foundation', 
+          path: '/PET&CO-foundation',
+          icon: '/assets/images/essential/veterinary.png',
+          description: 'Creating a better world for animals in need, one step at a time'
+        },
+        { 
+          label: 'Learn With PET&CO', 
+          path: '/learn-with-PET&CO',
+          icon: '/assets/images/dog/dg7.webp',
+          description: 'Expert tips and guides for happy, healthy pets'
+        },
+        { 
+          label: 'Store & Spa Locator', 
+          path: '/store-locator',
+          icon: '/assets/images/branding/logo.png',
+          description: 'Discover PET&CO stores and pet spas near you'
+        }
+      ]
+    },
+    {
+      key: 'spa',
+      label: 'PET&CO Spa',
+      path: '/pet-spa',
+      icon: '/assets/images/essential/spa.png'
+    },
+    {
+      key: 'birthday-club',
+      label: 'Join our Birthday Club',
+      path: '/birthday-club',
+      icon: '/assets/images/essential/birthday.png'
+    },
+    {
+      key: 'franchise',
+      label: 'Become a Franchisee',
+      path: '/franchise',
+      icon: '/assets/images/branding/franchise.png'
     }
   ];
 
@@ -710,6 +759,76 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">Comprehensive veterinary care and health checkups</p>
+                </Link>
+              </div>
+            </div>
+          ) : activeCategory === 'hub' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-6">
+              <div className="bg-gradient-to-br from-orange-50 to-amber-50 p-6 rounded-xl border border-orange-100 hover:shadow-lg transition-all duration-300">
+                <Link to="/adopt-pet" onClick={onClose} className="block group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                      <span className="text-2xl">🐕</span>
+                    </div>
+                    <h4 className="text-lg font-semibold text-foreground group-hover:text-orange-600">Adopt a Pet</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                    Find your forever friend and give them a loving home.
+                  </p>
+                  <span className="text-sm text-orange-600 font-medium group-hover:text-orange-700">
+                    Learn More →
+                  </span>
+                </Link>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100 hover:shadow-lg transition-all duration-300">
+                <Link to="/huft-foundation" onClick={onClose} className="block group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                      <span className="text-2xl">❤️</span>
+                    </div>
+                    <h4 className="text-lg font-semibold text-foreground group-hover:text-blue-600">PET&CO Foundation</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                    Creating a better world for animals in need, one step at a time.
+                  </p>
+                  <span className="text-sm text-blue-600 font-medium group-hover:text-blue-700">
+                    Learn More →
+                  </span>
+                </Link>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-100 hover:shadow-lg transition-all duration-300">
+                <Link to="/learn-with-huft" onClick={onClose} className="block group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                      <span className="text-2xl">📚</span>
+                    </div>
+                    <h4 className="text-lg font-semibold text-foreground group-hover:text-green-600">Learn With PET&CO</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                    Expert tips and guides for happy, healthy pets.
+                  </p>
+                  <span className="text-sm text-green-600 font-medium group-hover:text-green-700">
+                    Learn More →
+                  </span>
+                </Link>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-100 hover:shadow-lg transition-all duration-300">
+                <Link to="/store-locator" onClick={onClose} className="block group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                      <span className="text-2xl">📍</span>
+                    </div>
+                    <h4 className="text-lg font-semibold text-foreground group-hover:text-purple-600">Store & Spa Locator</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                    Discover PET&CO stores and pet spas near you.
+                  </p>
+                  <span className="text-sm text-purple-600 font-medium group-hover:text-purple-700">
+                    Learn More →
+                  </span>
                 </Link>
               </div>
             </div>

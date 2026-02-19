@@ -50,6 +50,7 @@ import DogPharmacyPage from './pages/pharmacy/dogs';
 import CatPharmacyPage from './pages/pharmacy/cats';
 import PharmacyCollectionPage from './pages/pharmacy/PharmacyCollectionPage';
 import PetServicesPage from './pages/pet-services';
+import AdoptPetPage from './pages/adopt-pet';
 import ComingSoon from './pages/ComingSoon';
 import PetBoardingPage from './pages/pet-services/PetBoarding';
 import PetWalkingPage from './pages/pet-services/PetWalking';
@@ -150,6 +151,7 @@ function App() {
                 
                 {/* Pet Services */}
                 <Route path="/pet-services" element={<PetServicesPage />} />
+                <Route path="/adopt-pet" element={<AdoptPetPage />} />
                 
                 {/* Service Routes - Users can view pages but need auth for booking */}
                 <Route path="/veterinary-service" element={<VeterinaryServicesPage />} />
