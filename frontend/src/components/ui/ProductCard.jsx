@@ -109,9 +109,28 @@ const ProductCard = ({ p }) => {
 
   // Image fallback
   const getImageUrl = (imageUrl) => {
+    const apiBase = import.meta.env?.VITE_API_BASE_URL || '';
+    const apiOrigin = apiBase ? apiBase.replace(/\/api\/?$/, '') : '';
+
+    if (!imageUrl) return '/assets/images/no_image.png';
+
+    // If imageUrl is an object (some API shapes), try common fields
+    if (typeof imageUrl === 'object') {
+      imageUrl = imageUrl.url || imageUrl.path || imageUrl.imageUrl || '';
+    }
+
     if (!imageUrl) return '/assets/images/no_image.png';
     if (imageUrl.startsWith('http')) return imageUrl;
-    if (imageUrl.startsWith('/admin/')) return `http://localhost:8080${imageUrl}`;
+    if (imageUrl.startsWith('//')) return window.location.protocol + imageUrl;
+
+    // Absolute path on backend (e.g. /uploads/..., /admin/...) -> prefix with API origin when available
+    if (imageUrl.startsWith('/')) {
+      return apiOrigin ? `${apiOrigin}${imageUrl}` : imageUrl;
+    }
+
+    // Relative paths (e.g. uploads/...) -> try prefixing with API origin
+    if (apiOrigin) return `${apiOrigin}/${imageUrl}`;
+
     return imageUrl;
   };
 

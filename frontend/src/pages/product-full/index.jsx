@@ -13,6 +13,8 @@ import productApi from '../../services/productApi';
 import dataService from '../../services/dataService';
 import apiClient from '../../services/api';
 import { extractAllProductImages } from '../../lib/productImageUtils';
+import Footer from '../homepage/components/Footer';
+import MobileBottomNav from '../../components/ui/MobileBottomNav';
 
 const ProductFullPage = () => {
   const params = useParams();
@@ -393,6 +395,9 @@ const ProductFullPage = () => {
           </div>
         </div>
       </section>
+      {/* Footer */}
+      <Footer />
+      <MobileBottomNav />
     </div>
   );
 };

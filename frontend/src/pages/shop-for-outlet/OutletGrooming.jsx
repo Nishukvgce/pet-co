@@ -7,6 +7,7 @@ import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import { useCart } from '../../contexts/CartContext';
 import productApi from '../../services/productApi';
 import ProductCard from '../../components/ui/ProductCard';
+import { normalizeProductFromApi } from '../../utils/productUtils';
 import FilterDrawer from '../../components/FilterDrawer';
 import { getFilterSections } from '../../data/categoryFilters';
 
@@ -83,25 +84,16 @@ const OutletGrooming = ({ initialActive = 'All Grooming & Care' }) => {
         const params = { type: 'Outlet', ...appliedFilters };
         const apiData = await productApi.getCustomerProducts(params);
 
-        const normalized = (apiData || []).map(item => ({
-          id: item?.id,
-          name: item?.name,
-          image: item?.imageUrl || (item?.images?.[0]) || '/assets/images/no_image.png',
-          badges: item?.badges || ['Outlet'],
-          variants: item?.variants?.length ? item.variants : [{
-            weight: 'Default',
-            price: Number(item?.price || 0),
-            originalPrice: Number(item?.originalPrice || item?.mrp || 0),
-            stock: item?.stockQuantity || 0
-          }],
-          price: Number(item?.price || 0),
-          original: Number(item?.originalPrice || item?.mrp || 0) || null,
-          category: item?.category || '',
-          subcategory: item?.subcategory || '',
-          brand: item?.brand || '',
-          stockQuantity: item?.stockQuantity || 0
-        }));
-        
+        const normalized = (apiData || []).map(item => {
+          const np = normalizeProductFromApi(item || {});
+          const fallbackImage = Array.isArray(np.images) ? (typeof np.images[0] === 'object' ? (np.images[0].url || np.images[0].path || np.images[0].imageUrl) : np.images[0]) : undefined;
+          return {
+            ...np,
+            id: np.id || item?.id,
+            image: np.imageUrl || np.image || fallbackImage || '/assets/images/no_image.png'
+          };
+        });
+
         setProducts(normalized);
       } catch (err) {
         console.error('Outlet Grooming: load failed', err);
