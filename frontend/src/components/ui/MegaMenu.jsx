@@ -181,45 +181,45 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
         onClick={() => closeWithAnimation()}
       />
 
-      {/* Mobile Left Drawer (exact layout per reference) */}
-      <aside className={`fixed inset-y-0 left-0 w-80 bg-white z-[1002] lg:hidden shadow-2xl overflow-y-auto transform transition-transform duration-200 ${visible ? 'translate-x-0' : '-translate-x-full'}`}>
+      {/* Mobile Left Drawer (enhanced mobile responsiveness) */}
+      <aside className={`fixed inset-y-0 left-0 w-80 bg-white z-[1002] lg:hidden shadow-2xl overflow-y-auto transform transition-transform duration-300 ${visible ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Blue gradient header */}
-        <div className="px-4 py-3" style={{ background: 'linear-gradient(180deg,#0b66b2,#0f4a8a)' }}>
+        <div className="px-4 py-4" style={{ background: 'linear-gradient(180deg,#0b66b2,#0f4a8a)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               {mobileStack.length > 1 && (
-                <button onClick={popMobileView} aria-label="Back" className="text-white text-lg mr-3">←</button>
+                <button onClick={popMobileView} aria-label="Back" className="text-white text-lg mr-3 hover:text-orange-200 transition-colors">←</button>
               )}
               <h3 className="text-white text-sm font-semibold">{mobileStack.length > 1 ? currentMobileView.title : 'Dog Toys = Daily Joy'}</h3>
             </div>
-            <button onClick={onClose} aria-label="Close menu" className="text-white text-2xl leading-none">×</button>
+            <button onClick={onClose} aria-label="Close menu" className="text-white text-2xl leading-none hover:text-orange-200 transition-colors">×</button>
           </div>
         </div>
 
         {/* Primary category list with icons (mobile nested drawer) */}
-        <nav className="px-3 py-3">
+        <nav className="px-4 py-4">
           {(() => {
             const current = mobileStack[mobileStack.length - 1] || { title: 'Menu', items: null };
             return (
               <div>
-                <div className="flex items-center mb-2">
+                <div className="flex items-center mb-4">
                   {mobileStack.length > 1 ? (
-                    <button onClick={popMobileView} className="mr-2 text-sm text-foreground">←</button>
+                    <button onClick={popMobileView} className="mr-2 text-sm text-primary hover:text-primary/80 transition-colors">← Back</button>
                   ) : null}
                   <h4 className="text-sm font-semibold text-foreground">{current.title}</h4>
                   {mobileStack.length > 1 && (
-                    <button onClick={resetMobileView} className="ml-auto text-xs text-muted-foreground">Home</button>
+                    <button onClick={resetMobileView} className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors">🏠 Home</button>
                   )}
                 </div>
 
                 {/* root: show top-level entries */}
                 {(!current.items || current.key === 'root') && (
-                  <div>
+                  <div className="space-y-2">
                     {mobileMenu.map((m, i) => (
-                      <button key={i} onClick={() => { if (m.children) { pushMobileView({ title: m.label, items: m.children, key: m.key }); } else if (m.path) { window.location.href = m.path; closeWithAnimation(); } }} className="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-muted text-left">
-                        <img src={m.icon} alt="dot" className="w-6 h-6" />
-                        <span className="text-sm text-foreground">{m.label}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="ml-auto h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="currentColor">
+                      <button key={i} onClick={() => { if (m.children) { pushMobileView({ title: m.label, items: m.children, key: m.key }); } else if (m.path) { window.location.href = m.path; closeWithAnimation(); } }} className="w-full flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted text-left transition-colors">
+                        <img src={m.icon} alt="dot" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
+                        <span className="text-sm font-medium text-foreground flex-1">{m.label}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-muted-foreground flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                         </svg>
                       </button>
@@ -290,29 +290,32 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
             );
           })()}
 
-          <div className="my-3 border-t border-border" />
+          <div className="my-6 border-t border-gray-200" />
 
           {/* Secondary menu items with badges */}
-          <ul className="space-y-2 px-1">
+          <ul className="space-y-3 px-1">
             {[
-              // { label: 'PET&CO Outlet Sale', path: '/shop-for-outlet', badge: '60% Off', icon: '/assets/images/dog/b1.webp' },
               { label: 'PET&CO Spa', path: '/spa', badge: 'App Exclusive', icon: '/assets/images/dog/grooming.webp' },
               { label: 'PET&CO Hub', path: '/hub', icon: '/assets/images/dog/pt1.webp' },
               { label: 'Store & Spa Locator', path: '/locator', icon: '/assets/images/essential/GPS.png' },
               { label: 'Become a Franchisee', path: '/franchise', icon: '/assets/images/dog/dg3.webp' },
-              // { label: 'Join our Birthday Club', path: '/birthday', icon: '/assets/images/essential/dog_birthday.jpg' }
+              { label: 'Join our Birthday Club', path: '/birthday', icon: '/assets/images/essential/dog_birthday.jpg' }
             ].map((it, i) => (
               <li key={i}>
                 <button
                   onClick={() => { window.location.href = it.path; onClose(); }}
-                  className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded hover:bg-muted text-sm text-foreground"
+                  className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
                 >
                   <span className="flex items-center gap-3">
-                    <img src={it.icon} alt="icon" className="w-5 h-5 rounded" />
-                    <span>{it.label}</span>
+                    <img src={it.icon} alt="icon" className="w-5 h-5 rounded flex-shrink-0" />
+                    <span className="font-medium">{it.label}</span>
                   </span>
                   {it.badge && (
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded text-white" style={{ background: it.badge === 'NEW' ? '#ff6b6b' : '#ff9f43' }}>{it.badge}</span>
+                    <span className="text-xs font-semibold px-2 py-1 rounded-full text-white whitespace-nowrap" style={{ 
+                      background: it.badge === 'App Exclusive' ? '#ff9f43' : it.badge === 'NEW' ? '#ff6b6b' : '#10b981' 
+                    }}>
+                      {it.badge}
+                    </span>
                   )}
                 </button>
               </li>
@@ -320,22 +323,23 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           </ul>
 
           {/* Brands row */}
-          <div className="mt-4 px-3">
+          <div className="mt-6 px-3">
+            <h4 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Featured Brands</h4>
             <div className="flex items-center gap-2 flex-wrap">
-              <Link to="/brands/sara" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-white leading-none" style={{ background: '#0b66b2' }} aria-label="Sara's">Sara's</Link>
-              <Link to="/brands/hearty" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-white leading-none" style={{ background: '#ff4d4f' }} aria-label="Hearty">Hearty</Link>
-              <Link to="/brands/meowsi" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-white leading-none" style={{ background: '#111827' }} aria-label="Meowsi">Meowsi</Link>
-              <Link to="/brands/fashi" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-white leading-none" style={{ background: '#06b6d4' }} aria-label="FashiDog">FashiDog</Link>
+              <Link to="/brands/sara" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-bold text-white leading-none transition-transform hover:scale-105" style={{ background: '#0b66b2' }} aria-label="Sara's">Sara's</Link>
+              <Link to="/brands/hearty" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-bold text-white leading-none transition-transform hover:scale-105" style={{ background: '#ff4d4f' }} aria-label="Hearty">Hearty</Link>
+              <Link to="/brands/meowsi" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-bold text-white leading-none transition-transform hover:scale-105" style={{ background: '#111827' }} aria-label="Meowsi">Meowsi</Link>
+              <Link to="/brands/fashi" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-bold text-white leading-none transition-transform hover:scale-105" style={{ background: '#06b6d4' }} aria-label="FashiDog">FashiDog</Link>
             </div>
           </div>
 
           {/* Footer links */}
-          <div className="mt-6 px-3 pb-6 border-t border-border">
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="/adopt-a-pet" onClick={onClose}>Adopt a Pet</a></li>
-              {/* <li><a href="/track-order" onClick={onClose}>Track Order</a></li> */}
-              <li><a href="/contact" onClick={onClose}>Contact Us</a></li>
-              <li><a href="/faqs" onClick={onClose}>FAQs & Exchange Policy</a></li>
+          <div className="mt-8 px-3 pb-8 border-t border-gray-200">
+            <h4 className="text-xs font-semibold text-muted-foreground mb-4 mt-4 uppercase tracking-wider">Quick Links</h4>
+            <ul className="space-y-3 text-sm">
+              <li><a href="/adopt-a-pet" onClick={onClose} className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">🐾 Adopt a Pet</a></li>
+              <li><a href="/contact" onClick={onClose} className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">📞 Contact Us</a></li>
+              <li><a href="/faqs" onClick={onClose} className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">❓ FAQs & Exchange Policy</a></li>
             </ul>
           </div>
         </nav>
