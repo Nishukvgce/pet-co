@@ -735,7 +735,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
               </div>
 
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100 hover:shadow-lg transition-all duration-300">
-                <Link to="/huft-foundation" onClick={onClose} className="block group">
+                <Link to="/petco-foundation" onClick={onClose} className="block group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                       <span className="text-2xl">❤️</span>
@@ -752,7 +752,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
               </div>
 
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-100 hover:shadow-lg transition-all duration-300">
-                <Link to="/learn-with-huft" onClick={onClose} className="block group">
+                <Link to="/learn-with-petco" onClick={onClose} className="block group">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
                       <span className="text-2xl">📚</span>
