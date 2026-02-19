@@ -652,6 +652,67 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                 </div>
               </div>
             </div>
+          ) : activeCategory === 'pet-services' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-4">
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
+                <Link to="/pet-services" onClick={onClose} className="block group">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <span className="text-purple-600 text-lg">✂️</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground group-hover:text-purple-600">Pet Grooming</h4>
+                      <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded">NEW</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Professional grooming services for cats and dogs</p>
+                </Link>
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg">
+                <Link to="/pet-boarding" onClick={onClose} className="block group">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <span className="text-blue-600 text-lg">🏠</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground group-hover:text-blue-600">Pet Boarding</h4>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Safe and comfortable boarding facilities with 24/7 care</p>
+                </Link>
+              </div>
+
+              <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-4 rounded-lg">
+                <Link to="/pet-walking" onClick={onClose} className="block group">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <span className="text-orange-600 text-lg">🚶</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground group-hover:text-orange-600">Pet Walking</h4>
+                      <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded">NEW</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Professional pet walking services with experienced walkers</p>
+                </Link>
+              </div>
+
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg">
+                <Link to="/veterinary-service" onClick={onClose} className="block group">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                      <span className="text-green-600 text-lg">❤️</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-foreground group-hover:text-green-600">Veterinary Service</h4>
+                      <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded">NEW</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Comprehensive veterinary care and health checkups</p>
+                </Link>
+              </div>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
               {/* categories removed — intentionally left blank for now */}

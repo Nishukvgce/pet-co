@@ -820,20 +820,18 @@ const Header = ({ onSearch = () => { } }) => {
                   <Icon name={isMegaMenuOpen && activeMegaCategory === 'cats' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
 
-                <Link 
-                  to="/pet-services"
-                  className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
+                <button
+                  className={`flex items-center gap-1 text-sm font-medium ${activeMegaCategory === 'pet-services' ? 'text-primary' : 'text-foreground'} hover:text-primary`}
+                  onClick={() => {
+                    const willOpen = !(isMegaMenuOpen && activeMegaCategory === 'pet-services');
+                    setActiveMegaCategory(willOpen ? 'pet-services' : null);
+                    setIsMegaMenuOpen(willOpen);
+                  }}
                 >
                   <span>Pet Services</span>
                   <span className="bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
-                </Link>
-
-                <Link 
-                  to="/pet-boarding"
-                  className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
-                >
-                  <span>Pet Boarding</span>
-                </Link>
+                  <Icon name={isMegaMenuOpen && activeMegaCategory === 'pet-services' ? 'ChevronUp' : 'ChevronDown'} size={16} />
+                </button>
 
                 <button
                   className={`flex items-center gap-2 text-sm font-medium ${activeMegaCategory === 'pharmacy' ? 'text-primary' : 'text-foreground'} hover:text-primary`}
@@ -847,22 +845,6 @@ const Header = ({ onSearch = () => { } }) => {
                   <span className="bg-[#ff7a00] text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
                   <Icon name={isMegaMenuOpen && activeMegaCategory === 'pharmacy' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
-
-                <Link 
-                  to="/pet-walking"
-                  className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
-                >
-                  <span>Pet walking</span>
-                  <span className="bg-[#ff7a00] text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
-                </Link>
-
-                <Link 
-                  to="/veterinary-service"
-                  className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
-                >
-                  <span>Veterinary Service</span>
-                  <span className="bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
-                </Link>
 
                 <button
                   className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
