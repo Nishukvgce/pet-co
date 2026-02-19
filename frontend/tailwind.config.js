@@ -11,12 +11,35 @@ module.exports = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: "1rem",
+        sm: "2rem",
+        lg: "4rem",
+        xl: "5rem",
+        "2xl": "6rem",
+      },
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
+      spacing: {
+        'mobile-safe': 'env(safe-area-inset-bottom)',
+        'header-mobile': '3.5rem',
+        'header-desktop': '5rem',
+        'mobile-nav': '4rem',
+        'mobile-nav-sm': '4.5rem',
+      },
+      fontSize: {
+        'mobile-xs': ['0.625rem', { lineHeight: '0.875rem' }],
+        'mobile-sm': ['0.75rem', { lineHeight: '1rem' }],
+        'mobile-base': ['0.875rem', { lineHeight: '1.25rem' }],
+        'mobile-lg': ['1rem', { lineHeight: '1.5rem' }],
+      },
+      screens: {
+        'xs': '475px',
+        'mobile-lg': '425px',
+      },
       colors: {
         border: "var(--color-border)", // light gray
         input: "var(--color-input)", // white
@@ -101,5 +124,56 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    // Add custom mobile-focused utilities
+    function({ addUtilities, theme }) {
+      const mobileUtilities = {
+        '.mobile-container': {
+          paddingLeft: theme('spacing.3'),
+          paddingRight: theme('spacing.3'),
+          '@screen sm': {
+            paddingLeft: theme('spacing.4'),
+            paddingRight: theme('spacing.4'),
+          },
+          '@screen lg': {
+            paddingLeft: theme('spacing.6'),
+            paddingRight: theme('spacing.6'),
+          },
+        },
+        '.mobile-grid': {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gap: theme('spacing.2'),
+          '@screen sm': {
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+            gap: theme('spacing.3'),
+          },
+          '@screen lg': {
+            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+            gap: theme('spacing.4'),
+          },
+        },
+        '.mobile-text': {
+          fontSize: theme('fontSize.sm')[0],
+          lineHeight: theme('fontSize.sm')[1].lineHeight,
+          '@screen sm': {
+            fontSize: theme('fontSize.base')[0],
+            lineHeight: theme('fontSize.base')[1].lineHeight,
+          },
+        },
+        '.mobile-button': {
+          padding: `${theme('spacing.2')} ${theme('spacing.4')}`,
+          fontSize: theme('fontSize.sm')[0],
+          minHeight: '44px',
+          minWidth: '44px',
+          '@screen sm': {
+            padding: `${theme('spacing.2.5')} ${theme('spacing.6')}`,
+            fontSize: theme('fontSize.base')[0],
+          },
+        },
+      };
+      addUtilities(mobileUtilities);
+    },
+  ],
 }

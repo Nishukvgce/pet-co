@@ -420,26 +420,26 @@ const Header = ({ onSearch = () => { } }) => {
           </div>
         </div>
 
-        {/* Top Bar - Mobile (Blue) */}
-        <div className={`lg:hidden bg-[#1e3a8a] text-white py-2 text-sm text-center font-medium`}>
+        {/* Top Bar - Mobile (Blue) - More compact on small screens */}
+        <div className={`lg:hidden bg-[#1e3a8a] text-white py-1.5 sm:py-2 text-xs sm:text-sm text-center font-medium`}>
           GST 2.0 Reforms
         </div>
 
         {/* Mobile compact header (visible on small screens) - back + rounded search */}
-        <div className="lg:hidden bg-white border-b border-[#e6e6e6] py-2">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-3">
-              <button onClick={() => navigate(-1)} aria-label="Back" className="p-2">
-                <Icon name="ChevronLeft" size={22} />
+        <div className="lg:hidden bg-white border-b border-[#e6e6e6] py-2 sm:py-3">
+          <div className="container mx-auto px-3 sm:px-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button onClick={() => navigate(-1)} aria-label="Back" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <Icon name="ChevronLeft" size={20} className="sm:size-[22px]" />
               </button>
 
-              <form onSubmit={handleSearch} className="flex-1 relative">
-                <div className={`flex items-center bg-white rounded-full px-3 py-2 shadow-sm border ${isSearchFocused ? 'border-orange-400 ring-2 ring-orange-200' : 'border-border'}`}>
-                  <Icon name="Search" size={16} className="text-gray-400 mr-2" />
+              <form onSubmit={handleSearch} className="flex-1 relative max-w-md">
+                <div className={`flex items-center bg-white rounded-full px-3 py-2 shadow-sm border ${isSearchFocused ? 'border-orange-400 ring-2 ring-orange-200' : 'border-gray-200'} transition-all duration-200`}>
+                  <Icon name="Search" size={14} className="text-gray-400 mr-2 flex-shrink-0 sm:size-4" />
                   <Input
                     ref={inputRef}
                     type="search"
-                    placeholder="Search"
+                    placeholder="Search for pets, food, toys..."
                     value={searchQuery}
                     onChange={handleSearchInputChange}
                     onKeyDown={(e) => {
@@ -450,28 +450,28 @@ const Header = ({ onSearch = () => { } }) => {
                     }}
                     onFocus={() => setIsSearchFocused(true)}
                     onBlur={() => setIsSearchFocused(false)}
-                    className="flex-1 border-0 focus:ring-0 text-sm"
+                    className="flex-1 border-0 focus:ring-0 text-sm bg-transparent"
                   />
                 </div>
 
                 {/* mobile suggestions */}
                 {suggestionsOpen && suggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 mt-2 bg-card border border-border rounded-md shadow-warm z-50 overflow-hidden">
+                  <div className="absolute left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden max-h-[300px] overflow-y-auto">
                     {suggestions.map((suggestion, index) => (
                       <button
                         key={index}
                         onMouseDown={() => handleSuggestionSelect(suggestion)}
-                        className="w-full flex items-center gap-3 p-3 hover:bg-muted/40 text-left"
+                        className="w-full flex items-center gap-2 sm:gap-3 p-2 sm:p-3 hover:bg-muted/40 text-left transition-colors"
                       >
-                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                           <Icon 
                             name={suggestion.type === 'product' ? 'Package' : suggestion.type === 'brand' ? 'Star' : suggestion.type === 'subcategory' ? 'Grid3x3' : suggestion.type === 'category' ? 'Package' : 'Search'} 
-                            size={14} 
-                            className="text-primary" 
+                            size={12} 
+                            className="text-primary sm:size-[14px]" 
                           />
                         </div>
-                        <div className="flex-1">
-                          <div className="text-sm text-foreground font-medium">{suggestion.text}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-foreground font-medium truncate">{suggestion.text}</div>
                           <div className="text-xs text-muted-foreground">
                             {suggestion.type === 'subcategory' ? '📂 Subcategory' : 
                              suggestion.type === 'product' ? '📦 Product' : 
@@ -480,17 +480,17 @@ const Header = ({ onSearch = () => { } }) => {
                             {suggestion.category && ` • ${suggestion.category.replace(/-/g, ' ')}`}
                           </div>
                         </div>
-                        <Icon name="ArrowRight" size={14} className="text-muted-foreground" />
+                        <Icon name="ArrowRight" size={12} className="text-muted-foreground flex-shrink-0 sm:size-[14px]" />
                       </button>
                     ))}
                     {searchQuery.trim() && (
                       <div className="border-t border-border">
                         <button
                           onMouseDown={handleSearch}
-                          className="w-full text-left p-3 text-sm hover:bg-muted/40 flex items-center gap-2"
+                          className="w-full text-left p-2 sm:p-3 text-sm hover:bg-muted/40 flex items-center gap-2"
                         >
-                          <Icon name="Search" size={14} className="text-muted-foreground" />
-                          Search for "{searchQuery.trim()}"
+                          <Icon name="Search" size={12} className="text-muted-foreground sm:size-[14px]" />
+                          <span className="truncate">Search for "{searchQuery.trim()}"</span>
                         </button>
                       </div>
                     )}
@@ -498,16 +498,25 @@ const Header = ({ onSearch = () => { } }) => {
                 )}
               </form>
 
-              {/* optional cart quick action on mobile - hidden */}
-              <button onClick={() => setIsCartDrawerOpen(true)} className="p-2 hidden">
-                <Icon name="ShoppingCart" size={20} />
+              {/* Cart icon for mobile - show cart count */}
+              <button 
+                onClick={() => setIsCartDrawerOpen(true)} 
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
+                aria-label="Shopping cart"
+              >
+                <Icon name="ShoppingCart" size={20} className="sm:size-[22px]" />
+                {getCartItemCount() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {getCartItemCount()}
+                  </span>
+                )}
               </button>
 
               {/* hamburger toggle for mobile navigation (opens MegaMenu drawer) */}
               <button
                 onClick={() => { setIsMegaMenuOpen(!isMegaMenuOpen); setActiveMegaCategory(null); }}
                 aria-label="Open menu"
-                className="p-2"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -518,20 +527,19 @@ const Header = ({ onSearch = () => { } }) => {
         </div>
 
         {/* Main white header with logo, large rounded search, and right actions */}
-        <div className="hidden lg:block bg-white border-b border-[#e6e6e6] py-4">
+        <div className="hidden lg:block bg-white border-b border-[#e6e6e6] py-3 xl:py-4">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between">
-              {/* Left: small orange square logo */}
-              <Link to="/homepage" className="flex items-center mr-6 relative">
-                <div className="w-20 h-20 bg-[#ff7a00] lg:bg-transparent rounded-md flex items-center justify-center">
-                  {/* keep using existing logo if present, fallback to logo.png */}
-                  <img src="/assets/images/logo.png" alt="Logo" className="w-20 h-20 object-contain" onError={(e) => { e.target.onerror = null; e.target.src = '/assets/images/logo.png' }} />
+              {/* Left: logo with proper sizing */}
+              <Link to="/homepage" className="flex items-center mr-4 xl:mr-6 relative flex-shrink-0">
+                <div className="w-16 h-16 xl:w-20 xl:h-20 bg-[#ff7a00] lg:bg-transparent rounded-md flex items-center justify-center">
+                  <img src="/assets/images/logo.png" alt="Pet Co Logo" className="w-16 h-16 xl:w-20 xl:h-20 object-contain" onError={(e) => { e.target.onerror = null; e.target.src = '/assets/images/logo.png' }} />
                 </div>
-                {/* Featured product (fallback to Lottie paw animation) */}
+                {/* Featured product or Lottie animation */}
                 {featuredProduct ? (
                   <Link
                     to={`/product-details/${featuredProduct.id}`}
-                    className="pointer-events-auto hidden sm:flex items-center justify-center rounded-full overflow-hidden"
+                    className="pointer-events-auto hidden xl:flex items-center justify-center rounded-full overflow-hidden"
                     style={{ position: 'absolute', left: 86, top: -6, width: 34, height: 34 }}
                     aria-label={featuredProduct.name || 'Featured product'}
                   >
@@ -542,8 +550,7 @@ const Header = ({ onSearch = () => { } }) => {
                     />
                   </Link>
                 ) : (
-                  /* Lottie paw animation container (positioned relative to the logo) */
-                  <div style={{ position: 'absolute', left: 86, top: -6, width: 34, height: 34 }} className="hidden sm:block pointer-events-none">
+                  <div style={{ position: 'absolute', left: 86, top: -6, width: 34, height: 34 }} className="hidden xl:block pointer-events-none">
                     <Lottie
                       lottieRef={lottieRef}
                       animationData={pawLottie}
@@ -554,11 +561,11 @@ const Header = ({ onSearch = () => { } }) => {
                 )}
               </Link>
 
-              {/* Center: large rounded search */}
-              <div className="flex-1 mx-6 max-w-xl">
+              {/* Center: responsive search */}
+              <div className="flex-1 mx-4 lg:mx-6 max-w-xl">
                 <form onSubmit={handleSearch} className="relative">
-                  <div className="gradient-outline flex items-center bg-white rounded-full px-3 py-2 shadow-sm hover:shadow-md transition-shadow duration-150 relative">
-                    <Icon name="Search" size={16} className="text-gray-400 mr-3" />
+                  <div className="gradient-outline flex items-center bg-white rounded-full px-3 xl:px-4 py-2 xl:py-3 shadow-sm hover:shadow-md transition-shadow duration-150 relative">
+                    <Icon name="Search" size={16} className="text-gray-400 mr-2 xl:mr-3 flex-shrink-0" />
                     <Input
                       ref={inputRef}
                       type="search"
@@ -573,18 +580,17 @@ const Header = ({ onSearch = () => { } }) => {
                       }}
                       onFocus={() => setIsSearchFocused(true)}
                       onBlur={() => setIsSearchFocused(false)}
-                      className="flex-1 border-0 focus:ring-0 placeholder-gray-400 text-xs"
+                      className="flex-1 border-0 focus:ring-0 placeholder-gray-400 text-sm bg-transparent"
                     />
 
                     {/* Animated placeholder overlay (click focuses input) */}
-                    {/* Show only when input is empty and not focused */}
                     {(!isSearchFocused && (!searchQuery || searchQuery?.trim() === '')) && (
                       <button
                         type="button"
                         onClick={() => {
                           inputRef.current?.focus();
                         }}
-                        className="absolute left-10 right-4 top-1/2 -translate-y-1/2 text-left text-gray-400 text-xs pointer-events-auto"
+                        className="absolute left-8 xl:left-10 right-4 top-1/2 -translate-y-1/2 text-left text-gray-400 text-sm pointer-events-auto"
                       >
                         <span>{animatedText}{showCursor ? '|' : ' '}</span>
                       </button>

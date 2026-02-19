@@ -135,28 +135,28 @@ const ProductCard = ({ p }) => {
   };
 
   return (
-    <article className={`bg-white rounded-[2rem] border border-border/50 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden relative group h-full flex flex-col ${!isInStock ? 'opacity-80' : ''}`}
+    <article className={`bg-white rounded-2xl sm:rounded-[2rem] border border-border/50 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden relative group h-full flex flex-col ${!isInStock ? 'opacity-80' : ''}`}
       style={{ cursor: 'pointer' }}
     >
-      {/* Badges */}
-      <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+      {/* Badges - Better mobile positioning */}
+      <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10 flex flex-col gap-1 sm:gap-2">
         {discount > 0 && (
-          <span className="bg-[#E63946] text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full shadow-sm tracking-wide">{discount}% OFF</span>
+          <span className="bg-[#E63946] text-white text-[9px] sm:text-[10px] lg:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-sm tracking-wide">{discount}% OFF</span>
         )}
         {p.badges && p.badges.length > 0 && !discount && (
-          <span className="bg-emerald-500 text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full shadow-sm tracking-wide">{p.badges[0]}</span>
+          <span className="bg-emerald-500 text-white text-[9px] sm:text-[10px] lg:text-xs font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-sm tracking-wide">{p.badges[0]}</span>
         )}
       </div>
 
-      {/* Wishlist icon - Transparent/Minimal */}
+      {/* Wishlist icon - Better mobile touch target */}
       <button
-        className="absolute top-4 right-4 z-20 p-2 rounded-full hover:bg-black/5 transition-colors duration-200"
+        className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 p-2 sm:p-2.5 rounded-full hover:bg-black/5 transition-colors duration-200"
         onClick={handleWishlist}
         aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
       >
         <Heart 
           className={`transition-colors duration-200 drop-shadow-sm ${wishlisted ? 'text-red-500 fill-red-500' : 'text-white/90 hover:text-white fill-black/20'}`} 
-          size={24} 
+          size={20} 
           strokeWidth={2}
         />
       </button>
@@ -173,28 +173,28 @@ const ProductCard = ({ p }) => {
         />
         {!isInStock && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px]">
-            <span className="text-white font-bold text-lg px-4 py-2 border-2 border-white rounded-lg">Out of Stock</span>
+            <span className="text-white font-bold text-sm sm:text-base lg:text-lg px-3 py-1.5 sm:px-4 sm:py-2 border-2 border-white rounded-lg">Out of Stock</span>
           </div>
         )}
       </div>
 
-      {/* Product Info */}
-      <div className="p-4 sm:p-5 flex flex-col flex-grow">
-        <div className="mb-1">
+      {/* Product Info - Responsive padding */}
+      <div className="p-3 sm:p-4 lg:p-5 flex flex-col flex-grow">
+        <div className="mb-1 sm:mb-2">
           <h3
-            className="text-lg font-bold text-gray-900 line-clamp-1 leading-tight group-hover:text-[#F37021] transition-colors"
+            className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 line-clamp-2 sm:line-clamp-1 leading-tight group-hover:text-[#F37021] transition-colors"
             title={p.name}
             onClick={() => navigate(`/product-detail-page?id=${p.id}`)}
           >
             {p.name}
           </h3>
-          {brand && <div className="text-sm text-gray-500 font-medium">by {brand}</div>}
+          {brand && <div className="text-xs sm:text-sm text-gray-500 font-medium">by {brand}</div>}
         </div>
 
-        {/* Variant Selector - Square Boxes */}
-        <div className="mt-3 mb-4 min-h-[3.5rem]">
+        {/* Variant Selector - Mobile optimized */}
+        <div className="mt-2 sm:mt-3 mb-3 sm:mb-4 min-h-[2.5rem] sm:min-h-[3.5rem]">
           {variants.length > 1 ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {variants.map((v, i) => {
                 const active = i === variantIdx;
                 const variantLabel = v.label || v.weight;
@@ -204,14 +204,14 @@ const ProductCard = ({ p }) => {
                   <button
                     key={i}
                     onClick={e => { e.stopPropagation(); setVariantIdx(i); }}
-                    className={`flex flex-col items-center justify-center min-w-[3.5rem] h-[3.5rem] px-2 rounded-lg border transition-all duration-200 ${
+                    className={`flex flex-col items-center justify-center min-w-[2.5rem] h-[2.5rem] sm:min-w-[3.5rem] sm:h-[3.5rem] px-1.5 sm:px-2 rounded-lg border transition-all duration-200 ${
                       active 
                         ? 'bg-[#F37021] text-white border-[#F37021] shadow-md transform scale-105' 
                         : 'bg-white text-gray-700 border-gray-200 hover:border-[#F37021] hover:shadow-sm'
                     }`}
                   >
-                    <span className="text-xs font-bold leading-none mb-1">{variantLabel}</span>
-                    <span className={`text-[10px] font-medium leading-none ${active ? 'text-white/90' : 'text-gray-500'}`}>
+                    <span className="text-[9px] sm:text-xs font-bold leading-none mb-0.5 sm:mb-1">{variantLabel}</span>
+                    <span className={`text-[8px] sm:text-[10px] font-medium leading-none ${active ? 'text-white/90' : 'text-gray-500'}`}>
                       ₹{variantPrice.toFixed(0)}
                     </span>
                   </button>
@@ -219,22 +219,22 @@ const ProductCard = ({ p }) => {
               })}
             </div>
           ) : (
-            <div className="h-[3.5rem]"></div> /* Spacer to keep card height consistent */
+            <div className="h-[2.5rem] sm:h-[3.5rem]"></div> /* Spacer to keep card height consistent */
           )}
         </div>
 
-        {/* Price and Add Button - Bottom aligned */}
-        <div className="mt-auto flex items-end justify-between" onClick={e => e.stopPropagation()}>
+        {/* Price and Add Button - Mobile optimized */}
+        <div className="mt-auto flex items-end justify-between gap-2" onClick={e => e.stopPropagation()}>
           <div className="flex flex-col">
-            <div className="text-xl sm:text-2xl font-bold text-gray-900 leading-none">₹{Number(currentPrice).toFixed(2)}</div>
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 leading-none">₹{Number(currentPrice).toFixed(2)}</div>
             {originalPrice > currentPrice && (
-              <div className="text-sm text-gray-400 line-through mt-1 font-medium">₹{Number(originalPrice).toFixed(2)}</div>
+              <div className="text-xs sm:text-sm text-gray-400 line-through mt-1 font-medium">₹{Number(originalPrice).toFixed(2)}</div>
             )}
           </div>
           <button
             onClick={handleAddToCart}
             disabled={!isInStock}
-            className={`px-6 py-2.5 rounded-full text-sm font-bold shadow-sm transition-all duration-200 active:scale-95 ${
+            className={`px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-sm transition-all duration-200 active:scale-95 ${
               isInStock 
                 ? 'bg-[#F37021] text-white hover:bg-[#E05F15] hover:shadow-md' 
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'

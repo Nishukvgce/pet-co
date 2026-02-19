@@ -528,29 +528,31 @@ const PharmacyCollectionPage = ({ subLabel }) => {
       </Helmet>
       <Header cartItemCount={getCartItemCount()} cartItems={cartItems} onSearch={() => { }} />
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Mobile horizontal categories */}
-        <div className="lg:hidden mb-6">
-          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
+        {/* Mobile horizontal categories - Enhanced for better UX */}
+        <div className="lg:hidden mb-4 sm:mb-6">
+          <div className="flex overflow-x-auto gap-2 sm:gap-3 pb-3 scrollbar-hide snap-x snap-mandatory">
             {categories.map((c, idx) => (
               <button
                 key={c.id}
                 onClick={() => handleCategoryClick(c)}
-                className={`flex-shrink-0 flex flex-col items-center gap-2 p-3 min-w-[80px] rounded-lg border ${
-                  active === c.label ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-200'
+                className={`flex-shrink-0 flex flex-col items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3 min-w-[75px] sm:min-w-[85px] rounded-xl border transition-all duration-200 snap-center ${
+                  active === c.label 
+                    ? 'bg-orange-50 border-orange-300 shadow-sm scale-105' 
+                    : 'bg-white border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-full overflow-hidden flex items-center justify-center ${
-                  active === c.label ? 'ring-2 ring-orange-400' : ''
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex items-center justify-center transition-all ${
+                  active === c.label ? 'ring-2 ring-orange-400 shadow-sm' : ''
                 }`}>
                   <img 
                     src={c.img} 
                     alt={c.label} 
-                    className="w-8 h-8 object-cover"
+                    className="w-6 h-6 sm:w-8 sm:h-8 object-cover"
                     onError={(e) => e.target.src = '/assets/images/no_image.png'}
                   />
                 </div>
-                <span className={`text-xs font-medium text-center leading-tight ${
+                <span className={`text-[10px] sm:text-xs font-medium text-center leading-tight max-w-full line-clamp-2 ${
                   active === c.label ? 'text-orange-600' : 'text-gray-600'
                 }`}>
                   {c.label}
@@ -560,7 +562,7 @@ const PharmacyCollectionPage = ({ subLabel }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-6">
           {/* Sidebar - Categories */}
           {/* Desktop/Tablet sidebar (hidden on small screens) */}
           <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
@@ -652,33 +654,38 @@ const PharmacyCollectionPage = ({ subLabel }) => {
               </div>
             </div>
 
-            {/* Filter drawer trigger (mobile) */}
-            <div className="absolute top-6 right-6 z-40 md:hidden">
+            {/* Filter drawer trigger (mobile) - Improved positioning */}
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-40 lg:hidden">
               <button
                 onClick={() => setFilterOpen(true)}
-                className="flex items-center gap-2 border border-border rounded px-3 py-1 bg-white"
+                className="flex items-center gap-1.5 sm:gap-2 border border-gray-300 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 bg-white shadow-sm hover:shadow-md transition-shadow"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 019 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
                 </svg>
-                <span className="text-sm">Filter</span>
+                <span className="text-xs sm:text-sm font-medium">Filter</span>
               </button>
             </div>
 
-            {/* Product grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+            {/* Product grid - Enhanced mobile responsiveness */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
               {loadingProducts ? (
-                <div className="col-span-full py-12 text-center text-muted-foreground">Loading pharmacy products...</div>
+                <div className="col-span-full py-8 sm:py-12 text-center text-muted-foreground">
+                  <div className="inline-flex items-center gap-2">
+                    <div className="animate-spin h-5 w-5 border-2 border-orange-400 border-t-transparent rounded-full"></div>
+                    <span className="text-sm sm:text-base">Loading pharmacy products...</span>
+                  </div>
+                </div>
               ) : filteredProducts.length > 0 ? (
                 filteredProducts.map(p => (<ProductCard key={p.id} p={p} />))
               ) : (
-                <div className="col-span-full py-12 text-center">
+                <div className="col-span-full py-8 sm:py-12 text-center px-4">
                   <div className="text-gray-500 mb-2">
-                    <div className="text-4xl mb-4">💊</div>
-                    <h3 className="text-lg font-semibold mb-2">No products found</h3>
-                    <p className="text-sm">No Pharmacy products match your current filters.</p>
-                    <p className="text-xs mt-2 text-gray-400">Try selecting a different category or subcategory.</p>
-                    {fetchError && <div className="text-xs mt-2 text-orange-600">{fetchError}</div>}
+                    <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">💊</div>
+                    <h3 className="text-base sm:text-lg font-semibold mb-2">No products found</h3>
+                    <p className="text-sm text-gray-600 mb-3">No Pharmacy products match your current filters.</p>
+                    <p className="text-xs text-gray-400">Try selecting a different category or clear filters.</p>
+                    {fetchError && <div className="text-xs mt-3 text-orange-600 bg-orange-50 p-2 rounded-md">{fetchError}</div>}
                   </div>
                 </div>
               )}
