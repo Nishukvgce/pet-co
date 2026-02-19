@@ -96,55 +96,8 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
         { label: 'Prescription Food', path: '/pharmacy/prescription-food', subs: ['Renal Support','Hypoallergenic Diets','Digestive Support','Weight Management','All Prescription Food'] }
       ]
     },
-    {
-      key: 'hub',
-      label: 'PET&CO Hub',
-      icon: '/assets/images/dog/dg5.webp',
-      children: [
-        { 
-          label: 'Adopt a Pet', 
-          path: '/adopt-pet',
-          icon: '/assets/images/dog/dg1.webp',
-          description: 'Find your forever friend and give them a loving home'
-        },
-        { 
-          label: 'PET&CO Foundation', 
-          path: '/PET&CO-foundation',
-          icon: '/assets/images/essential/veterinary.png',
-          description: 'Creating a better world for animals in need, one step at a time'
-        },
-        { 
-          label: 'Learn With PET&CO', 
-          path: '/learn-with-PET&CO',
-          icon: '/assets/images/dog/dg7.webp',
-          description: 'Expert tips and guides for happy, healthy pets'
-        },
-        { 
-          label: 'Store & Spa Locator', 
-          path: '/store-locator',
-          icon: '/assets/images/branding/logo.png',
-          description: 'Discover PET&CO stores and pet spas near you'
-        }
-      ]
-    },
-    {
-      key: 'spa',
-      label: 'PET&CO Spa',
-      path: '/pet-spa',
-      icon: '/assets/images/essential/spa.png'
-    },
-    {
-      key: 'birthday-club',
-      label: 'Join our Birthday Club',
-      path: '/birthday-club',
-      icon: '/assets/images/essential/birthday.png'
-    },
-    {
-      key: 'franchise',
-      label: 'Become a Franchisee',
-      path: '/franchise',
-      icon: '/assets/images/branding/franchise.png'
-    }
+   
+    
   ];
 
   const [visible, setVisible] = useState(false);
