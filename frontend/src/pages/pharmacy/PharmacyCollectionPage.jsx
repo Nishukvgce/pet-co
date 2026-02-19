@@ -75,25 +75,42 @@ const PharmacyCollectionPage = ({ subLabel }) => {
 
   const [active, setActive] = useState(categories[categories.length - 1].label);
 
+  // Debug the active state changes
+  useEffect(() => {
+    console.log(`PharmacyCollectionPage: ACTIVE STATE CHANGED to: "${active}"`);
+  }, [active]);
+
   // Initialize active state based on URL path
   useEffect(() => {
     const pathname = location?.pathname || '';
     const segments = pathname.split('/').filter(Boolean);
     
+    console.log(`PharmacyCollectionPage: URL-to-active mapping - pathname: "${pathname}"`);
+    console.log(`PharmacyCollectionPage: URL-to-active mapping - segments:`, segments);
+    console.log(`PharmacyCollectionPage: URL-to-active mapping - categories:`, categories.map(c => ({id: c.id, label: c.label, labelSlug: slugify(c.label)})));
+    
     // If URL has a specific subcategory segment, map it to the corresponding label
     if (segments.length >= 3) {
       const subcategorySegment = segments[2]; // e.g., "vitamins-minerals"
+      console.log(`PharmacyCollectionPage: URL-to-active mapping - subcategorySegment: "${subcategorySegment}"`);
       
       // Find matching category by ID or slug
       const matchingCategory = categories.find(cat => {
         const catSlug = slugify(cat.label);
-        return catSlug === subcategorySegment || cat.id === subcategorySegment;
+        const idMatch = catSlug === subcategorySegment;
+        const slugMatch = cat.id === subcategorySegment;
+        console.log(`PharmacyCollectionPage: URL-to-active mapping - checking category "${cat.label}" (id: "${cat.id}", slug: "${catSlug}") vs "${subcategorySegment}" - idMatch: ${idMatch}, slugMatch: ${slugMatch}`);
+        return idMatch || slugMatch;
       });
       
       if (matchingCategory) {
-        console.log('PharmacyCollectionPage: Setting active based on URL:', subcategorySegment, '->', matchingCategory.label);
+        console.log('PharmacyCollectionPage: URL-to-active mapping - Setting active from URL:', subcategorySegment, '->', matchingCategory.label);
         setActive(matchingCategory.label);
+      } else {
+        console.log('PharmacyCollectionPage: URL-to-active mapping - NO MATCH FOUND for:', subcategorySegment);
       }
+    } else {
+      console.log('PharmacyCollectionPage: URL-to-active mapping - segments.length < 3, not setting active');
     }
   }, [location?.pathname, categories]);
 
@@ -274,6 +291,8 @@ const PharmacyCollectionPage = ({ subLabel }) => {
 
   // Frontend filtering by category and subcategory
   useEffect(() => {
+    console.log(`PharmacyCollectionPage: FILTERING EFFECT TRIGGERED - active: "${active}", products length: ${products.length}`);
+    
     if (products.length === 0 || products === sampleProducts) {
       setFilteredProducts([]);
       return;
@@ -288,6 +307,10 @@ const PharmacyCollectionPage = ({ subLabel }) => {
     else if (isPrescriptionPath) pageCategory = 'Prescription Food';
     else pageCategory = 'Pharmacy';
 
+    console.log(`PharmacyCollectionPage: DEBUG - Current path: ${pathname}`);
+    console.log(`PharmacyCollectionPage: DEBUG - Path flags:`, {isDogPath, isCatPath, isMedicinesPath, isSupplementsPath, isPrescriptionPath});
+    console.log(`PharmacyCollectionPage: DEBUG - Determined pageCategory: "${pageCategory}"`);
+
     // Enhanced normalization
     const norm = s => String(s||'')
       .toLowerCase()
@@ -298,25 +321,40 @@ const PharmacyCollectionPage = ({ subLabel }) => {
 
     let working = products;
     
+    // Debug product categories before filtering
+    console.log(`PharmacyCollectionPage: DEBUG - Product categories in data:`, [...new Set(products.map(p => `"${p.category}"`))])
+    
     // Step 1: Filter by category (exact match only)
     working = working.filter(p => {
       const productCategory = norm(p.category || '');
       const targetCategory = norm(pageCategory);
-      return productCategory === targetCategory;
+      const matches = productCategory === targetCategory;
+      console.log(`PharmacyCollectionPage: DEBUG - Product "${p.name}": category="${p.category}" normalized="${productCategory}" vs target="${targetCategory}" matches=${matches}`);
+      return matches;
     });
     
     console.log(`PharmacyCollectionPage: After category filter (${pageCategory}): ${working.length} products`);
     
     // Step 2: Filter by subcategory if specified
     // Use slugified comparison to handle spaces/hyphens/case reliably
-    const activeSubcategory = active && !active.toLowerCase().includes('all') ? active : null;
+    // Only skip subcategory filtering if the category explicitly starts with "All" (like "All Prescription Food")
+    const activeSubcategory = active && !active.toLowerCase().startsWith('all ') ? active : null;
+    console.log(`PharmacyCollectionPage: DEBUG - Active subcategory: "${active}" -> filtered: "${activeSubcategory}"`);
+    
     if (activeSubcategory && activeSubcategory.trim()) {
       const targetSubSlug = slugify(activeSubcategory);
+      console.log(`PharmacyCollectionPage: DEBUG - Target subcategory slug: "${targetSubSlug}"`);
+      console.log(`PharmacyCollectionPage: DEBUG - Products before subcategory filter:`, working.map(p => `"${p.name}" subcategory="${p.subcategory}"`));
+      
       working = working.filter(p => {
         const productSub = String(p.subcategory || '');
         const productSubSlug = slugify(productSub);
-        // match exact slug or fuzzy contains
-        return productSubSlug === targetSubSlug || productSubSlug.includes(targetSubSlug) || targetSubSlug.includes(productSubSlug);
+        const matches = productSubSlug === targetSubSlug;
+        
+        console.log(`PharmacyCollectionPage: DEBUG - Product "${p.name}": subcategory="${productSub}" slug="${productSubSlug}" vs target="${targetSubSlug}" matches=${matches}`);
+        
+        // Require exact normalized slug match to prevent cross-section contamination
+        return matches;
       });
       console.log(`PharmacyCollectionPage: After subcategory filter (${activeSubcategory} -> ${targetSubSlug}): ${working.length} products`);
     }
@@ -371,7 +409,8 @@ const PharmacyCollectionPage = ({ subLabel }) => {
       console.error('Filtering by selectedFilters failed', err);
     }
 
-    console.log(`PharmacyCollectionPage: Final filtered products: ${working.length}`);
+    console.log(`PharmacyCollectionPage: Final filtered products: ${working.length}`, working.map(p => `"${p.name}" (subcat: "${p.subcategory}")`));
+    console.log(`PharmacyCollectionPage: SETTING FILTERED PRODUCTS - active was "${active}"`);
     setFilteredProducts(working);
   }, [products, active, isDogPath, isCatPath, isMedicinesPath, isSupplementsPath, isPrescriptionPath, selectedFilters]);
 
