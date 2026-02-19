@@ -14,6 +14,7 @@ import DogBanner from './components/DogBanner';
 import Footer from './components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import WinterCollection from './components/WinterCollection'; // Updated import path for WinterCollection
+import LearnWithPetCo from './components/LearnWithPetCo';
 import LoginModal from '../../components/ui/LoginModal';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -186,6 +187,9 @@ const Homepage = () => {
 
           {/* Bestsellers Carousel */}
           <BestsellersCarousel onAddToCart={handleAddToCart} />
+
+          {/* Learn With PET&Co */}
+          <LearnWithPetCo />
         </main>
 
         {/* Footer */}
@@ -239,6 +243,9 @@ const Homepage = () => {
 
           {/* Bestsellers Carousel */}
           <BestsellersCarousel onAddToCart={handleAddToCart} />
+
+          {/* Learn With PET&Co */}
+          <LearnWithPetCo />
 
           {/* Newsletter Section removed per request */}
         </main>

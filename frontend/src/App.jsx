@@ -58,6 +58,8 @@ import PetWalkingPage from './pages/pet-services/PetWalking';
 import PetCoOutletPage from './pages/pet-services/PetCoOutlet';
 import BrandCollection from './pages/brands/BrandCollection';
 import FranchiseDetails from './pages/franchise-details';
+import LearnWithPetCoPage from './pages/learn-with-petco';
+import BlogPost from './pages/blog/BlogPost';
 
 // Outlet components
 import ShopForOutletIndex from './pages/shop-for-outlet/ShopForOutletIndex';
@@ -563,6 +565,11 @@ function App() {
                 <Route path="/brands/meowsi" element={<ComingSoon title="Meowsi Brand" message="Browse Meowsi's cat essentials - coming soon!" />} />
                 <Route path="/brands/fashi" element={<ComingSoon title="FashiDog Brand" message="Check out FashiDog's stylish accessories - coming soon!" />} />
                 
+                {/* Learn With PET&Co Routes */}
+                <Route path="/learn-with-petco" element={<LearnWithPetCoPage />} />
+                <Route path="/blog" element={<LearnWithPetCoPage />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
+
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </ErrorBoundary>
