@@ -278,7 +278,7 @@ const PetBoardingPage = () => {
               {/* Centre image */}
               <div className="rounded-3xl overflow-hidden shadow-warm-lg border border-border">
                 <AppImage
-                  src="/assets/images/boarding/homepethorading.jpg"
+                  src="/assets/images/boarding/pet borading.jpeg"
                   alt="Home pet boarding comfort"
                   className="w-full h-full min-h-[300px] object-cover"
                 />

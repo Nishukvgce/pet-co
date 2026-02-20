@@ -60,6 +60,7 @@ import BrandCollection from './pages/brands/BrandCollection';
 import FranchiseDetails from './pages/franchise-details';
 import LearnWithPetCoPage from './pages/learn-with-petco';
 import BlogPost from './pages/blog/BlogPost';
+import ReturnRefundPolicy from './pages/return-refund-policy/ReturnRefundPolicy';
 
 // Outlet components
 import ShopForOutletIndex from './pages/shop-for-outlet/ShopForOutletIndex';
@@ -558,6 +559,8 @@ function App() {
                 <Route path="/track-order" element={<ComingSoon title="Track Order" message="Order tracking system coming soon!" />} />
                 <Route path="/contact" element={<ComingSoon title="Contact Us" message="Contact page coming soon! Email us at support@petco.com" />} />
                 <Route path="/faqs" element={<ComingSoon title="FAQs & Exchange Policy" message="FAQ and exchange policy page coming soon!" />} />
+                <Route path="/return-refund-policy" element={<ReturnRefundPolicy />} />
+                <Route path="/return-policy" element={<ReturnRefundPolicy />} />
                 
                 {/* Brand pages */}
                 <Route path="/brands/sara" element={<ComingSoon title="Sara's Brand" message="Explore Sara's premium pet products - coming soon!" />} />
