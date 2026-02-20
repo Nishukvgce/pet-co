@@ -93,11 +93,11 @@ const PetCoFoundation = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Initiative 1 */}
-                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
+                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group flex flex-col h-full">
                         <div className="h-48 overflow-hidden">
-                            <img src="/assets/images/dog/dg2.webp" alt="Feeding Drive" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                          <img src="/assets/images/dog/dg2.webp" alt="Feeding Drive" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
                         </div>
-                        <div className="p-8">
+                        <div className="p-8 flex flex-col flex-grow">
                             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4 text-orange-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                             </div>
@@ -110,14 +110,14 @@ const PetCoFoundation = () => {
                                 <li className="flex items-center"><span className="w-1.5 h-1.5 bg-orange-500 rounded-full mr-2"></span>Special diet for puppies</li>
                             </ul>
                         </div>
-                    </div>
+                      </div>
 
                     {/* Initiative 2 */}
-                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
-                         <div className="h-48 overflow-hidden">
-                            <img src="/assets/images/cat/ct2.webp" alt="Medical Care" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
-                        </div>
-                        <div className="p-8">
+                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group flex flex-col h-full">
+                       <div className="h-48 overflow-hidden">
+                        <img src="/assets/images/cat/ct2.webp" alt="Medical Care" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                      </div>
+                      <div className="p-8 flex flex-col flex-grow">
                             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                             </div>
@@ -130,17 +130,17 @@ const PetCoFoundation = () => {
                                 <li className="flex items-center"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>Sterilization drives</li>
                             </ul>
                         </div>
-                    </div>
+                      </div>
 
                     {/* Initiative 3 */}
-                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
-                         <div className="h-48 overflow-hidden">
-                             {/* Placeholder image from collage if needed, or re-using */}
-                             <div className="w-full h-full bg-orange-50 flex items-center justify-center">
-                                 <svg className="w-16 h-16 text-orange-200" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
-                             </div>
-                        </div>
-                        <div className="p-8">
+                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group flex flex-col h-full">
+                       <div className="h-48 overflow-hidden">
+                         {/* Placeholder image from collage if needed, or re-using */}
+                         <div className="w-full h-full bg-orange-50 flex items-center justify-center">
+                           <svg className="w-16 h-16 text-orange-200" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+                         </div>
+                      </div>
+                      <div className="p-8 flex flex-col flex-grow">
                             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 text-green-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
                             </div>
@@ -153,7 +153,7 @@ const PetCoFoundation = () => {
                                 <li className="flex items-center"><span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>Awareness campaigns</li>
                             </ul>
                         </div>
-                    </div>
+                      </div>
                 </div>
             </div>
         </section>
@@ -293,7 +293,7 @@ const PetCoFoundation = () => {
                         <p className="text-gray-600 text-sm mb-4 flex-grow">
                           Found injured and abandoned, Bruno's recovery journey is a testament to resilience. After weeks of critical care, he is now healthy, happy, and ready for his forever home.
                         </p>
-                        <a href="#" className="inline-flex items-center text-orange-600 font-semibold text-sm hover:text-orange-700">
+                        <a href="#" className="mt-auto inline-flex items-center text-orange-600 font-semibold text-sm hover:text-orange-700">
                           Read Bruno's Story <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </a>
                       </div>
@@ -310,7 +310,7 @@ const PetCoFoundation = () => {
                         <p className="text-gray-600 text-sm mb-4 flex-grow">
                           Thanks to our dedicated volunteers, over 500 stray animals receive a nutritious meal every single day. This simple act of kindness keeps them healthy and builds trust within the community.
                         </p>
-                        <a href="#" className="inline-flex items-center text-orange-600 font-semibold text-sm hover:text-orange-700">
+                        <a href="#" className="mt-auto inline-flex items-center text-orange-600 font-semibold text-sm hover:text-orange-700">
                           Volunteer With Us <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </a>
                       </div>
@@ -327,7 +327,7 @@ const PetCoFoundation = () => {
                         <p className="text-gray-600 text-sm mb-4 flex-grow">
                           Adoption changes lives. Our latest drive saw 15 kittens and 8 puppies find loving families. Every adoption not only saves a life but also opens up a spot for another animal in need.
                         </p>
-                        <a href="#" className="inline-flex items-center text-orange-600 font-semibold text-sm hover:text-orange-700">
+                        <a href="#" className="mt-auto inline-flex items-center text-orange-600 font-semibold text-sm hover:text-orange-700">
                           Adopt a Pet <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </a>
                       </div>
