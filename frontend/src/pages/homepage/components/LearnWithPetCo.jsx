@@ -124,16 +124,16 @@ const ArrowRight = ({ className = '' }) => (
 // ─── Component ────────────────────────────────────────────────────────────────
 const LearnWithPetCo = () => {
   return (
-    <section className="py-16 lg:py-20 bg-gradient-to-b from-white to-orange-50/30">
+    <section className="py-8 lg:py-20 bg-gradient-to-b from-white to-orange-50/30">
       <div className="container mx-auto px-4">
 
         {/* ── Premium Banner Header ─────────────────────────────────────────── */}
-        <div className="relative rounded-3xl overflow-hidden bg-[#faf4f0] mb-12 lg:mb-16">
+        <div className="relative rounded-3xl overflow-hidden bg-[#faf4f0] mb-8 lg:mb-16">
           <div className="absolute top-0 right-0 w-1/3 h-full bg-[#f2e6e1] skew-x-12 transform origin-bottom-right opacity-50" />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
             {/* Text */}
-            <div className="p-8 lg:p-12 lg:pr-4">
+            <div className="p-6 lg:p-12 lg:pr-4">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -147,14 +147,14 @@ const LearnWithPetCo = () => {
                   </span>
                 </div>
 
-                <h2 className="text-4xl lg:text-6xl font-heading font-black text-gray-900 mb-6 leading-tight">
+                <h2 className="text-3xl sm:text-4xl lg:text-6xl font-heading font-black text-gray-900 mb-4 leading-tight">
                   Learn with{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">
                     PET&CO
                   </span>
                 </h2>
 
-                <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-lg">
+                <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed mb-5 max-w-lg">
                   Empowering pet parents with over 20 years of expert knowledge. From nutrition to
                   behavior, explore our curated guides to give your companions the happy, healthy life
                   they deserve.
@@ -175,7 +175,7 @@ const LearnWithPetCo = () => {
             </div>
 
             {/* Hero image */}
-            <div className="relative h-64 lg:h-[500px] overflow-hidden">
+            <div className="relative h-52 sm:h-64 lg:h-[500px] overflow-hidden">
               <motion.img
                 initial={{ scale: 1.1, opacity: 0 }}
                 whileInView={{ scale: 1, opacity: 1 }}
@@ -209,7 +209,7 @@ const LearnWithPetCo = () => {
         </div>
 
         {/* ── Browse by Topic (6-tile category grid) ────────────────────────── */}
-        <div className="mb-14 lg:mb-20">
+        <div className="mb-8 lg:mb-20">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl lg:text-3xl font-heading font-bold text-gray-900">Browse by Topic</h3>
             <Link
@@ -255,7 +255,7 @@ const LearnWithPetCo = () => {
         </div>
 
         {/* ── Why PET&CO Essentials — Featured Guides (4 large image cards) ─── */}
-        <div className="mb-14 lg:mb-20">
+        <div className="mb-8 lg:mb-20">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-2xl lg:text-3xl font-heading font-bold text-gray-900">
@@ -322,7 +322,7 @@ const LearnWithPetCo = () => {
             <h3 className="text-2xl lg:text-3xl font-heading font-bold text-gray-900">Latest Guides</h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-10">
             {articles.map((article, index) => (
               <motion.article
                 key={article.id}
