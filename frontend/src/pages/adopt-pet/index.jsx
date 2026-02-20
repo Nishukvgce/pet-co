@@ -111,45 +111,45 @@ const AdoptPetPage = () => {
 
       <Header />
       
-      <main className="min-h-screen bg-background">
-        {/* Clean Hero Banner (no buttons) */}
-        <div className="relative bg-gradient-to-r from-orange-100 via-pink-100 to-purple-100 py-20 overflow-hidden">
+      <main className="min-h-screen bg-background pb-20 md:pb-0">
+        {/* Hero Banner */}
+        <div className="relative bg-gradient-to-r from-orange-100 via-pink-100 to-purple-100 py-10 md:py-20 overflow-hidden">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
               <div className="lg:col-span-7">
-                <h1 className="text-5xl md:text-6xl font-heading font-bold text-foreground mb-4 leading-tight">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-heading font-bold text-foreground mb-4 leading-tight">
                   Find Your Forever Friend
                 </h1>
-                <p className="text-lg text-muted-foreground mb-8 max-w-3xl">
+                <p className="text-base md:text-lg text-muted-foreground mb-6 max-w-3xl">
                   Every pet deserves a loving home. Browse adoptable pets from verified shelters and
                   connect with them directly. Adopt, don't shop — change a life today.
                 </p>
 
-                <div className="flex gap-10 mt-6">
+                <div className="flex flex-wrap gap-6 sm:gap-10 mt-4">
                   <div>
-                    <div className="text-3xl font-extrabold text-foreground">100+</div>
-                    <div className="text-sm text-muted-foreground">Happy Adoptions</div>
+                    <div className="text-2xl sm:text-3xl font-extrabold text-foreground">100+</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Happy Adoptions</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-extrabold text-foreground">Verified</div>
-                    <div className="text-sm text-muted-foreground">Shelters Only</div>
+                    <div className="text-2xl sm:text-3xl font-extrabold text-foreground">Verified</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Shelters Only</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-extrabold text-foreground">Health</div>
-                    <div className="text-sm text-muted-foreground">Guaranteed</div>
+                    <div className="text-2xl sm:text-3xl font-extrabold text-foreground">Health</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Guaranteed</div>
                   </div>
                 </div>
               </div>
 
-              <div className="lg:col-span-5">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="lg:col-span-5 hidden sm:block">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   {pets.slice(0, 4).map((p) => (
                     <div key={p.id} className="rounded-2xl overflow-hidden shadow-lg border border-white/30 bg-white/60">
-                      <img src={p.image} alt={p.name} className="w-full h-36 object-cover" />
+                      <img src={p.image} alt={p.name} className="w-full h-28 sm:h-36 object-cover" />
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 text-sm text-muted-foreground">Click a pet below to view full details and contact the shelter.</div>
+                <div className="mt-3 text-sm text-muted-foreground">Click a pet below to view full details and contact the shelter.</div>
               </div>
             </div>
           </div>
@@ -160,41 +160,41 @@ const AdoptPetPage = () => {
         </div>
 
         {/* Pets Grid Section */}
-        <div className="container mx-auto px-4 py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4">
+        <div className="container mx-auto px-4 py-10 md:py-16">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-4xl font-heading font-bold text-foreground mb-3">
               Pets Looking for Homes
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Click on any pet to learn more about their story and how you can give them a loving home.
             </p>
           </div>
 
           {/* Filter Section */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
-            <button className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8">
+            <button className="px-4 sm:px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm sm:text-base">
               All Pets
             </button>
-            <button className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <button className="px-4 sm:px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base">
               Dogs
             </button>
-            <button className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <button className="px-4 sm:px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base">
               Cats
             </button>
-            <button className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <button className="px-4 sm:px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base">
               Puppies
             </button>
-            <button className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <button className="px-4 sm:px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base">
               Kittens
             </button>
           </div>
 
-          {/* Pets Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {/* Pets Grid — 2 columns on mobile, 3 on md, 4 on xl */}
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
             {pets.map((pet) => (
               <div 
                 key={pet.id}
-                className="bg-card rounded-xl border border-border overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group"
+                className="bg-card rounded-xl border border-border overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group"
                 onClick={() => handlePetClick(pet)}
               >
                 <div className="aspect-square overflow-hidden">
@@ -205,37 +205,37 @@ const AdoptPetPage = () => {
                   />
                 </div>
                 
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-xl font-heading font-bold text-foreground">
+                <div className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <h3 className="text-base sm:text-xl font-heading font-bold text-foreground">
                       {pet.name}
                     </h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       pet.gender === 'Female' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700'
                     }`}>
                       {pet.gender}
                     </span>
                   </div>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Icon name="Calendar" size={16} />
-                      <span>{pet.age} • {pet.breed}</span>
+                  <div className="space-y-1 mb-3">
+                    <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
+                      <Icon name="Calendar" size={14} />
+                      <span className="truncate">{pet.age} • {pet.breed}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Icon name="MapPin" size={16} />
-                      <span>{pet.location}</span>
+                    <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
+                      <Icon name="MapPin" size={14} />
+                      <span className="truncate">{pet.location}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Icon name="Shield" size={16} className={pet.vaccinated ? 'text-green-500' : 'text-gray-400'} />
+                    <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+                      <Icon name="Shield" size={14} className={pet.vaccinated ? 'text-green-500' : 'text-gray-400'} />
                       <span className={pet.vaccinated ? 'text-green-600' : 'text-gray-500'}>
                         {pet.vaccinated ? 'Vaccinated' : 'Not Vaccinated'}
                       </span>
                     </div>
                   </div>
                   
-                  <button className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                    <Icon name="Heart" size={18} />
+                  <button className="w-full bg-primary text-white py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-1.5 text-sm">
+                    <Icon name="Heart" size={15} />
                     Learn More
                   </button>
                 </div>
@@ -244,7 +244,7 @@ const AdoptPetPage = () => {
           </div>
 
           {/* Load More */}
-          <div className="text-center mt-12">
+          <div className="text-center mt-8 sm:mt-12">
             <button className="px-8 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
               Load More Pets
             </button>
@@ -252,50 +252,50 @@ const AdoptPetPage = () => {
         </div>
 
         {/* How to Adopt Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-16">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-10 md:py-16">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-heading font-bold text-foreground mb-3">
                 How to Adopt
               </h2>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base md:text-lg text-muted-foreground">
                 Simple steps to bring your new family member home
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white text-2xl font-bold">1</span>
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <span className="text-white text-xl sm:text-2xl font-bold">1</span>
                 </div>
-                <h3 className="text-xl font-heading font-bold text-foreground mb-2">
-                  Browse & Connect
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-foreground mb-2">
+                  Browse &amp; Connect
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Find a pet you connect with and contact the shelter directly through our platform.
                 </p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white text-2xl font-bold">2</span>
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <span className="text-white text-xl sm:text-2xl font-bold">2</span>
                 </div>
-                <h3 className="text-xl font-heading font-bold text-foreground mb-2">
-                  Meet & Greet
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-foreground mb-2">
+                  Meet &amp; Greet
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Visit the shelter to meet your potential new family member and ensure it's a good fit.
                 </p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-white text-2xl font-bold">3</span>
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <span className="text-white text-xl sm:text-2xl font-bold">3</span>
                 </div>
-                <h3 className="text-xl font-heading font-bold text-foreground mb-2">
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-foreground mb-2">
                   Complete Adoption
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Complete the adoption paperwork and welcome your new family member home!
                 </p>
               </div>
