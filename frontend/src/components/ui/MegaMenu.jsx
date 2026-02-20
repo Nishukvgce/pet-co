@@ -334,10 +334,10 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
               {hubOpen && (
                 <ul className="mt-1 ml-8 space-y-1 border-l-2 border-orange-100 pl-3">
                   {[
-                    { label: 'Adopt a Pet', path: '/adopt-pet', icon: '🐕' },
-                    { label: 'PET&CO Foundation', path: '/petco-foundation', icon: '❤️' },
-                    { label: 'Learn With PET&CO', path: '/learn-with-petco', icon: '📚' },
-                    { label: 'Store & Spa Locator', path: '/store-locator', icon: '📍' },
+                    { label: 'Adopt a Pet', path: '/adopt-pet', icon: '' },
+                    { label: 'PET&CO Foundation', path: '/petco-foundation', icon: '' },
+                    { label: 'Learn With PET&CO', path: '/learn-with-petco', icon: '' },
+                    { label: 'Store & Spa Locator', path: '/store-locator', icon: '' },
                   ].map((link, idx) => (
                     <li key={idx}>
                       <button
