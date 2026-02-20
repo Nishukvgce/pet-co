@@ -11,7 +11,7 @@ const TrustSignals = () => {
     {
       icon: 'Truck',
       title: 'Free Shipping',
-      description: 'On orders above ₹499'
+      description: 'On orders above ₹999'
     },
     {
       icon: 'RotateCcw',
@@ -100,7 +100,7 @@ const TrustSignals = () => {
                 Call Us
               </p>
               <p className="font-data text-xs text-muted-foreground">
-                +91 80-4567-8900
+                90080 03096
               </p>
             </div>
           </div>
@@ -124,7 +124,7 @@ const TrustSignals = () => {
                 Email Support
               </p>
               <p className="font-data text-xs text-muted-foreground">
-                support@neenusnatural.com
+                info@petandco.com
               </p>
             </div>
           </div>

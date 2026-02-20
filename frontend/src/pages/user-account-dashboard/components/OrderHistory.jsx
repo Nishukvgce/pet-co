@@ -958,12 +958,12 @@ const OrderHistory = () => {
                     )} */}
                     
                     {/* Track order button for processing/shipped orders */}
-                    {(order?.status?.toLowerCase() === 'processing' || order?.status?.toLowerCase() === 'shipped') && (
+                    {/* {(order?.status?.toLowerCase() === 'processing' || order?.status?.toLowerCase() === 'shipped') && (
                       <Button variant="outline" size="sm">
                         <Icon name="Truck" className="h-4 w-4 mr-2" />
                         Track Order
                       </Button>
-                    )}
+                    )} */}
                     
                     {/* Cancel order button for processing orders */}
                     {order?.status?.toLowerCase() === 'processing' && (

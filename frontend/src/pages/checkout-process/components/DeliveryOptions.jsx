@@ -177,7 +177,7 @@ const DeliveryOptions = ({ onNext, onBack, shippingAddress, user: parentUser, is
               <ul className="font-body text-sm text-muted-foreground space-y-1">
                 {/* <li>• Orders placed before 2 PM are processed the same day</li>
                 <li>• Weekend deliveries available for express and premium options</li> */}
-                <li>• Free delivery on orders above ₹500</li>
+                <li>• Free delivery on orders above ₹999</li>
                 <li>• All products are carefully packaged to maintain freshness</li>
               </ul>
             </div>

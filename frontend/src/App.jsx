@@ -556,7 +556,7 @@ function App() {
                 <Route path="/birthday" element={<ComingSoon title="Birthday Club" message="Join our birthday club for special treats - coming soon!" />} />
                 {/* replaced by dedicated PetBoardingPage route above */}
                 <Route path="/adopt-a-pet" element={<ComingSoon title="Adopt a Pet" message="Pet adoption services coming soon!" />} />
-                <Route path="/track-order" element={<ComingSoon title="Track Order" message="Order tracking system coming soon!" />} />
+                {/* <Route path="/track-order" element={<ComingSoon title="Track Order" message="Order tracking system coming soon!" />} /> */}
                 <Route path="/contact" element={<ComingSoon title="Contact Us" message="Contact page coming soon! Email us at support@petco.com" />} />
                 <Route path="/faqs" element={<ComingSoon title="FAQs & Exchange Policy" message="FAQ and exchange policy page coming soon!" />} />
                 <Route path="/return-refund-policy" element={<ReturnRefundPolicy />} />

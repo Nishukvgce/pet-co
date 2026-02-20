@@ -14,7 +14,7 @@ import DogBanner from './components/DogBanner';
 import Footer from './components/Footer';
 import MobileBottomNav from '../../components/ui/MobileBottomNav';
 import WinterCollection from './components/WinterCollection'; // Updated import path for WinterCollection
-import LearnWithPetCo from './components/LearnWithPetCo';
+// import LearnWithPetCo from './components/LearnWithPetCo';
 import LoginModal from '../../components/ui/LoginModal';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -98,16 +98,16 @@ const Homepage = () => {
         <title>PET&CO - Premium Natural & Handmade Food Products</title>
         <meta
           name="description"
-          content="Discover authentic Indian flavors with PET&CO premium handmade food products. From traditional sweets to organic spices, experience pure natural taste with free shipping on orders above ₹499."
+          content="Discover authentic Indian flavors with PET&CO premium handmade food products. From traditional sweets to organic spices, experience pure natural taste with free shipping on orders above ₹999."
         />
         <meta name="keywords" content="natural food products, handmade sweets, organic spices, traditional pickles, pure ghee, Indian food, authentic flavors, chemical-free, preservative-free" />
         <meta property="og:title" content="PET&CO - Premium Natural & Handmade Food Products" />
-        <meta property="og:description" content="Discover authentic Indian flavors with premium handmade food products. Free shipping on orders above ₹499." />
+        <meta property="og:description" content="Discover authentic Indian flavors with premium handmade food products. Free shipping on orders above ₹999." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://neenusnatural.com/homepage" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="PET&CO - Premium Natural Food Products" />
-        <meta name="twitter:description" content="Authentic Indian flavors, handmade with love. Free shipping on orders above ₹499." />
+        <meta name="twitter:description" content="Authentic Indian flavors, handmade with love. Free shipping on orders above ₹999." />
         <link rel="canonical" href="https://neenusnatural.com/homepage" />
       </Helmet>
 
@@ -189,7 +189,7 @@ const Homepage = () => {
           <BestsellersCarousel onAddToCart={handleAddToCart} />
 
           {/* Learn With PET&Co */}
-          <LearnWithPetCo />
+          {/* <LearnWithPetCo /> */}
         </main>
 
         {/* Footer */}
@@ -245,7 +245,7 @@ const Homepage = () => {
           <BestsellersCarousel onAddToCart={handleAddToCart} />
 
           {/* Learn With PET&Co */}
-          <LearnWithPetCo />
+          {/* <LearnWithPetCo /> */}
 
           {/* Newsletter Section removed per request */}
         </main>

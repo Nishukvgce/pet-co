@@ -16,10 +16,10 @@ const AnnouncementBar = ({ isVisible = true, onClose }) => {
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex-1 text-center">
           <p className="font-caption text-sm font-medium">
-            <span className="hidden sm:inline">🎉 Free shipping on orders above ₹499 | Use code </span>
+            <span className="hidden sm:inline">🎉 Free shipping on orders above ₹999 | Use code </span>
             <span className="font-data font-bold">FLAT10</span>
             <span className="hidden sm:inline"> for 10% off on first order</span>
-            <span className="sm:hidden">Free shipping ₹499+ | Code: FLAT10</span>
+            <span className="sm:hidden">Free shipping ₹999+ | Code: FLAT10</span>
           </p>
         </div>
         <button

@@ -31,8 +31,8 @@ const OrderSummary = ({
     }
   };
 
-  // Free shipping threshold set to ₹500 for all locations per policy
-  const freeShippingThreshold = 500;
+  // Free shipping threshold set to ₹999 for all locations per policy
+  const freeShippingThreshold = 999;
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
 
   return (

@@ -23,7 +23,7 @@ const Footer = () => {
     customer: [
       { label: "My Account", path: "/user-account-dashboard" },
       { label: "Order History", path: "/user-account-dashboard?tab=orders" },
-      { label: "Track Order", path: "/track-order" },
+    
       { label: "Help & Support", path: "/support" }
     ],
     policies: [
@@ -44,7 +44,7 @@ const Footer = () => {
 
   const socialLinks = [
     { name: "Facebook", icon: "Facebook", url: "https://www.facebook.com/people/PET-CO/61580257131444" },
-    { name: "Instagram", icon: "Instagram", url: "https://www.instagram.com/petandco_bangalore" },
+    { name: "Instagram", icon: "Instagram", url: "https://www.instagram.com/petandco_banglore" },
     { name: "YouTube", icon: "Youtube", url: "" }
   ];
 
@@ -173,7 +173,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-[#0b1620] p-6 rounded">
             <h3 className="text-center font-semibold text-lg">Free Shipping</h3>
-            <p className="text-center text-sm text-orange-500 mt-2">On all orders above ₹499</p>
+            <p className="text-center text-sm text-orange-500 mt-2">On all orders above ₹999</p>
           </div>
           <div className="bg-[#0b1620] p-6 rounded">
             <h3 className="text-center font-semibold text-lg">Free Returns</h3>

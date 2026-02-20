@@ -52,7 +52,7 @@ const OrderSummary = ({
   const items = cartItems?.length > 0 ? cartItems : mockCartItems;
   // If server review data exists, prefer server-provided totals (server applies coupon and sets shipping)
   const calculatedSubtotal = serverReview?.subtotal ?? subtotal ?? items?.reduce((sum, item) => sum + (item?.price * item?.quantity), 0);
-  const calculatedShipping = serverReview?.shippingFee ?? shipping ?? (calculatedSubtotal >= 500 ? 0 : 50);
+  const calculatedShipping = serverReview?.shippingFee ?? shipping ?? (calculatedSubtotal >= 999 ? 0 : 50);
   const calculatedTotal = serverReview?.total ?? total ?? (calculatedSubtotal + calculatedShipping - (discount || 0));
   const calculatedDiscount = Math.max(0, (calculatedSubtotal - calculatedTotal)) || (discount || 0);
 
@@ -223,10 +223,10 @@ const OrderSummary = ({
           </div>
 
           {/* Free Shipping Notice */}
-          {calculatedSubtotal < 500 && (
+          {calculatedSubtotal < 999 && (
             <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
               <p className="font-caption text-xs text-warning-foreground">
-                Add ₹{(500 - calculatedSubtotal)?.toFixed(2)} more for free shipping!
+                Add ₹{(999 - calculatedSubtotal)?.toFixed(2)} more for free shipping!
               </p>
             </div>
           )}

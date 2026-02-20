@@ -96,7 +96,7 @@ const ShoppingCart = () => {
     <>
       <Helmet>
         <title>Shopping Cart - PET&CO | Review Your Natural Products</title>
-        <meta name="description" content="Review and modify your cart items. Secure checkout with natural and organic food products. Free shipping available on orders above ₹500." />
+        <meta name="description" content="Review and modify your cart items. Secure checkout with natural and organic food products. Free shipping available on orders above ₹999." />
         <meta name="keywords" content="shopping cart, natural products, organic food, checkout, free shipping, PET&CO" />
       </Helmet>
       <div className="min-h-screen bg-background">
