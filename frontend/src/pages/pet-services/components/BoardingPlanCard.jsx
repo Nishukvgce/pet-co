@@ -1,55 +1,51 @@
 import React from 'react';
 import AppImage from '../../../components/AppImage';
+import Button from '../../../components/ui/Button';
 
-const BoardingPlanCard = ({
-  title,
-  imageSrc,
-  plans = [],
-  petType = 'dog',
-  onSelectPlan,
-}) => {
+const BoardingPlanCard = ({ title, imageSrc, plans = [], onSelectPlan }) => {
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden">
-      <div className="p-4 sm:p-6">
-        <h3 className="text-2xl font-heading font-bold text-foreground text-center">
-          {title}
-        </h3>
-      </div>
-
+    <div className="rounded-3xl overflow-hidden border border-border bg-surface shadow-sm flex flex-col">
       {/* Image */}
-      <div className="px-4 sm:px-6">
-        <div className="rounded-xl overflow-hidden border border-muted">
-          <AppImage
-            src={imageSrc}
-            alt={`${petType} boarding representative image`}
-            className="w-full h-[220px] sm:h-[260px] object-cover"
-            loading="lazy"
-          />
-        </div>
+      <div className="overflow-hidden h-52">
+        <AppImage
+          src={imageSrc}
+          alt={title}
+          className="w-full h-full object-cover"
+        />
       </div>
 
-      {/* Plans */}
-      <div className="px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {plans.map((p, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => onSelectPlan?.(p)}
-              className="group rounded-xl overflow-hidden border border-border text-left focus:outline-none focus:ring-2 focus:ring-primary"
-            
-            >
-              <div className="px-5 py-4 bg-muted/60">
-                <div className="text-lg font-semibold text-foreground">{p.name}</div>
-                {p.subtitle && (
-                  <div className="text-sm text-muted-foreground">{p.subtitle}</div>
-                )}
-              </div>
-              <div className="px-5 py-4">
-                <div className="text-xl font-bold text-primary">₹ {p.price}</div>
-              </div>
-            </button>
-          ))}
+      {/* Content */}
+      <div className="p-6 flex flex-col gap-4 flex-1">
+        <h3 className="text-xl font-heading font-bold text-foreground">{title}</h3>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left py-2 pr-4 font-semibold text-muted-foreground">Plan</th>
+                <th className="text-left py-2 pr-4 font-semibold text-muted-foreground">Duration</th>
+                <th className="text-right py-2 pr-4 font-semibold text-muted-foreground">Price</th>
+                <th className="text-right py-2 font-semibold text-muted-foreground"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {plans.map((plan, idx) => (
+                <tr key={idx} className="border-b border-border last:border-0">
+                  <td className="py-3 pr-4 font-medium text-foreground">{plan.name}</td>
+                  <td className="py-3 pr-4 text-muted-foreground">{plan.subtitle}</td>
+                  <td className="py-3 pr-4 text-right font-semibold text-primary">₹{plan.price}</td>
+                  <td className="py-3 text-right">
+                    <Button
+                      size="sm"
+                      onClick={() => onSelectPlan && onSelectPlan(plan)}
+                    >
+                      Book
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

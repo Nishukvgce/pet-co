@@ -139,7 +139,7 @@ const PetWalkingPage = () => {
                   {/* Main professional card */}
                   <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-6 md:p-10 transform hover:scale-105 transition-all duration-500 hover:shadow-3xl">
                     <AppImage
-                      src="/assets/images/petwalking/petwalking.jpg"
+                      src="/assets/images/petwalking/petwalking.jpeg"
                       alt="Professional pet walking service"
                       className="w-full h-64 md:h-80 lg:h-96 object-cover rounded-2xl"
                     />
@@ -274,55 +274,54 @@ const PetWalkingPage = () => {
         </section>
 
         {/* Professional Benefits Section */}
-        <section className="py-12 md:py-24 bg-gradient-to-br from-slate-50 to-blue-50/30">
-          <div className="container mx-auto px-4">
+        <section className="py-12 md:py-24 bg-gradient-to-br from-orange-50/50 via-white to-slate-50 overflow-hidden">
+            <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
             {/* Professional Image */}
-            <div className="relative order-1 lg:order-2 mb-6 lg:mb-0">
-              <div className="absolute -top-6 -left-6 h-16 w-16 rounded-2xl bg-orange-200/30 blur-md" />
-              <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/50">
+            <div className="order-1 lg:order-2 mb-6 lg:mb-0">
+              <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white ring-1 ring-orange-100">
                 <AppImage 
-                  src="/assets/images/petwalking/petwalking2.png" 
+                  src="/assets/images/petwalking/petwalking2.jpeg" 
                   alt="Professional dog walker with happy dog"
-                  className="w-full h-56 sm:h-64 md:h-80 lg:h-96 object-cover"
+                  className="w-full aspect-[4/3] object-cover object-center"
                 />
               </div>
             </div>
 
-            {/* Benefits list */}
+                {/* Benefits list */}
             <div className="order-2 lg:order-1">
-              <div className="mb-8">
-                <h3 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight mb-3 tracking-tight">
-                  Why Choose Our
+                  <div className="mb-8">
+                    <h3 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight mb-3 tracking-tight">
+                      Why Choose Our
                   <span className="block bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                    Premium Services
-                  </span>
-                </h3>
-                <p className="text-lg text-slate-600 font-medium">Professional pet care with unmatched attention to detail</p>
-              </div>
+                        Premium Services
+                      </span>
+                    </h3>
+                <p className="text-base md:text-lg text-blue-600 font-semibold">Professional pet care with unmatched attention to detail</p>
+                  </div>
               <ul className="mt-4 md:mt-6 space-y-3 md:space-y-4">
                 <li className="flex items-start gap-3">
                   <span className="mt-1 h-8 w-8 inline-flex items-center justify-center rounded-full bg-orange-100 text-orange-600"><Icon name="MapPin" size={18} /></span>
-                  <p className="text-foreground">Live updates + walk history, all in-app.</p>
-                </li>
+                  <p className="text-slate-700 leading-relaxed">Live updates + walk history, all in-app.</p>
+                    </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1 h-8 w-8 inline-flex items-center justify-center rounded-full bg-orange-100 text-orange-600"><Icon name="Dog" size={18} /></span>
-                  <p className="text-foreground">Trained walkers who treat your dog like their own.</p>
-                </li>
+                  <p className="text-slate-700 leading-relaxed">Trained walkers who treat your dog like their own.</p>
+                    </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1 h-8 w-8 inline-flex items-center justify-center rounded-full bg-orange-100 text-orange-600"><Icon name="Phone" size={18} /></span>
-                  <p className="text-foreground">Cancel, reschedule, or book — your way.</p>
-                </li>
+                  <p className="text-slate-700 leading-relaxed">Cancel, reschedule, or book — your way.</p>
+                    </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1 h-8 w-8 inline-flex items-center justify-center rounded-full bg-orange-100 text-orange-600"><Icon name="Clock" size={18} /></span>
-                  <p className="text-foreground">Support from 10 am to 7 pm, every day.</p>
-                </li>
+                  <p className="text-slate-700 leading-relaxed">Support from 10 am to 7 pm, every day.</p>
+                    </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1 h-8 w-8 inline-flex items-center justify-center rounded-full bg-orange-100 text-orange-600"><Icon name="RefreshCcw" size={18} /></span>
                   <p className="text-foreground">If your walker can’t make it, we’ll find a replacement or give you an extra walk.</p>
-                </li>
-              </ul>
-            </div>
+                    </li>
+                  </ul>
+                </div>
             </div>
           </div>
         </section>

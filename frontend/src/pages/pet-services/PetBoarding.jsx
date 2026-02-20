@@ -263,6 +263,46 @@ const PetBoardingPage = () => {
               Book Now
             </Button>
           </div>
+
+          {/* Gallery Section */}
+          <div className="mt-16">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-heading font-bold">
+                Our Boarding <span className="text-primary">Gallery</span>
+              </h3>
+              <div className="mx-auto mt-3 h-0.5 w-40 bg-primary/60" />
+              <p className="text-muted-foreground mt-3 text-sm">
+                A glimpse into the loving, safe, and fun environment your pet enjoys while in our care.
+              </p>
+            </div>
+
+            <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+              {[
+                { src: '/assets/images/boarding/boadingGallary/dogshelter.jpeg', alt: 'Dog shelter boarding environment' },
+                { src: '/assets/images/boarding/boadingGallary/lovely-pets.jpeg', alt: 'Lovely pets enjoying their stay' },
+                { src: '/assets/images/boarding/boadingGallary/petandcoentrence.jpeg', alt: 'PET&CO boarding entrance' },
+                { src: '/assets/images/boarding/boadingGallary/petboarding.jpeg', alt: 'Pet boarding facility' },
+                { src: '/assets/images/boarding/boadingGallary/petshelter.jpeg', alt: 'Pet shelter cosy area' },
+                { src: '/assets/images/boarding/boadingGallary/petshelter1.jpeg', alt: 'Pet shelter comfortable space' },
+                { src: '/assets/images/boarding/boadingGallary/playroom.jpeg', alt: 'Playroom for pets' },
+                { src: '/assets/images/boarding/boadingGallary/playroom1.jpeg', alt: 'Fun playroom activities' },
+                { src: '/assets/images/boarding/boadingGallary/playroom2.jpeg', alt: 'Spacious play area' },
+                { src: '/assets/images/boarding/boadingGallary/playroom3.jpeg', alt: 'Pets playing together' },
+                { src: '/assets/images/boarding/boadingGallary/swimming.jpeg', alt: 'Pet swimming session' },
+              ].map((img, idx) => (
+                <div
+                  key={idx}
+                  className="break-inside-avoid rounded-2xl overflow-hidden border border-border group cursor-pointer"
+                >
+                  <AppImage
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
       {showBookingForm && (
