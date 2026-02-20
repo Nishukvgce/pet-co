@@ -101,6 +101,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
   ];
 
   const [visible, setVisible] = useState(false);
+  const [hubOpen, setHubOpen] = useState(false);
   // mobile drawer navigation state: a simple stack of views
   const [mobileStack, setMobileStack] = useState([{ title: 'Menu', items: null, key: 'root' }]);
 
@@ -295,33 +296,101 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           <div className="my-6 border-t border-gray-200" />
 
           {/* Secondary menu items with badges */}
-          <ul className="space-y-3 px-1">
-            {[
-              { label: 'PET&CO Spa', path: '/spa', badge: 'App Exclusive', icon: '/assets/images/dog/grooming.webp' },
-              { label: 'PET&CO Hub', path: '/hub', icon: '/assets/images/dog/pt1.webp' },
-              { label: 'Store & Spa Locator', path: '/locator', icon: '/assets/images/essential/GPS.png' },
-              { label: 'Become a Franchisee', path: '/franchise', icon: '/assets/images/dog/dg3.webp' },
-              { label: 'Join our Birthday Club', path: '/birthday', icon: '/assets/images/essential/dog_birthday.jpg' }
-            ].map((it, i) => (
-              <li key={i}>
-                <button
-                  onClick={() => { window.location.href = it.path; onClose(); }}
-                  className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
+          <ul className="space-y-1 px-1">
+            {/* PET&CO Spa */}
+            <li>
+              <button
+                onClick={() => { window.location.href = '/spa'; onClose(); }}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
+              >
+                <span className="flex items-center gap-3">
+                  <img src="/assets/images/dog/grooming.webp" alt="icon" className="w-5 h-5 rounded flex-shrink-0" />
+                  <span className="font-medium">PET&amp;CO Spa</span>
+                </span>
+                <span className="text-xs font-semibold px-2 py-1 rounded-full text-white whitespace-nowrap" style={{ background: '#ff9f43' }}>
+                  App Exclusive
+                </span>
+              </button>
+            </li>
+
+            {/* PET&CO Hub — inline accordion */}
+            <li>
+              <button
+                onClick={() => setHubOpen(o => !o)}
+                className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm text-foreground transition-colors ${hubOpen ? 'bg-orange-50' : 'hover:bg-muted'}`}
+              >
+                <span className="flex items-center gap-3">
+                  <img src="/assets/images/dog/pt1.webp" alt="icon" className="w-5 h-5 rounded flex-shrink-0" />
+                  <span className="font-medium">PET&amp;CO Hub</span>
+                </span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${hubOpen ? 'rotate-90' : ''}`}
+                  viewBox="0 0 20 20" fill="currentColor"
                 >
-                  <span className="flex items-center gap-3">
-                    <img src={it.icon} alt="icon" className="w-5 h-5 rounded flex-shrink-0" />
-                    <span className="font-medium">{it.label}</span>
-                  </span>
-                  {it.badge && (
-                    <span className="text-xs font-semibold px-2 py-1 rounded-full text-white whitespace-nowrap" style={{ 
-                      background: it.badge === 'App Exclusive' ? '#ff9f43' : it.badge === 'NEW' ? '#ff6b6b' : '#10b981' 
-                    }}>
-                      {it.badge}
-                    </span>
-                  )}
-                </button>
-              </li>
-            ))}
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+              </button>
+              {hubOpen && (
+                <ul className="mt-1 ml-8 space-y-1 border-l-2 border-orange-100 pl-3">
+                  {[
+                    { label: 'Adopt a Pet', path: '/adopt-pet', icon: '🐕' },
+                    { label: 'PET&CO Foundation', path: '/petco-foundation', icon: '❤️' },
+                    { label: 'Learn With PET&CO', path: '/learn-with-petco', icon: '📚' },
+                    { label: 'Store & Spa Locator', path: '/store-locator', icon: '📍' },
+                  ].map((link, idx) => (
+                    <li key={idx}>
+                      <button
+                        onClick={() => { window.location.href = link.path; onClose(); }}
+                        className="w-full text-left flex items-center gap-2 px-2 py-2 rounded-md hover:bg-orange-50 text-sm text-foreground transition-colors"
+                      >
+                        <span className="text-base">{link.icon}</span>
+                        <span>{link.label}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+
+            {/* Store & Spa Locator */}
+            <li>
+              <button
+                onClick={() => { window.location.href = '/locator'; onClose(); }}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
+              >
+                <span className="flex items-center gap-3">
+                  <img src="/assets/images/essential/GPS.png" alt="icon" className="w-5 h-5 rounded flex-shrink-0" />
+                  <span className="font-medium">Store &amp; Spa Locator</span>
+                </span>
+              </button>
+            </li>
+
+            {/* Become a Franchisee */}
+            <li>
+              <button
+                onClick={() => { window.location.href = '/franchise-details'; onClose(); }}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
+              >
+                <span className="flex items-center gap-3">
+                  <img src="/assets/images/dog/dg3.webp" alt="icon" className="w-5 h-5 rounded flex-shrink-0" />
+                  <span className="font-medium">Become a Franchisee</span>
+                </span>
+              </button>
+            </li>
+
+            {/* Join our Birthday Club */}
+            <li>
+              <button
+                onClick={() => { window.location.href = '/birthday'; onClose(); }}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
+              >
+                <span className="flex items-center gap-3">
+                  <img src="/assets/images/essential/dog_birthday.jpg" alt="icon" className="w-5 h-5 rounded flex-shrink-0" />
+                  <span className="font-medium">Join our Birthday Club</span>
+                </span>
+              </button>
+            </li>
           </ul>
 
           {/* Brands row */}
