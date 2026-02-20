@@ -10,18 +10,18 @@ import Footer from '../homepage/components/Footer';
 const branches = [
   {
     id: 1,
-    name: 'PET&CO Store & Spa – Indiranagar, Bengaluru',
-    area: 'Indiranagar',
+    name: 'PET&CO Store & Spa – Mahadevapura, Bengaluru',
+    area: 'Mahadevapura',
     city: 'Bengaluru',
-    address: '12, 100 Feet Road, HAL 2nd Stage, Indiranagar, Bengaluru – 560038',
-    phone: '+91 80 4567 8901',
+    address: '8, 1st Main road, 12th Cross Rd, Pai Layout, Mahadevapura, Bengaluru, Karnataka – 560016',
+    phone: '+91 90080 03096⁩',
     rating: 4.8,
     reviews: 214,
     hours: 'Mon–Sun: 10:00 AM – 9:00 PM',
     todayStatus: 'Open Now',
     services: ['Pet Store', 'Grooming Spa', 'Veterinary Consult'],
     image: '/assets/images/dog/dg1.webp',
-    mapUrl: 'https://www.google.com/maps/search/pet+store+indiranagar+bengaluru',
+    mapUrl: 'https://share.google/gcfmRIGxAH3MUUxsj',
     storeType: 'Flagship',
     badgeColor: 'bg-orange-500',
   },
@@ -36,7 +36,7 @@ const branches = [
     reviews: 178,
     hours: 'Mon–Sun: 10:00 AM – 9:00 PM',
     todayStatus: 'Open Now',
-    services: ['Pet Store', 'Grooming Spa', 'Pet Boarding'],
+    services: ['Pet Store', 'Grooming Spa', 'Pet Boarding','Veterinary Consult'],
     image: '/assets/images/dog/dh1.webp',
     mapUrl: 'https://www.google.com/maps/search/pet+store+koramangala+bengaluru',
     storeType: 'Premium',
@@ -57,10 +57,10 @@ const StoreCard = ({ branch, index }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.5, delay: index * 0.15 }}
-    className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group"
+    className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col h-full"
   >
     {/* Store Image */}
-    <div className="relative h-52 overflow-hidden">
+    <div className="relative h-52 overflow-hidden flex-shrink-0">
       <img
         src={branch.image}
         alt={branch.name}
@@ -92,56 +92,58 @@ const StoreCard = ({ branch, index }) => (
     </div>
 
     {/* Store Info */}
-    <div className="p-6 space-y-4">
-      {/* Rating */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              className={`w-4 h-4 ${i < Math.floor(branch.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200 fill-gray-200'}`}
-            />
+    <div className="p-6 flex-1 flex flex-col">
+      <div className="space-y-4">
+        {/* Rating */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-4 h-4 ${i < Math.floor(branch.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200 fill-gray-200'}`}
+              />
+            ))}
+          </div>
+          <span className="text-sm font-bold text-gray-800">{branch.rating}</span>
+          <span className="text-xs text-gray-400">({branch.reviews} reviews)</span>
+        </div>
+
+        {/* Address */}
+        <div className="flex items-start gap-3">
+          <MapPin className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
+          <p className="text-sm text-gray-600 leading-relaxed">{branch.address}</p>
+        </div>
+
+        {/* Phone */}
+        <div className="flex items-center gap-3">
+          <Phone className="w-4 h-4 text-orange-500 shrink-0" />
+          <a href={`tel:${branch.phone}`} className="text-sm text-gray-600 hover:text-orange-600 transition-colors font-medium">
+            {branch.phone}
+          </a>
+        </div>
+
+        {/* Hours */}
+        <div className="flex items-center gap-3">
+          <Clock className="w-4 h-4 text-orange-500 shrink-0" />
+          <p className="text-sm text-gray-600">{branch.hours}</p>
+        </div>
+
+        {/* Services */}
+        <div className="flex flex-wrap gap-2 pt-1">
+          {branch.services.map((svc) => (
+            <span
+              key={svc}
+              className="inline-flex items-center gap-1.5 text-xs font-medium bg-orange-50 text-orange-700 px-3 py-1 rounded-full border border-orange-100"
+            >
+              {serviceIcons[svc]}
+              {svc}
+            </span>
           ))}
         </div>
-        <span className="text-sm font-bold text-gray-800">{branch.rating}</span>
-        <span className="text-xs text-gray-400">({branch.reviews} reviews)</span>
       </div>
 
-      {/* Address */}
-      <div className="flex items-start gap-3">
-        <MapPin className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
-        <p className="text-sm text-gray-600 leading-relaxed">{branch.address}</p>
-      </div>
-
-      {/* Phone */}
-      <div className="flex items-center gap-3">
-        <Phone className="w-4 h-4 text-orange-500 shrink-0" />
-        <a href={`tel:${branch.phone}`} className="text-sm text-gray-600 hover:text-orange-600 transition-colors font-medium">
-          {branch.phone}
-        </a>
-      </div>
-
-      {/* Hours */}
-      <div className="flex items-center gap-3">
-        <Clock className="w-4 h-4 text-orange-500 shrink-0" />
-        <p className="text-sm text-gray-600">{branch.hours}</p>
-      </div>
-
-      {/* Services */}
-      <div className="flex flex-wrap gap-2 pt-1">
-        {branch.services.map((svc) => (
-          <span
-            key={svc}
-            className="inline-flex items-center gap-1.5 text-xs font-medium bg-orange-50 text-orange-700 px-3 py-1 rounded-full border border-orange-100"
-          >
-            {serviceIcons[svc]}
-            {svc}
-          </span>
-        ))}
-      </div>
-
-      {/* Divider */}
-      <div className="border-t border-gray-100 pt-4 flex gap-3">
+      {/* Divider + actions should stick to bottom for uniform layout */}
+      <div className="mt-6 border-t border-gray-100 pt-4 flex gap-3">
         <a
           href={branch.mapUrl}
           target="_blank"
