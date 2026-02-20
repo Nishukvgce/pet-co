@@ -235,7 +235,7 @@ const AdoptPetPage = () => {
                   </div>
                   
                   <button className="w-full bg-primary text-white py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-1.5 text-sm">
-                    <Icon name="Heart" size={15} />
+                  
                     Learn More
                   </button>
                 </div>

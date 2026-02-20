@@ -61,6 +61,7 @@ import FranchiseDetails from './pages/franchise-details';
 import LearnWithPetCoPage from './pages/learn-with-petco';
 import BlogPost from './pages/blog/BlogPost';
 import ReturnRefundPolicy from './pages/return-refund-policy/ReturnRefundPolicy';
+import StoreLocator from './pages/store-locator/StoreLocator';
 
 // Outlet components
 import ShopForOutletIndex from './pages/shop-for-outlet/ShopForOutletIndex';
@@ -550,8 +551,8 @@ function App() {
                 <Route path="/outlet" element={<ComingSoon title="PET&CO Outlet" message="Amazing deals up to 60% off coming soon!" />} />
                 <Route path="/spa" element={<ComingSoon title="PET&CO Spa" message="Pet grooming and spa services coming soon!" />} />
                 <Route path="/hub" element={<ComingSoon title="PET&CO Hub" message="Community hub for pet lovers coming soon!" />} />
-                <Route path="/locator" element={<ComingSoon title="Store & Spa Locator" message="Find stores and spa locations near you - coming soon!" />} />
-                <Route path="/locator" element={<ComingSoon title="Store & Spa Locator" message="Find stores and spa locations near you - coming soon!" />} />
+                <Route path="/store-locator" element={<StoreLocator />} />
+                <Route path="/locator" element={<StoreLocator />} />
                 <Route path="/franchise-details" element={<FranchiseDetails />} />
                 <Route path="/birthday" element={<ComingSoon title="Birthday Club" message="Join our birthday club for special treats - coming soon!" />} />
                 {/* replaced by dedicated PetBoardingPage route above */}

@@ -209,50 +209,7 @@ const LearnWithPetCo = () => {
         </div>
 
         {/* ── Browse by Topic (6-tile category grid) ────────────────────────── */}
-        <div className="mb-8 lg:mb-20">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl lg:text-3xl font-heading font-bold text-gray-900">Browse by Topic</h3>
-            <Link
-              to="/learn-with-petco"
-              className="text-sm font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1"
-            >
-              View all <ArrowRight />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
-            {topicCategories.map((topic, i) => (
-              <motion.div
-                key={topic.slug}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.07 }}
-              >
-                <Link
-                  to={`/learn-with-petco/topic/${topic.slug}`}
-                  className="group flex flex-col items-center gap-3"
-                >
-                  {/* Circular image */}
-                  <div
-                    className={`relative w-full aspect-square rounded-2xl overflow-hidden ${topic.color} ring-2 ring-transparent group-hover:ring-orange-300 transition-all duration-300`}
-                  >
-                    <img
-                      src={topic.image}
-                      alt={topic.label}
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {/* subtle overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                  </div>
-                  <span className="text-xs lg:text-sm font-semibold text-gray-800 text-center group-hover:text-orange-600 transition-colors">
-                    {topic.label}
-                  </span>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+    
 
         {/* ── Why PET&CO Essentials — Featured Guides (4 large image cards) ─── */}
         <div className="mb-8 lg:mb-20">
