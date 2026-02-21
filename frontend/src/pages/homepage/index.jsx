@@ -8,6 +8,7 @@ import BestsellersCarousel from './components/BestsellersCarousel';
 import PromoCards from '../../components/ui/PromoCards';
 import Essential from './components/Essential';
 import FeaturedBrands, { DecodingCatsSection } from './components/FeaturedBrands';
+import BigDeals from './components/BigDeals';
 import HouseOfPetCo from './components/HouseOfPetCo';
 import CatBanner from './components/CatBanner';
 import DogBanner from './components/DogBanner';
@@ -167,6 +168,9 @@ const Homepage = () => {
           {/* Featured Brands (next section) */}
           <FeaturedBrands />
 
+          {/* Big Deals - inserted after Featured Brands per request */}
+          <BigDeals />
+
           {/* From the House of PET&CO */}
           <HouseOfPetCo />
 
@@ -222,6 +226,9 @@ const Homepage = () => {
 
           {/* Featured Brands (next section) */}
           <FeaturedBrands />
+
+          {/* Big Deals - inserted after Featured Brands for desktop */}
+          <BigDeals />
 
           {/* From the House of PET&CO */}
           <HouseOfPetCo />

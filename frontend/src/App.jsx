@@ -549,7 +549,7 @@ function App() {
                 {/* Additional navigation routes */}
                 <Route path="/gift-cards" element={<ComingSoon title="Gift Cards" message="Digital gift cards are coming soon!" />} />
                 <Route path="/outlet" element={<ComingSoon title="PET&CO Outlet" message="Amazing deals up to 60% off coming soon!" />} />
-                <Route path="/spa" element={<ComingSoon title="PET&CO Spa" message="Pet grooming and spa services coming soon!" />} />
+                {/* <Route path="/spa" element={<ComingSoon title="PET&CO Spa" message="Pet grooming and spa services coming soon!" />} /> */}
                 <Route path="/hub" element={<ComingSoon title="PET&CO Hub" message="Community hub for pet lovers coming soon!" />} />
                 <Route path="/store-locator" element={<StoreLocator />} />
                 <Route path="/locator" element={<StoreLocator />} />

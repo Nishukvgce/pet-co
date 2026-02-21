@@ -298,7 +298,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           {/* Secondary menu items with badges */}
           <ul className="space-y-1 px-1">
             {/* PET&CO Spa */}
-            <li>
+            {/* <li>
               <button
                 onClick={() => { window.location.href = '/spa'; onClose(); }}
                 className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg hover:bg-muted text-sm text-foreground transition-colors"
@@ -311,7 +311,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                   App Exclusive
                 </span>
               </button>
-            </li>
+            </li> */}
 
             {/* PET&CO Hub — inline accordion */}
             <li>
@@ -394,7 +394,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           </ul>
 
           {/* Brands row */}
-          <div className="mt-6 px-3">
+          {/* <div className="mt-6 px-3">
             <h4 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Featured Brands</h4>
             <div className="flex items-center gap-2 flex-wrap">
               <Link to="/brands/sara" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-bold text-white leading-none transition-transform hover:scale-105" style={{ background: '#0b66b2' }} aria-label="Sara's">Sara's</Link>
@@ -402,7 +402,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
               <Link to="/brands/meowsi" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-bold text-white leading-none transition-transform hover:scale-105" style={{ background: '#111827' }} aria-label="Meowsi">Meowsi</Link>
               <Link to="/brands/fashi" onClick={onClose} className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-bold text-white leading-none transition-transform hover:scale-105" style={{ background: '#06b6d4' }} aria-label="FashiDog">FashiDog</Link>
             </div>
-          </div>
+          </div> */}
 
           {/* Footer links */}
           <div className="mt-8 px-3 pb-8 border-t border-gray-200">

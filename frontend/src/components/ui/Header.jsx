@@ -871,13 +871,13 @@ const Header = ({ onSearch = () => { } }) => {
                   <Icon name={isMegaMenuOpen && activeMegaCategory === 'hub' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
 
-                <Link 
+                {/* <Link 
                   to="/pet-spa"
                   className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
                 >
                   <span>PET&CO Spa</span>
                   <span className="bg-[#ff7a00] text-white text-xs font-semibold px-2 py-0.5 rounded">App Exclusive</span>
-                </Link>
+                </Link> */}
 
                 <Link 
                   to="/birthday-club"
