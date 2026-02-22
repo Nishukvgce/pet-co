@@ -59,6 +59,7 @@ import PetCoOutletPage from './pages/pet-services/PetCoOutlet';
 import BrandCollection from './pages/brands/BrandCollection';
 import FranchiseDetails from './pages/franchise-details';
 import LearnWithPetCoPage from './pages/learn-with-petco';
+import PetParentPage from './pages/pet-parent';
 import BlogPost from './pages/blog/BlogPost';
 import ReturnRefundPolicy from './pages/return-refund-policy/ReturnRefundPolicy';
 import StoreLocator from './pages/store-locator/StoreLocator';
@@ -572,6 +573,7 @@ function App() {
                 {/* Learn With PET&Co Routes */}
                 <Route path="/learn-with-petco" element={<LearnWithPetCoPage />} />
                 <Route path="/learn-with-petco/topic/:slug" element={<LearnWithPetCoPage />} />
+                <Route path="/pet-parent" element={<PetParentPage />} />
                 <Route path="/blog" element={<LearnWithPetCoPage />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
 

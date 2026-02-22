@@ -18,7 +18,7 @@ const categories = [
   {
     key: 'pet-parent',
     label: 'Pet parent',
-    to: '/learn-with-petco',
+    to: '/pet-parent',
     local: '/assets/images/homecategory/parents.webp',
     fallback: 'https://images.unsplash.com/photo-1525253086316-d0c936c814f8?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=abcdef1234567890'
   },
