@@ -86,7 +86,7 @@ const Footer = () => {
       </div>
 
       {/* Announcement banner */}
-      <div className="border-b border-[#0f2230]">
+      {/* <div className="border-b border-[#0f2230]">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <div className="w-16 opacity-90">
             <Icon name="Award" size={36} color="white" />
@@ -98,7 +98,7 @@ const Footer = () => {
             <Icon name="Award" size={36} color="white" />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main five-column footer */}
       <div className="container mx-auto px-4 py-10">

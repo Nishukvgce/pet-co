@@ -7,6 +7,7 @@ import CategoryTiles from './components/CategoryTiles';
 import BestsellersCarousel from './components/BestsellersCarousel';
 import PromoCards from '../../components/ui/PromoCards';
 import Essential from './components/Essential';
+import WhoShoppingFor from './components/WhoShoppingFor';
 import FeaturedBrands, { DecodingCatsSection } from './components/FeaturedBrands';
 import BigDeals from './components/BigDeals';
 import HouseOfPetCo from './components/HouseOfPetCo';
@@ -162,6 +163,9 @@ const Homepage = () => {
           {/* Promo cards (coupons / codes) - placed directly after hero */}
           <PromoCards />
 
+          {/* Who you shopping for? - category icons */}
+          <WhoShoppingFor />
+
           {/* Essentials section (below promo cards) */}
           <Essential />
 
@@ -220,6 +224,9 @@ const Homepage = () => {
 
           {/* Promo cards (coupons / codes) - placed directly after hero */}
           <PromoCards />
+
+          {/* Who you shopping for? - category icons */}
+          <WhoShoppingFor />
 
           {/* Essentials (below promo cards) */}
           <Essential />
