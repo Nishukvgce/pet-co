@@ -6,6 +6,16 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+:root {
+  /* PET PARENT premium palette */
+  --pp-primary: #b76e79; /* rose-gold accent */
+  --pp-dark: #1b1b1f; /* deep ink for text and borders */
+  --pp-pink: #fdeef2; /* soft rose petal background */
+  --pp-heading-pink: #f7a1b9; /* heading accent (rose variant) */
+  --pp-shadow: rgba(0,0,0,0.75);
+  --pp-badge-font-size: 13px;
+}
+
 * {
   box-sizing: border-box;
   line-height: normal;
