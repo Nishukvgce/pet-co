@@ -364,6 +364,13 @@ const outletWalkingSections = [
   buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+'])
 ];
 
+const rabbitSections = [
+  buildSection('brands', 'Brand', ['Science Selective', 'FloofYou', 'Oxbow', 'Boltz', 'Vetrina', 'Vitapol', 'M-Pets', 'Trixie']),
+  buildSection('foodType', 'Veg/Non-Veg', ['Veg', 'Non-Veg']),
+  buildSection('petTypes', 'Pet Type', ['Rabbits', 'Hamster & Guinea Pigs', 'Birds', 'Cats', 'Dogs']),
+  buildSection('priceRanges', 'Price', ['INR 0 - INR 500', 'INR 501 - INR 1000', 'INR 1000 - INR 2000', 'INR 2000+'])
+];
+
 export const CATEGORY_FILTERS = {
   dogs: {
     label: 'Dogs',
@@ -426,6 +433,14 @@ export const CATEGORY_FILTERS = {
       grooming: buildSubcategoryConfig('Outlet Grooming', outletGroomingSections),
       litter: buildSubcategoryConfig('Outlet Litter', catLitterSuppliesSections),
       all: buildSubcategoryConfig('All Outlet', outletFoodSections)
+    }
+  },
+  rabbits: {
+    label: 'Rabbits',
+    type: 'Rabbit',
+    subcategories: {
+      default: buildSubcategoryConfig('Rabbit Products', rabbitSections),
+      products: buildSubcategoryConfig('Rabbit Products', rabbitSections)
     }
   }
 };

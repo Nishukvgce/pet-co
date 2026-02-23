@@ -62,6 +62,7 @@ import FranchiseDetails from './pages/franchise-details';
 import LearnWithPetCoPage from './pages/learn-with-petco';
 import PetParentPage from './pages/pet-parent';
 import PetParentProducts from './pages/pet-parent/PetParentProducts';
+import RabbitProducts from './pages/shop-for-rabbit/RabbitProducts';
 import BlogPost from './pages/blog/BlogPost';
 import ReturnRefundPolicy from './pages/return-refund-policy/ReturnRefundPolicy';
 import StoreLocator from './pages/store-locator/StoreLocator';
@@ -578,6 +579,7 @@ function App() {
                 <Route path="/learn-with-petco/topic/:slug" element={<LearnWithPetCoPage />} />
                 <Route path="/pet-parent" element={<PetParentPage />} />
                 <Route path="/pet-parent/products" element={<PetParentProducts />} />
+                <Route path="/shop-for-rabbit" element={<RabbitProducts />} />
                 <Route path="/blog" element={<LearnWithPetCoPage />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
 

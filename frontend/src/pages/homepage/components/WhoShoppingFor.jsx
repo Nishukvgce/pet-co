@@ -32,14 +32,14 @@ const categories = [
   {
     key: 'rabbit',
     label: 'Rabbit',
-    to: '/shop-for-rabbit',
+      to: '/shop?type=rabbit',
     local: '/assets/images/homecategory/rabbit.jpg',
     fallback: 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=7890abcdef123456'
   },
   {
     key: 'birds',
     label: 'Birds',
-    to: '/shop-for-birds',
+    to: '/shop?type=birds',
     local: '/assets/images/homecategory/birds.webp',
     fallback: 'https://images.unsplash.com/photo-1501706362039-c6e8093a4b1c?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0fedcba987654321'
   },

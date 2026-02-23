@@ -21,6 +21,17 @@ export default function ShopIndex() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [selectedAge, setSelectedAge] = useState('all');
 
+  // Sidebar filter state
+  const [brandOptions, setBrandOptions] = useState([]);
+  const [petTypeOptions, setPetTypeOptions] = useState([]);
+  const [brandCounts, setBrandCounts] = useState({});
+  const [petTypeCounts, setPetTypeCounts] = useState({});
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [selectedPetTypes, setSelectedPetTypes] = useState([]);
+  const [priceMin, setPriceMin] = useState(0);
+  const [priceMax, setPriceMax] = useState(2000);
+  const [priceRange, setPriceRange] = useState([0, 2000]);
+
   // Layout refs for sidebar/top scroll behavior
   const leftRef = useRef(null);
   const rightRef = useRef(null);
@@ -44,15 +55,30 @@ export default function ShopIndex() {
 
         const normalized = (apiData || []).map(item => {
           const np = normalizeProductFromApi(item || {});
-          const fallbackImage = Array.isArray(np.images) ? (typeof np.images[0] === 'object' ? (np.images[0].url || np.images[0].path || np.images[0].imageUrl) : np.images[0]) : undefined;
-          return {
-            ...np,
-            id: np.id || item?.id,
-            image: np.imageUrl || np.image || fallbackImage || '/assets/images/no_image.png'
-          };
+          const fallbackImage = Array.isArray(np.images)
+            ? (typeof np.images[0] === 'object' ? (np.images[0].url || np.images[0].path || np.images[0].imageUrl) : np.images[0])
+            : undefined;
+          if (!np.image && fallbackImage) np.image = fallbackImage;
+          return np;
         });
 
-        if (!mounted) return;
+        try {
+          const brands = Array.from(new Set((normalized || []).map(p => (p.brand || '').toString()).filter(Boolean)));
+          const petTypes = Array.from(new Set((normalized || []).map(p => (p.petType || p.petTypeLabel || p.type || '').toString()).filter(Boolean)));
+          const prices = (normalized || []).map(p => Number(p.price || p.pricePerUnit || 0)).filter(n => !Number.isNaN(n));
+          const minP = prices.length ? Math.min(...prices) : 0;
+          const maxP = prices.length ? Math.max(...prices) : 2000;
+          const bCounts = (normalized || []).reduce((acc, p) => { const b = (p.brand||'').toString(); if (!b) return acc; acc[b] = (acc[b] || 0) + 1; return acc; }, {});
+          const ptCounts = (normalized || []).reduce((acc, p) => { const t = (p.petType || p.petTypeLabel || p.type || '').toString(); if (!t) return acc; acc[t] = (acc[t] || 0) + 1; return acc; }, {});
+          setBrandOptions(brands);
+          setPetTypeOptions(petTypes);
+          setBrandCounts(bCounts);
+          setPetTypeCounts(ptCounts);
+          setPriceMin(Math.floor(minP));
+          setPriceMax(Math.ceil(maxP));
+          setPriceRange([Math.floor(minP), Math.ceil(maxP)]);
+        } catch (e) { /* ignore */ }
+
         setProducts(normalized);
       } catch (err) {
         console.error('ShopIndex: failed to load products', err);
@@ -102,6 +128,31 @@ export default function ShopIndex() {
         return false;
       });
     }
+    // Apply Brand filter
+    if (selectedBrands && selectedBrands.length) {
+      const brandsLower = selectedBrands.map(b => b.toString().toLowerCase());
+      working = working.filter(p => (p.brand || '').toString().split(',').some(b => brandsLower.includes(b.trim().toLowerCase())));
+    }
+
+    // Apply Pet Type filter
+    if (selectedPetTypes && selectedPetTypes.length) {
+      const petLower = selectedPetTypes.map(b => b.toString().toLowerCase());
+      working = working.filter(p => {
+        const candidate = (p.petType || p.petTypeLabel || p.type || '').toString().toLowerCase();
+        return petLower.includes(candidate) || petLower.some(v => candidate.includes(v));
+      });
+    }
+
+    // Apply Price range
+    try {
+      const min = Number(priceRange[0] || priceMin);
+      const max = Number(priceRange[1] || priceMax);
+      working = working.filter(p => {
+        const pr = Number(p.price || p.pricePerUnit || 0) || 0;
+        return pr >= min && pr <= max;
+      });
+    } catch (e) { /* ignore */ }
+
     setFilteredProducts(working);
   }, [products, appliedFilters, selectedAge]);
 
@@ -111,6 +162,67 @@ export default function ShopIndex() {
       if (current.has(option)) current.delete(option); else current.add(option);
       return { ...prev, [sectionId]: Array.from(current) };
     });
+  };
+
+  // Brand checkbox toggle (applies immediately)
+  const toggleBrand = (brand) => {
+    setSelectedBrands(prev => {
+      const s = new Set(prev || []);
+      if (s.has(brand)) s.delete(brand); else s.add(brand);
+      const arr = Array.from(s);
+      setSelectedBrands(arr);
+      // apply immediately
+      setAppliedFilters(prevApplied => ({ ...prevApplied, brands: arr }));
+      return arr;
+    });
+  };
+
+  const togglePetType = (ptype) => {
+    setSelectedPetTypes(prev => {
+      const s = new Set(prev || []);
+      if (s.has(ptype)) s.delete(ptype); else s.add(ptype);
+      const arr = Array.from(s);
+      setSelectedPetTypes(arr);
+      setAppliedFilters(prevApplied => ({ ...prevApplied, petTypes: arr }));
+      return arr;
+    });
+  };
+
+  const handlePriceRangeChange = (min, max) => {
+    // normalize inputs to numbers and clamp to allowed bounds
+    let a = Number(min) || 0;
+    let b = Number(max) || 0;
+    if (a < priceMin) a = priceMin;
+    if (b > priceMax) b = priceMax;
+    if (a > b) {
+      // swap so the lower value is first
+      const tmp = a; a = b; b = tmp;
+    }
+    setPriceRange([Math.floor(a), Math.ceil(b)]);
+  };
+
+  const handlePriceInputChange = (index, raw) => {
+    const val = Number(raw);
+    if (Number.isNaN(val)) return;
+    const next = [...priceRange];
+    next[index] = val;
+    // enforce bounds
+    if (next[0] < priceMin) next[0] = priceMin;
+    if (next[1] > priceMax) next[1] = priceMax;
+    if (next[0] > next[1]) {
+      // keep them ordered; if user sets min > max, swap
+      const tmp = next[0]; next[0] = next[1]; next[1] = tmp;
+    }
+    setPriceRange([Math.floor(next[0]), Math.ceil(next[1])]);
+  };
+
+  const handleMaxPriceChange = (raw) => {
+    const val = Number(raw);
+    if (Number.isNaN(val)) return;
+    let v = Math.ceil(val);
+    if (v < priceMin) v = priceMin;
+    if (v > priceMax) v = priceMax;
+    setPriceRange([priceMin, v]);
   };
 
   const clearFilters = () => setSelectedFilters({});
@@ -137,22 +249,39 @@ export default function ShopIndex() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Sidebar */}
-          <div className={`md:col-span-3 space-y-3 ${showSidebar ? 'hidden md:block' : 'hidden'}`}>
+          <div className={`md:col-span-3 space-y-3 ${showSidebar ? 'md:block' : 'hidden'}`}>
             <div ref={leftRef} className="bg-white rounded border border-border overflow-hidden thin-gold-scroll" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }}>
               {/* Simple static Pet Type & Brand sections to match image */}
               <div className="p-4 border-b">
+                <h4 className="text-sm font-medium mb-3">Price</h4>
+                <div className="px-2 py-4">
+                  <div className="w-full mb-2">
+                    <input aria-label="max-price" type="range" min={priceMin} max={priceMax} value={priceRange[1]} onChange={e => handleMaxPriceChange(e.target.value)} className="w-full" />
+                  </div>
+                  <div className="flex justify-between text-xs mt-2 text-gray-600"><span>₹{priceMin}</span><span>₹{priceRange[1]}</span></div>
+                  <div className="mt-3 flex gap-2">
+                    <div className="w-full">
+                      <input aria-label="max-price-input" type="number" className="w-full border px-2 py-1" value={priceRange[1]} onChange={e => handleMaxPriceChange(e.target.value)} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border-b">
                 <h4 className="text-sm font-medium mb-3">Pet Type</h4>
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2"><input type="checkbox" /> Turtle (4)</label>
+                  {petTypeOptions.length ? petTypeOptions.map(pt => (
+                    <label key={pt} className="flex items-center gap-2"><input type="checkbox" checked={selectedPetTypes.includes(pt)} onChange={() => togglePetType(pt)} /> {pt} <span className="text-xs text-muted-foreground ml-1">({petTypeCounts[pt] || 0})</span></label>
+                  )) : <div className="text-xs text-muted-foreground">No pet types</div>}
                 </div>
               </div>
 
               <div className="p-4">
                 <h4 className="text-sm font-medium mb-3">Brand</h4>
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2"><input type="checkbox" /> Splashy Fin (17)</label>
-                  <label className="flex items-center gap-2"><input type="checkbox" /> Tetra (9)</label>
-                  <label className="flex items-center gap-2"><input type="checkbox" /> Tunai (7)</label>
+                  {brandOptions.length ? brandOptions.map(b => (
+                    <label key={b} className="flex items-center gap-2"><input type="checkbox" checked={selectedBrands.includes(b)} onChange={() => toggleBrand(b)} /> {b} <span className="text-xs text-muted-foreground ml-1">({brandCounts[b] || 0})</span></label>
+                  )) : <div className="text-xs text-muted-foreground">No brands</div>}
                 </div>
               </div>
             </div>
@@ -165,12 +294,12 @@ export default function ShopIndex() {
               <div className="flex items-center gap-3">
                 <button onClick={() => setFilterOpen(true)} className="px-4 py-2 border rounded bg-white">FILTERS</button>
                 <button onClick={() => setShowSidebar(s => !s)} className="px-3 py-2 border rounded bg-white">{showSidebar ? 'Hide' : 'Show'}</button>
-                <div className="flex items-center gap-2">
-                  <div className="px-3 py-2 border rounded bg-white">Age :</div>
-                  <select value={selectedAge} onChange={e => setSelectedAge(e.target.value)} className="border rounded px-2 py-2 bg-white text-sm">
-                    <option value="all">all</option>
-                    <option value="Puppy">Puppy</option>
+                <div>
+                  <select value={selectedAge} onChange={e => setSelectedAge(e.target.value)} className="border rounded px-3 py-2 bg-white">
+                    <option value="all">All Ages</option>
                     <option value="Adult">Adult</option>
+                    <option value="Kitten">Kitten</option>
+                    <option value="Puppy">Puppy</option>
                     <option value="Senior">Senior</option>
                   </select>
                 </div>
@@ -187,9 +316,22 @@ export default function ShopIndex() {
             </div>
 
             {/* Banner placeholder */}
-           
-        
-
+            {/* Brand chips (driven from backend) */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 overflow-x-auto" ref={topRef}>
+                {brandOptions.length ? brandOptions.map(b => (
+                  <button
+                    key={b}
+                    onClick={() => toggleBrand(b)}
+                    className={`text-sm px-3 py-1 rounded border whitespace-nowrap ${selectedBrands.includes(b) ? 'bg-white border-gray-300' : 'bg-white border-border'}`}
+                  >
+                    {b} <span className="text-xs text-muted-foreground ml-2">({brandCounts[b] || 0})</span>
+                  </button>
+                )) : (
+                  <div className="text-sm text-muted-foreground">No brands</div>
+                )}
+              </div>
+            </div>
             {/* Product Grid */}
             {loading ? (
               <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full"></div></div>
