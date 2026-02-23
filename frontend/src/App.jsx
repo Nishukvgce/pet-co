@@ -577,6 +577,7 @@ function App() {
                 <Route path="/learn-with-petco" element={<LearnWithPetCoPage />} />
                 <Route path="/learn-with-petco/topic/:slug" element={<LearnWithPetCoPage />} />
                 <Route path="/pet-parent" element={<PetParentPage />} />
+                <Route path="/pet-parent/products" element={<PetParentProducts />} />
                 <Route path="/blog" element={<LearnWithPetCoPage />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
 
