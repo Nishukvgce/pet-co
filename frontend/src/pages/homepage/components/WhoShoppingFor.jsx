@@ -25,7 +25,7 @@ const categories = [
   {
     key: 'fish',
     label: 'Fish',
-    to: '/shop-for-fish',
+    to: '/shop?type=fish',
     local: '/assets/images/homecategory/fish.webp',
     fallback: 'https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=123456abcdef7890'
   },

@@ -37,6 +37,7 @@ import DogHealthHygiene from './pages/shop-for-dogs/DogHealthHygiene';
 import DogTravelSupplies from './pages/shop-for-dogs/DogTravelSupplies';
 import DogTrainingEssentials from './pages/shop-for-dogs/DogTrainingEssentials';
 import ShopForDogsIndex from './pages/shop-for-dogs/ShopForDogsIndex';
+import ShopIndex from './pages/shop/ShopIndex';
 import CatFood from './pages/shop-for-cats/CatFood';
 import ShopForCatsIndex from './pages/shop-for-cats/ShopForCatsIndex';
 import CatTreats from './pages/shop-for-cats/CatTreats';
@@ -60,6 +61,7 @@ import BrandCollection from './pages/brands/BrandCollection';
 import FranchiseDetails from './pages/franchise-details';
 import LearnWithPetCoPage from './pages/learn-with-petco';
 import PetParentPage from './pages/pet-parent';
+import PetParentProducts from './pages/pet-parent/PetParentProducts';
 import BlogPost from './pages/blog/BlogPost';
 import ReturnRefundPolicy from './pages/return-refund-policy/ReturnRefundPolicy';
 import StoreLocator from './pages/store-locator/StoreLocator';
@@ -171,7 +173,8 @@ function App() {
                 <Route path="/brand/:brandSlug" element={<BrandCollection />} />
                 <Route path="/brands/:brandSlug" element={<BrandCollection />} />
                 
-                {/* Product collection route: choose collection based on query param (walk-essentials, dogfood, dogtreats, etc.) */}
+                {/* Product collection route: generic shop page (supports ?type=fish) and collection routes */}
+                <Route path="/shop" element={<ShopIndex />} />
                 <Route path="/shop-for-dogs" element={<ShopForDogsIndex />} />
                 <Route path="/shop-for-dogs/dog-grooming" element={<DogGrooming />} />
                 <Route path="/shop-for-dogs/dog-grooming/brushes-combs" element={<BrushesAndCombs />} />
