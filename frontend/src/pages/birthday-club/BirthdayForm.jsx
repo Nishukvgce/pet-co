@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import serviceBookingApi from '../../services/serviceBookingApi';
 import { AuthContext } from '../../contexts/AuthContext';
 
-export default function BirthdayForm() {
+export default function BirthdayForm({ onSuccess }) {
   const { user } = useContext(AuthContext) || {};
   const [form, setForm] = useState({
     ownerName: user?.name || '',
@@ -57,6 +57,7 @@ export default function BirthdayForm() {
       if (res && res.success) {
         setSuccess('Thank you! Your birthday booking was received. We will contact you shortly.');
         setForm((s) => ({ ...s, petName: '', preferredDate: '', preferredTime: '', notes: '' }));
+        if (typeof onSuccess === 'function') onSuccess();
       } else {
         setError(res?.message || 'Failed to submit booking');
       }

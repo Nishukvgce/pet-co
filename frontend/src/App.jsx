@@ -571,11 +571,11 @@ function App() {
                 <Route path="/return-policy" element={<ReturnRefundPolicy />} />
                 
                 {/* Brand pages */}
-                <Route path="/brands/sara" element={<ComingSoon title="Sara's Brand" message="Explore Sara's premium pet products - coming soon!" />} />
+                {/* <Route path="/brands/sara" element={<ComingSoon title="Sara's Brand" message="Explore Sara's premium pet products - coming soon!" />} />
                 <Route path="/brands/hearty" element={<ComingSoon title="Hearty Brand" message="Discover Hearty's nutritious pet food - coming soon!" />} />
                 <Route path="/brands/meowsi" element={<ComingSoon title="Meowsi Brand" message="Browse Meowsi's cat essentials - coming soon!" />} />
                 <Route path="/brands/fashi" element={<ComingSoon title="FashiDog Brand" message="Check out FashiDog's stylish accessories - coming soon!" />} />
-                
+                 */}
                 {/* Learn With PET&Co Routes */}
                 <Route path="/learn-with-petco" element={<LearnWithPetCoPage />} />
                 <Route path="/learn-with-petco/topic/:slug" element={<LearnWithPetCoPage />} />

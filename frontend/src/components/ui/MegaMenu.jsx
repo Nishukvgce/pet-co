@@ -77,11 +77,15 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
           path: '/pet-services',
           icon: '/assets/images/dog/dg7.webp'
         },
-        { 
-          label: 'Veterinary Service', 
-          path: '/veterinary-service',
-          icon: '/assets/images/essential/veterinary.png'
-        }
+        
+      ]
+    },
+    {
+      key: 'veterinary',
+      label: 'Veterinary',
+      icon: '/assets/images/essential/veterinary.png',
+      children: [
+        { label: 'Veterinary Services', path: '/veterinary-service', icon: '/assets/images/essential/veterinary.png' }
       ]
     },
     {
@@ -724,7 +728,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
               </div>
             </div>
           ) : activeCategory === 'pet-services' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
               <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
                 <Link to="/pet-services" onClick={onClose} className="block group">
                   <div className="flex items-center gap-3 mb-2">
@@ -769,7 +773,10 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                 </Link>
               </div>
 
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg">
+            </div>
+          ) : activeCategory === 'veterinary' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
+              {/* <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg">
                 <Link to="/veterinary-service" onClick={onClose} className="block group">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -780,9 +787,9 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                       <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded">NEW</span>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">Comprehensive veterinary care and health checkups</p>
+                  <p className="text-xs text-muted-foreground">Comprehensive veterinary care including consultations, vaccinations and health checkups.</p>
                 </Link>
-              </div>
+              </div> */}
             </div>
           ) : activeCategory === 'hub' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-6">

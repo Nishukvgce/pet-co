@@ -833,6 +833,15 @@ const Header = ({ onSearch = () => { } }) => {
                   <Icon name={isMegaMenuOpen && activeMegaCategory === 'pet-services' ? 'ChevronUp' : 'ChevronDown'} size={16} />
                 </button>
 
+                <Link
+                  to="/veterinary-service"
+                  className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary"
+                  onClick={() => { setIsMegaMenuOpen(false); setActiveMegaCategory(null); }}
+                >
+                  <span>Veterinary</span>
+                  <span className="bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
+                </Link>
+
                 <button
                   className={`flex items-center gap-2 text-sm font-medium ${activeMegaCategory === 'pharmacy' ? 'text-primary' : 'text-foreground'} hover:text-primary`}
                   onClick={() => {
