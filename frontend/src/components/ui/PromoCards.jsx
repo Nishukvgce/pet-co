@@ -43,7 +43,7 @@ const PromoCards = () => {
     return () => { mounted = false; };
   }, []);
   return (
-    <motion.section className="container mx-auto px-4 py-8" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={container}>
+    <motion.section className="container mx-auto px-4 py-8" initial="hidden" animate="show" variants={container}>
       {/* Continuous auto-scrolling promo row (pure CSS) */}
       <style>{`
         :root{ --promo-gap: 1rem; --promo-speed: 26s; --promo-card-minw: 320px; }
