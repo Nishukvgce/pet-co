@@ -130,7 +130,12 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
     
     // Rating (for new products)
     rating: '',
-    reviewCount: ''
+    reviewCount: '',
+    // Manufacturer Details
+    sku: '',
+    countryOfOrigin: '',
+    manufacturerName: '',
+    marketedBy: ''
   });
 
   const [categories, setCategories] = useState([]);
@@ -143,6 +148,7 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
   const [existingImages, setExistingImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [descriptionMode, setDescriptionMode] = useState('write'); // 'write' | 'preview'
   const [activeTab, setActiveTab] = useState('basic');
 
   // Type-based subcategory mapping
@@ -435,6 +441,45 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
       { id: 'training-aids', name: 'Training Aids' },
       { id: 'hygiene-products', name: 'Hygiene Products' },
       { id: 'all-accessories', name: 'All Accessories' }
+    ],
+    'Rabbit': [
+      { id: 'rabbit-food', name: 'Rabbit Food' },
+      { id: 'rabbit-treats', name: 'Rabbit Treats' },
+      { id: 'rabbit-habitats', name: 'Habitats & Accessories' },
+      { id: 'rabbit-grooming', name: 'Grooming & Health' },
+      { id: 'rabbit-toys', name: 'Toys & Chews' }
+    ],
+    'Fish': [
+      { id: 'fish-food', name: 'Fish Food' },
+      { id: 'aquariums', name: 'Aquariums & Bowls' },
+      { id: 'aquarium-filters', name: 'Filters & Pumps' },
+      { id: 'aquarium-decor', name: 'Decor & Gravel' },
+      { id: 'water-care', name: 'Water Care & Health' }
+    ],
+    'Bird': [
+      { id: 'bird-food', name: 'Bird Food' },
+      { id: 'bird-treats', name: 'Bird Treats' },
+      { id: 'bird-cages', name: 'Cages & Accessories' },
+      { id: 'bird-toys', name: 'Toys & Perches' },
+      { id: 'bird-health', name: 'Health & Grooming' }
+    ],
+    'Pet Parent': [
+      { id: 'tshirts', name: 'Tshirts' },
+      { id: 'keychains', name: 'Key chains' },
+      { id: 'floor', name: 'Floor cleaners' },
+      { id: 'lint', name: 'Lint rollers' },
+      { id: 'accessories', name: 'Accessories' },
+      { id: 'mugs', name: 'Mugs' },
+      { id: 'plants', name: 'Pet-safe plants' },
+      { id: 'carry', name: 'Everyday carry' },
+      { id: 'brooch', name: 'Brooch' },
+      { id: 'wallart', name: 'Wall art' },
+      { id: 'fridgemagnets', name: 'Fridge magnets' },
+      { id: 'air', name: 'Air freshners' },
+      { id: 'charms', name: 'Charms' },
+      { id: 'stationary', name: 'Stationary' },
+      { id: 'coasters', name: 'Coasters' },
+      { id: 'furniture', name: 'Furniture' }
     ]
   };
 
@@ -560,7 +605,17 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
 
   const populateFormFromProduct = (product) => {
     console.log('populateFormFromProduct - Full product data:', product);
-    const metadata = typeof product.metadata === 'object' ? product.metadata || {} : {};
+    let metadata = {};
+    try {
+      if (product && product.metadata) {
+        if (typeof product.metadata === 'object') metadata = product.metadata || {};
+        else if (typeof product.metadata === 'string') {
+          try { metadata = JSON.parse(product.metadata || '{}'); } catch { metadata = {}; }
+        }
+      }
+    } catch (err) {
+      metadata = {};
+    }
     const filters = metadata.filters || {};
     const pharmacy = metadata.pharmacy || {};
     
@@ -788,7 +843,12 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
       expiryDate: pharmacy.expiryDate || product.expiryDate || '',
 
       rating: product.rating?.toString() || '',
-      reviewCount: product.reviewCount?.toString() || ''
+      reviewCount: product.reviewCount?.toString() || '',
+      // Manufacturer Details - read from metadata.manufacturer object or product fields
+      sku: metadata.manufacturer?.sku || product.sku || '',
+      countryOfOrigin: metadata.manufacturer?.countryOfOrigin || product.countryOfOrigin || '',
+      manufacturerName: metadata.manufacturer?.manufacturerName || product.manufacturerName || '',
+      marketedBy: metadata.manufacturer?.marketedBy || product.marketedBy || ''
     });
 
     // Handle existing images - check multiple sources
@@ -947,6 +1007,22 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
     }
   }, [defaultSection, product]);
 
+  // Keep the rich-text contentEditable in sync with `formData.description` when loading/editing
+  useEffect(() => {
+    try {
+      const el = document.getElementById('desc-rich-editor');
+      if (el) {
+        const current = el.innerHTML || '';
+        const desired = formData.description || '';
+        if (current !== desired) {
+          el.innerHTML = desired;
+        }
+      }
+    } catch (e) {
+      // ignore DOM errors (server-side rendering or missing element)
+    }
+  }, [formData.description]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (name.includes('.')) {
@@ -959,11 +1035,12 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
         }
       }));
     } else if (name === 'type') {
-      // Clear subcategory when type changes
+      // Clear category/subcategory when type changes
       setFormData(prev => ({
         ...prev,
         [name]: type === 'checkbox' ? checked : value,
-        subcategory: '', // Clear subcategory when type changes
+        category: '',
+        subcategory: '',
         subcategoryLabel: ''
       }));
     } else if (name === 'subcategory') {
@@ -1269,6 +1346,13 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
           indications,
           contraindications,
           expiryDate: formData.expiryDate
+        },
+        // Manufacturer Details
+        manufacturer: {
+          sku: formData.sku,
+          countryOfOrigin: formData.countryOfOrigin,
+          manufacturerName: formData.manufacturerName,
+          marketedBy: formData.marketedBy
         }
       };
 
@@ -1323,10 +1407,10 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
 
   const tabs = [
     { id: 'basic', label: 'Basic Info' },
-    { id: 'details', label: 'Product Details' },
     { id: 'variants', label: 'Variants & Pricing' },
     { id: 'images', label: 'Images' },
-    { id: 'metadata', label: 'Categories & Tags' }
+    { id: 'metadata', label: 'Categories & Tags' },
+    { id: 'manufacturer', label: 'Manufacturer Details' }
   ];
 
   return (
@@ -1423,20 +1507,105 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
-                    Full Description * ({formData.description.length}/10000 characters)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-medium text-foreground">
+                      Full Description * ({formData.description.length}/10000 characters)
+                    </label>
+                    <span className="text-xs text-muted-foreground">Rich Text Editor</span>
+                  </div>
+
+                  {/* Toolbar */}
+                  <div className="flex flex-wrap gap-1 border border-border border-b-0 rounded-t-md bg-gray-50 px-2 py-1.5">
+                    {[
+                      { cmd: 'bold', label: <strong>B</strong>, title: 'Bold' },
+                      { cmd: 'italic', label: <em>I</em>, title: 'Italic' },
+                      { cmd: 'underline', label: <span style={{textDecoration:'underline'}}>U</span>, title: 'Underline' },
+                    ].map(({ cmd, label, title }) => (
+                      <button
+                        key={cmd}
+                        type="button"
+                        title={title}
+                        onMouseDown={(e) => { e.preventDefault(); document.execCommand(cmd, false, null); }}
+                        className="px-2 py-0.5 rounded text-sm border border-gray-300 bg-white hover:bg-gray-100 min-w-[28px]"
+                      >{label}</button>
+                    ))}
+                    <div className="w-px bg-gray-300 mx-1" />
+                    {[
+                      { cmd: 'formatBlock', val: 'H2', label: 'H2', title: 'Heading 2' },
+                      { cmd: 'formatBlock', val: 'H3', label: 'H3', title: 'Heading 3' },
+                      { cmd: 'formatBlock', val: 'H4', label: 'H4', title: 'Heading 4' },
+                      { cmd: 'formatBlock', val: 'P',  label: 'Para', title: 'Paragraph' },
+                    ].map(({ cmd, val, label, title }) => (
+                      <button
+                        key={val}
+                        type="button"
+                        title={title}
+                        onMouseDown={(e) => { e.preventDefault(); document.execCommand(cmd, false, val); }}
+                        className="px-2 py-0.5 rounded text-xs border border-gray-300 bg-white hover:bg-gray-100 font-semibold"
+                      >{label}</button>
+                    ))}
+                    <div className="w-px bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      title="Bullet List"
+                      onMouseDown={(e) => { e.preventDefault(); document.execCommand('insertUnorderedList', false, null); }}
+                      className="px-2 py-0.5 rounded text-sm border border-gray-300 bg-white hover:bg-gray-100"
+                    >• List</button>
+                    <button
+                      type="button"
+                      title="Numbered List"
+                      onMouseDown={(e) => { e.preventDefault(); document.execCommand('insertOrderedList', false, null); }}
+                      className="px-2 py-0.5 rounded text-sm border border-gray-300 bg-white hover:bg-gray-100"
+                    >1. List</button>
+                    <div className="w-px bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      title="Insert Table"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        const table = `<table style="width:100%;border-collapse:collapse;margin:8px 0"><tr><th style="border:1px solid #ccc;padding:6px;background:#f3f4f6">Feature</th><th style="border:1px solid #ccc;padding:6px;background:#f3f4f6">Details</th></tr><tr><td style="border:1px solid #ccc;padding:6px">Item</td><td style="border:1px solid #ccc;padding:6px">Value</td></tr></table><p><br></p>`;
+                        document.execCommand('insertHTML', false, table);
+                      }}
+                      className="px-2 py-0.5 rounded text-xs border border-gray-300 bg-white hover:bg-gray-100"
+                    >⊞ Table</button>
+                    <button
+                      type="button"
+                      title="Horizontal Rule"
+                      onMouseDown={(e) => { e.preventDefault(); document.execCommand('insertHorizontalRule', false, null); }}
+                      className="px-2 py-0.5 rounded text-xs border border-gray-300 bg-white hover:bg-gray-100"
+                    >── Hr</button>
+                  </div>
+
+                  {/* Editor area */}
+                  <div
+                    id="desc-rich-editor"
+                    contentEditable
+                    suppressContentEditableWarning
+                    onInput={(e) => {
+                      const html = e.currentTarget.innerHTML;
+                      setFormData(prev => ({ ...prev, description: html }));
+                    }}
+                    className="w-full min-h-[220px] border border-border rounded-b-md bg-white px-4 py-3 text-sm text-gray-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary/40 overflow-auto product-description-html"
+                    style={{ maxHeight: '340px' }}
+                    data-placeholder="Paste or type your product description here, then use the toolbar above to format it..."
+                  />
+
+                  {/* Hidden textarea to keep formData.description in sync for form submit */}
                   <textarea
                     name="description"
                     value={formData.description}
-                    onChange={handleChange}
+                    onChange={() => {}}
                     required
-                    rows={5}
                     maxLength={10000}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                    placeholder="Detailed product description"
+                    className="hidden"
+                    readOnly
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Select text and use the toolbar to apply formatting. Use <code className="bg-muted px-1 rounded">⊞ Table</code> to insert a feature table.
+                  </p>
                 </div>
+
+
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* <div>
@@ -1498,135 +1667,6 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
               </div>
             )}
 
-            {/* Product Details Tab */}
-            {activeTab === 'details' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
-                    Key Features
-                  </label>
-                  {formData.features.map((feature, index) => (
-                    <div key={index} className="flex gap-2 mb-2">
-                      <Input
-                        value={feature}
-                        onChange={(e) => handleArrayFieldChange('features', index, e.target.value)}
-                        placeholder="Enter a key feature"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeArrayField('features', index)}
-                        disabled={formData.features.length === 1}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => addArrayField('features')}
-                  >
-                    <Plus size={16} className="mr-1" />
-                    Add Feature
-                  </Button>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
-                    Ingredients (comma-separated) ({formData.ingredients.length}/10000 characters)
-                  </label>
-                  <textarea
-                    name="ingredients"
-                    value={formData.ingredients}
-                    onChange={handleChange}
-                    rows={3}
-                    maxLength={10000}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                    placeholder="Chicken, Rice, Vegetables, etc."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
-                    Benefits (comma-separated) ({formData.benefits.length}/10000 characters)
-                  </label>
-                  <textarea
-                    name="benefits"
-                    value={formData.benefits}
-                    onChange={handleChange}
-                    rows={3}
-                    maxLength={10000}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-                    placeholder="High protein, Supports digestive health, etc."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Nutrition Information
-                  </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-xs text-muted-foreground mb-1">Protein %</label>
-                      <Input
-                        name="nutrition.protein"
-                        value={formData.nutrition.protein}
-                        onChange={handleChange}
-                        placeholder="25"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-muted-foreground mb-1">Fat %</label>
-                      <Input
-                        name="nutrition.fat"
-                        value={formData.nutrition.fat}
-                        onChange={handleChange}
-                        placeholder="15"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-muted-foreground mb-1">Fiber %</label>
-                      <Input
-                        name="nutrition.fiber"
-                        value={formData.nutrition.fiber}
-                        onChange={handleChange}
-                        placeholder="4"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-muted-foreground mb-1">Moisture %</label>
-                      <Input
-                        name="nutrition.moisture"
-                        value={formData.nutrition.moisture}
-                        onChange={handleChange}
-                        placeholder="10"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-muted-foreground mb-1">Ash %</label>
-                      <Input
-                        name="nutrition.ash"
-                        value={formData.nutrition.ash}
-                        onChange={handleChange}
-                        placeholder="8"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-muted-foreground mb-1">Calories/kg</label>
-                      <Input
-                        name="nutrition.calories"
-                        value={formData.nutrition.calories}
-                        onChange={handleChange}
-                        placeholder="3500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Variants Tab */}
             {activeTab === 'variants' && (
@@ -1877,7 +1917,7 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
             {/* Metadata Tab */}
             {activeTab === 'metadata' && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1"> Type</label>
                     <select
@@ -1889,12 +1929,32 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                       <option value="">Select Type</option>
                       <option value="Dog">Dog</option>
                       <option value="Cat">Cat</option>
+                      <option value="Rabbit">Rabbit</option>
+                      <option value="Fish">Fish</option>
+                      <option value="Bird">Bird</option>
                       <option value="Pharmacy">Pharmacy</option>
                       <option value="Outlet">Outlet</option>
+                      <option value="Pet Parent">Pet Parent</option>
                     </select>
 
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
-                    <div className="bg-gray-50 p-4 rounded-lg border space-y-3">
+                    {/* For Rabbit/Bird/Fish show a single Breed Name input instead of Category/Subcategory */}
+                    {['Rabbit','Bird','Fish'].includes(formData.type) ? (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Breed Name</label>
+                        <Input
+                          name="subcategoryLabel"
+                          value={formData.subcategoryLabel}
+                          onChange={handleChange}
+                          placeholder="Enter breed name"
+                        />
+                        <p className="text-xs text-gray-500 mt-2">For {formData.type} products, provide the breed name here. Category and subcategory selection are hidden.</p>
+                      </div>
+                    ) : formData.type === 'Pet Parent' ? (
+                      null
+                    ) : (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
+                        <div className="bg-gray-50 p-4 rounded-lg border space-y-3">
                       {/* Search Input */}
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1990,15 +2050,20 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                             );
                           })}
                         </select>
-                      )}
+                          )}
                     </div>
                   </div>
+                )}
+                </div>
 
-                  <div>
+                <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Subcategory {!formData.type && <span className="text-sm font-normal text-gray-400">(Select Type first)</span>}
                     </label>
-                    {formData.type && subcategories && subcategories.length > 0 ? (
+                    {/* When type is Rabbit/Bird/Fish we already show Breed Name above and hide category/subcategory */}
+                    {['Rabbit','Bird','Fish'].includes(formData.type) ? (
+                      <></>
+                    ) : formData.type && subcategories && subcategories.length > 0 ? (
                       <div className="bg-gray-50 p-4 rounded-lg border space-y-3">
                         {/* Search Input */}
                         <div className="relative">
@@ -2109,14 +2174,18 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                   });
                   // Use a human-friendly label (name/label/slug) for type inference
                   const selectedCategoryLabel = selectedCategory ? (selectedCategory.name || selectedCategory.label || selectedCategory.slug || selectedCategory.id) : (formData.category || '');
-                  const type = inferCategoryType(selectedCategoryLabel || '');
+                  // Fallback to formData.type if inferCategoryType doesn't yield a specific type
+                  let type = inferCategoryType(selectedCategoryLabel || '');
+                  if(type === 'generic' && formData.type) {
+                      type = formData.type.toLowerCase();
+                  }
                   // Derive subtype from the selected CATEGORY label (not numeric id)
                   const categorySubType = inferSubcategoryType(selectedCategoryLabel || '') || 'generic';
                   
                   const sections = [];
 
-                  // Pet-specific filters for dog/cat categories
-                  if (type === 'dog' || type === 'cat') {
+                  // Pet-specific filters for dog/cat/rabbit/bird etc categories
+                  if (['dog', 'cat', 'rabbit', 'bird', 'fish'].includes(type)) {
                     sections.push(
                       <div key="pet-specific" className="space-y-4">
                         <h4 className="text-sm font-medium text-foreground">Pet-specific Filters</h4>
@@ -2489,6 +2558,59 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                 
 
               
+              </div>
+            )}
+
+            {/* Manufacturer Details Tab */}
+            {activeTab === 'manufacturer' && (
+              <div className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                  <p className="text-sm text-blue-700">These details are shown on the product detail page under "Manufacturer Details".</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">SKU</label>
+                  <Input
+                    name="sku"
+                    value={formData.sku}
+                    onChange={handleChange}
+                    placeholder="e.g. DSWJC0001NKFPH"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Country of Origin</label>
+                  <Input
+                    name="countryOfOrigin"
+                    value={formData.countryOfOrigin}
+                    onChange={handleChange}
+                    placeholder="e.g. India"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Name & Address of Manufacturer</label>
+                  <textarea
+                    name="manufacturerName"
+                    value={formData.manufacturerName}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm"
+                    placeholder="e.g. NEO KUMFURT Corp. Office: 273, Satra Plaza, Sector 19D, Vashi, Navi Mumbai, 400705"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Marketed by</label>
+                  <textarea
+                    name="marketedBy"
+                    value={formData.marketedBy}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm"
+                    placeholder="e.g. NEO KUMFURT Corp. Office: 273, Satra Plaza, Sector 19D, Vashi, Navi Mumbai, 400705"
+                  />
+                </div>
               </div>
             )}
 

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 const slides = [
   {
-    src: '/assets/images/banners/d1.png',
+    src: '/assets/images/banners/d1.jpeg',
     // Mobile-specific banner (used on small viewports)
     mobileSrc: '/assets/images/banners/2.png',
     fit: 'contain',

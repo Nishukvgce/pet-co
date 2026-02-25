@@ -903,6 +903,50 @@ public class ProductController {
                 md.put("pharmacy", pharmacy);
             }
 
+            // Ensure a structured `manufacturer` object is available in metadata
+            try {
+                // Prefer explicit manufacturer column value
+                if (p.getManufacturer() != null && !p.getManufacturer().isBlank()) {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("name", p.getManufacturer());
+                    // add extra fields from columns if available
+                    if (p.getManufacturerAddress() != null) m.put("address", p.getManufacturerAddress());
+                    if (p.getCountryOfOrigin() != null) m.put("countryOfOrigin", p.getCountryOfOrigin());
+                    if (p.getSku() != null) m.put("sku", p.getSku());
+                    if (p.getMarketedBy() != null) m.put("marketedBy", p.getMarketedBy());
+                    md.put("manufacturer", m);
+                } else {
+                    // If pharmacy.manufacturer exists, map it into metadata.manufacturer
+                    Object pharmacyMan = pharmacy.get("manufacturer");
+                    if (pharmacyMan != null) {
+                        if (pharmacyMan instanceof Map) {
+                            md.put("manufacturer", pharmacyMan);
+                        } else {
+                            Map<String, Object> m = new HashMap<>();
+                            m.put("name", pharmacyMan.toString());
+                            md.put("manufacturer", m);
+                        }
+                    } else {
+                        // If metadata already contains a manufacturer (string), convert to object
+                        Object existing = md.get("manufacturer");
+                        if (existing instanceof String) {
+                            Map<String, Object> m = new HashMap<>();
+                            m.put("name", existing.toString());
+                            md.put("manufacturer", m);
+                        }
+                    }
+                }
+            } catch (Exception ignore) {
+            }
+
+            // Export SKU / country / manufacturer address / marketedBy into metadata for frontend
+            try {
+                if (p.getSku() != null && !p.getSku().isBlank()) md.put("sku", p.getSku());
+                if (p.getCountryOfOrigin() != null && !p.getCountryOfOrigin().isBlank()) md.put("countryOfOrigin", p.getCountryOfOrigin());
+                if (p.getManufacturerAddress() != null && !p.getManufacturerAddress().isBlank()) md.put("manufacturerAddress", p.getManufacturerAddress());
+                if (p.getMarketedBy() != null && !p.getMarketedBy().isBlank()) md.put("marketedBy", p.getMarketedBy());
+            } catch (Exception ignore) {}
+
             // Add filters object for frontend convenience (from extracted columns)
             Map<String, Object> filters = new HashMap<>();
             if (p.getBrands() != null && !p.getBrands().isBlank()) {
@@ -994,7 +1038,77 @@ public class ProductController {
                 md.put("filters", filters);
             }
 
-            // Update metadata back to product
+            // If top-level price/originalPrice is missing, try to derive from variants
+            try {
+                Object variantsObj2 = md.get("variants");
+                if (variantsObj2 instanceof List) {
+                    List<?> variantsList2 = (List<?>) variantsObj2;
+                    double minPrice = Double.MAX_VALUE;
+                    double minOriginal = Double.MAX_VALUE;
+                    boolean foundPrice = false;
+                    boolean foundOriginal = false;
+
+                    for (Object varObj : variantsList2) {
+                        if (!(varObj instanceof Map)) continue;
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> v = (Map<String, Object>) varObj;
+
+                        Object pv = v.get("price");
+                        if (pv == null) pv = v.get("sellingPrice");
+                        if (pv == null) pv = v.get("mrp");
+                        Double pval = null;
+                        try {
+                            if (pv instanceof Number) pval = ((Number) pv).doubleValue();
+                            else if (pv != null) {
+                                String s = pv.toString().replaceAll("[^0-9\\.\\-]", "");
+                                if (!s.isBlank()) pval = Double.parseDouble(s);
+                            }
+                        } catch (Exception ignore) {
+                        }
+
+                        if (pval != null) {
+                            foundPrice = true;
+                            if (pval < minPrice) minPrice = pval;
+                        }
+
+                        Object opv = v.get("originalPrice");
+                        if (opv == null) opv = v.get("original_price");
+                        if (opv == null) opv = v.get("mrp");
+                        Double oval = null;
+                        try {
+                            if (opv instanceof Number) oval = ((Number) opv).doubleValue();
+                            else if (opv != null) {
+                                String s = opv.toString().replaceAll("[^0-9\\.\\-]", "");
+                                if (!s.isBlank()) oval = Double.parseDouble(s);
+                            }
+                        } catch (Exception ignore) {
+                        }
+
+                        if (oval != null) {
+                            foundOriginal = true;
+                            if (oval < minOriginal) minOriginal = oval;
+                        }
+                    }
+
+                    if (foundPrice && p.getPrice() == null) {
+                        p.setPrice(minPrice == Double.MAX_VALUE ? null : minPrice);
+                    }
+                    if (foundOriginal && p.getOriginalPrice() == null) {
+                        p.setOriginalPrice(minOriginal == Double.MAX_VALUE ? null : minOriginal);
+                    }
+                    // If originalPrice still missing, set it equal to price for display
+                    if (p.getOriginalPrice() == null && p.getPrice() != null) {
+                        p.setOriginalPrice(p.getPrice());
+                    }
+
+                    // Put pricing back into metadata for frontend convenience
+                    try {
+                        if (p.getPrice() != null) md.put("price", p.getPrice());
+                        if (p.getOriginalPrice() != null) md.put("originalPrice", p.getOriginalPrice());
+                    } catch (Exception ignore) {}
+                }
+            } catch (Exception ignore) {}
+
             p.setMetadata(md);
 
         } catch (Exception e) {
@@ -1573,6 +1687,58 @@ public class ProductController {
                 }
             }
 
+            // If metadata contains a structured manufacturer object, extract name into column
+            Object metaManufacturer = md.get("manufacturer");
+            if (metaManufacturer != null) {
+                try {
+                    if (metaManufacturer instanceof Map) {
+                        Map<?, ?> mm = (Map<?, ?>) metaManufacturer;
+                        Object name = mm.get("name");
+                        if (name == null) name = mm.get("manufacturerName");
+                        if (name != null && !name.toString().isBlank()) {
+                            p.setManufacturer(name.toString());
+                        }
+                        // Extract other manufacturer related fields if present
+                        Object maddr = mm.get("address");
+                        if (maddr == null) maddr = mm.get("manufacturerAddress");
+                        if (maddr != null && !maddr.toString().isBlank()) {
+                            p.setManufacturerAddress(maddr.toString());
+                        }
+                        Object country = mm.get("country") != null ? mm.get("country") : mm.get("countryOfOrigin");
+                        if (country != null && !country.toString().isBlank()) {
+                            p.setCountryOfOrigin(country.toString());
+                        }
+                        Object skuObj = mm.get("sku");
+                        if (skuObj != null && !skuObj.toString().isBlank()) {
+                            p.setSku(skuObj.toString());
+                        }
+                        Object marketed = mm.get("marketedBy") != null ? mm.get("marketedBy") : mm.get("marketed_by");
+                        if (marketed != null && !marketed.toString().isBlank()) {
+                            p.setMarketedBy(marketed.toString());
+                        }
+                    } else if (metaManufacturer instanceof String) {
+                        String mstr = (String) metaManufacturer;
+                        if (!mstr.isBlank()) p.setManufacturer(mstr);
+                    }
+                } catch (Exception ignore) {
+                }
+            }
+
+            // Additionally, if metadata contains top-level keys for SKU / country / manufacturer address / marketedBy, extract them
+            try {
+                Object skuObj = md.get("sku");
+                if (skuObj != null && !skuObj.toString().isBlank()) p.setSku(skuObj.toString());
+                Object countryObj = md.get("countryOfOrigin");
+                if (countryObj == null) countryObj = md.get("country");
+                if (countryObj != null && !countryObj.toString().isBlank()) p.setCountryOfOrigin(countryObj.toString());
+                Object maddrObj = md.get("manufacturerAddress");
+                if (maddrObj == null) maddrObj = md.get("manufacturer_address");
+                if (maddrObj != null && !maddrObj.toString().isBlank()) p.setManufacturerAddress(maddrObj.toString());
+                Object marketedObj = md.get("marketedBy");
+                if (marketedObj == null) marketedObj = md.get("marketed_by");
+                if (marketedObj != null && !marketedObj.toString().isBlank()) p.setMarketedBy(marketedObj.toString());
+            } catch (Exception ignore) {}
+
             // Extract filter information from metadata.filters to separate columns for
             // efficient querying
             Object filtersObj = md.get("filters");
@@ -1755,6 +1921,21 @@ public class ProductController {
             }
             if (p.getWeightUnit() != null && !p.getWeightUnit().isBlank()) {
                 md.remove("weightUnit");
+            }
+            if (p.getSku() != null && !p.getSku().isBlank()) {
+                md.remove("sku");
+            }
+            if (p.getCountryOfOrigin() != null && !p.getCountryOfOrigin().isBlank()) {
+                md.remove("countryOfOrigin");
+                md.remove("country");
+            }
+            if (p.getManufacturerAddress() != null && !p.getManufacturerAddress().isBlank()) {
+                md.remove("manufacturerAddress");
+                md.remove("manufacturer_address");
+            }
+            if (p.getMarketedBy() != null && !p.getMarketedBy().isBlank()) {
+                md.remove("marketedBy");
+                md.remove("marketed_by");
             }
             if (p.getFlavors() != null && !p.getFlavors().isBlank()) {
                 md.remove("flavors");

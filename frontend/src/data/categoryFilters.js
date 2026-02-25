@@ -32,7 +32,11 @@ export const PRODUCT_TYPES = {
   DOG: 'Dog',
   CAT: 'Cat',
   PHARMACY: 'Pharmacy',
-  OUTLET: 'Outlet'
+  OUTLET: 'Outlet',
+  RABBIT: 'Rabbit',
+  FISH: 'Fish',
+  BIRD: 'Bird',
+  PET_PARENT: 'Pet Parent'
 };
 
 // Category mappings for consistent naming
@@ -371,6 +375,23 @@ const rabbitSections = [
   buildSection('priceRanges', 'Price', ['INR 0 - INR 500', 'INR 501 - INR 1000', 'INR 1000 - INR 2000', 'INR 2000+'])
 ];
 
+const fishSections = [
+  buildSection('brands', 'Brand', ['Tetra', 'Hikari', 'API', 'Seachem', 'Aqueon']),
+  buildSection('foodType', 'Veg/Non-Veg', ['Veg', 'Non-Veg']),
+  buildSection('priceRanges', 'Price', ['INR 0 - INR 500', 'INR 501 - INR 1000', 'INR 1000 - INR 2000', 'INR 2000+'])
+];
+
+const birdSections = [
+  buildSection('brands', 'Brand', ['Vitapol', 'Zupreem', 'Higgins', 'Kaytee']),
+  buildSection('foodType', 'Veg/Non-Veg', ['Veg', 'Non-Veg']),
+  buildSection('priceRanges', 'Price', ['INR 0 - INR 500', 'INR 501 - INR 1000', 'INR 1000 - INR 2000', 'INR 2000+'])
+];
+
+const petParentSections = [
+  buildSection('brands', 'Brand', ['Pet and Co', 'Generic']),
+  buildSection('priceRanges', 'Price', ['INR 0 - INR 500', 'INR 501 - INR 1000', 'INR 1000 - INR 2000', 'INR 2000+'])
+];
+
 export const CATEGORY_FILTERS = {
   dogs: {
     label: 'Dogs',
@@ -441,6 +462,30 @@ export const CATEGORY_FILTERS = {
     subcategories: {
       default: buildSubcategoryConfig('Rabbit Products', rabbitSections),
       products: buildSubcategoryConfig('Rabbit Products', rabbitSections)
+    }
+  },
+  fish: {
+    label: 'Fish',
+    type: 'Fish',
+    subcategories: {
+      default: buildSubcategoryConfig('Fish Products', fishSections),
+      products: buildSubcategoryConfig('Fish Products', fishSections)
+    }
+  },
+  birds: {
+    label: 'Birds',
+    type: 'Bird',
+    subcategories: {
+      default: buildSubcategoryConfig('Bird Products', birdSections),
+      products: buildSubcategoryConfig('Bird Products', birdSections)
+    }
+  },
+  'pet-parent': {
+    label: 'Pet Parent',
+    type: 'Pet Parent',
+    subcategories: {
+      default: buildSubcategoryConfig('Pet Parent Products', petParentSections),
+      products: buildSubcategoryConfig('Pet Parent Products', petParentSections)
     }
   }
 };

@@ -8,11 +8,15 @@ body {
 
 :root {
   /* PET PARENT premium palette */
-  --pp-primary: #b76e79; /* rose-gold accent */
-  --pp-dark: #1b1b1f; /* deep ink for text and borders */
-  --pp-pink: #fdeef2; /* soft rose petal background */
-  --pp-heading-pink: #f7a1b9; /* heading accent (rose variant) */
-  --pp-shadow: rgba(0,0,0,0.75);
+  --pp-primary: #b76e79;
+  /* rose-gold accent */
+  --pp-dark: #1b1b1f;
+  /* deep ink for text and borders */
+  --pp-pink: #fdeef2;
+  /* soft rose petal background */
+  --pp-heading-pink: #f7a1b9;
+  /* heading accent (rose variant) */
+  --pp-shadow: rgba(0, 0, 0, 0.75);
   --pp-badge-font-size: 13px;
 }
 
@@ -24,7 +28,8 @@ body {
 }
 
 /* Prevent horizontal scroll caused by elements sized with 100vw or overflowing children */
-html, body {
+html,
+body {
   overflow-x: hidden;
   max-width: 100%;
 }
@@ -42,33 +47,34 @@ img {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
-  
+
   .mobile-margin {
     margin-left: 0.75rem;
     margin-right: 0.75rem;
   }
-  
+
   .mobile-text-sm {
     font-size: 0.75rem;
     line-height: 1rem;
   }
-  
+
   .mobile-touch-target {
     min-height: 44px;
     min-width: 44px;
   }
-  
-  .mobile-spacing > * + * {
+
+  .mobile-spacing>*+* {
     margin-top: 1rem;
   }
 }
 
 /* Enhanced touch targets for mobile */
 @media (pointer: coarse) {
-  button, 
-  a, 
-  input[type="button"], 
-  input[type="submit"], 
+
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
   input[type="reset"],
   [role="button"] {
     min-height: 44px;
@@ -119,24 +125,26 @@ img {
     width: 100% !important;
     height: auto !important;
     max-width: none !important;
-    object-fit: cover; /* fills width while maintaining aspect; change to 'contain' if you want full image visible */
+    object-fit: cover;
+    /* fills width while maintaining aspect; change to 'contain' if you want full image visible */
   }
 }
 
 /* Gradient outline for search field without changing box size
    Uses double background technique so border is a gradient while preserving
    the element's inner size (no extra padding). */
-.gradient-outline{
-  border-radius:9999px;
-  border:2px solid transparent; /* required for background-clip trick */
-  background-image: linear-gradient(#ffffff,#ffffff), linear-gradient(90deg,#3b82f6,#ff7a00);
+.gradient-outline {
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  /* required for background-clip trick */
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(90deg, #3b82f6, #ff7a00);
   background-origin: padding-box, border-box;
   background-clip: padding-box, border-box;
 }
 
 /* subtle focus state */
-.gradient-outline:focus-within{
-  box-shadow: 0 6px 18px rgba(59,130,246,0.08);
+.gradient-outline:focus-within {
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.08);
 }
 
 /* Category rail (left column) styling for exact mobile reference appearance */
@@ -145,21 +153,46 @@ img {
   padding-top: 0.25rem;
 }
 
-.category-rail ul { list-style: none; margin: 0; padding: 0; }
+.category-rail ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
-.category-rail li { align-items: center; }
+.category-rail li {
+  align-items: center;
+}
 
-.category-icon { border-radius: 9999px; overflow: hidden; flex-shrink: 0; }
+.category-icon {
+  border-radius: 9999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
 
-.category-label { padding-left: 0.25rem; }
+.category-label {
+  padding-left: 0.25rem;
+}
 
-.category-right-border { width: 4px; height: 48px; border-radius: 2px; margin-left: 0.5rem; }
+.category-right-border {
+  width: 4px;
+  height: 48px;
+  border-radius: 2px;
+  margin-left: 0.5rem;
+}
 
-.category-rail li[data-active="true"] { background: rgba(255,131,62,0.06); }
-.category-rail li[data-active="true"] .category-icon { box-shadow: 0 0 0 4px rgba(255,122,0,0.06); }
+.category-rail li[data-active="true"] {
+  background: rgba(255, 131, 62, 0.06);
+}
+
+.category-rail li[data-active="true"] .category-icon {
+  box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.06);
+}
 
 /* Product grid section visual divider (tall orange line left of grid) */
-.product-grid-section { position: relative; }
+.product-grid-section {
+  position: relative;
+}
+
 .product-grid-section::before {
   content: '';
   position: absolute;
@@ -167,20 +200,38 @@ img {
   top: 0;
   bottom: 0;
   width: 4px;
-  background: transparent; /* default transparent; active item shows small accents */
+  background: transparent;
+  /* default transparent; active item shows small accents */
 }
 
 /* Make product grid 2 columns on small screens exactly (matches reference 2x2 layout) */
 @media (max-width: 767px) {
-  .product-grid-section .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .category-rail { width: 6.5rem; }
-  .category-rail .category-icon { width: 56px; height: 56px; }
-  .category-rail li { padding: 0.5rem 0.75rem; }
-  .category-right-border { height: 56px; }
+  .product-grid-section .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .category-rail {
+    width: 6.5rem;
+  }
+
+  .category-rail .category-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .category-rail li {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .category-right-border {
+    height: 56px;
+  }
 }
 
 @media (min-width: 768px) {
-  .product-grid-section .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .product-grid-section .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /* Hide scrollbar utility for horizontal category scrolling */
@@ -195,9 +246,12 @@ img {
 
 /* Professional animations for PetWalking page */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -212,18 +266,17 @@ img {
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }
 }
 
 .animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -237,16 +290,146 @@ img {
 .thin-gold-scroll::-webkit-scrollbar {
   width: 6px;
 }
+
 .thin-gold-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .thin-gold-scroll::-webkit-scrollbar-thumb {
   background-color: #fbbf24;
   border-radius: 20px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
+
 .thin-gold-scroll {
   scrollbar-width: thin;
   scrollbar-color: #fbbf24 transparent;
+}
+
+/* ===== Product HTML Description Styles ===== */
+/* Used in product-detail-page and admin preview */
+.product-description-html {
+  color: #374151;
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+.product-description-html h1,
+.product-description-html h2,
+.product-description-html h3,
+.product-description-html h4,
+.product-description-html h5 {
+  font-weight: 700;
+  color: #111827;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.product-description-html h1 {
+  font-size: 1.375rem;
+}
+
+.product-description-html h2 {
+  font-size: 1.25rem;
+}
+
+.product-description-html h3 {
+  font-size: 1.1rem;
+}
+
+.product-description-html h4 {
+  font-size: 1rem;
+}
+
+.product-description-html p {
+  margin-bottom: 0.75rem;
+}
+
+.product-description-html ul,
+.product-description-html ol {
+  margin: 0.5rem 0 0.75rem 1.25rem;
+}
+
+.product-description-html ul {
+  list-style-type: disc;
+}
+
+.product-description-html ol {
+  list-style-type: decimal;
+}
+
+.product-description-html li {
+  margin-bottom: 0.35rem;
+  display: list-item;
+}
+
+.product-description-html strong,
+.product-description-html b {
+  font-weight: 700;
+  color: #111827;
+}
+
+.product-description-html em,
+.product-description-html i {
+  font-style: italic;
+}
+
+.product-description-html a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.product-description-html table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.8rem;
+}
+
+.product-description-html th {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.product-description-html td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.product-description-html tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+.product-description-html blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  color: #6b7280;
+  font-style: italic;
+  margin: 0.75rem 0;
+}
+
+.product-description-html hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1rem 0;
+}
+
+/* Admin preview pane should match user page exactly */
+.admin-description-preview .product-description-html {
+  font-size: 0.8125rem;
+}
+
+/* contentEditable placeholder for rich text editor */
+[contenteditable][data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  font-style: italic;
 }

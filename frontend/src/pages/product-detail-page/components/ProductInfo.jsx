@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 import PincodeChecker from '../../../components/ui/PincodeChecker';
 
 const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) => {
-  const [selectedVariant, setSelectedVariant] = useState(product?.variants?.[0]);
+  const [selectedVariant, setSelectedVariant] = useState(product?.variants?.[0] || null);
   const [quantity, setQuantity] = useState(1);
+
+  // Keep selected variant in sync when product changes (e.g., navigating to product full page)
+  useEffect(() => {
+    setSelectedVariant(product?.variants?.[0] || null);
+    setQuantity(1);
+  }, [product?.id]);
 
   // Determine available stock from variant or product
   const availableStock = (selectedVariant?.stock ?? product?.stockQuantity ?? 0) || 0;
@@ -79,6 +85,14 @@ const ProductInfo = ({ product, onAddToCart, onAddToWishlist, isInWishlist }) =>
             <a href={`/brands/${encodeURIComponent(product.brand)}`} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium border border-primary/20 hover:underline">
               {product?.brand}
             </a>
+          )}
+
+          {/* Show structured manufacturer details if available */}
+          {product?.manufacturer && product.manufacturer.name && (
+            <div className="ml-2 text-sm text-muted-foreground">
+              <div>Manufactured by <a href={product.manufacturer.website || `/brands/${encodeURIComponent(product.manufacturer.name)}`} className="text-primary hover:underline">{product.manufacturer.name}</a></div>
+              {product.manufacturer.address && <div className="text-xs text-muted-foreground">{product.manufacturer.address}</div>}
+            </div>
           )}
           {product?.isPopular && (
             <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 border border-secondary/20">

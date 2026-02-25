@@ -57,12 +57,26 @@ const ProductFullPage = () => {
           if (!productData) throw new Error(`Product with ID ${productId} not found`);
         }
 
-        // Normalize product data and include metadata fields
+        // Ensure metadata is parsed (backend may return JSON string)
+        try {
+          if (productData && productData.metadata && typeof productData.metadata === 'string') {
+            try {
+              productData.metadata = JSON.parse(productData.metadata || '{}');
+            } catch (e) {
+              productData.metadata = {};
+            }
+          }
+        } catch (e) {
+          // ignore
+          productData.metadata = productData.metadata || {};
+        }
+
+        // Normalize product data and include metadata fields (prefer metadata where backend stores values)
         const normalizedProduct = {
           id: productData?.id,
           name: productData?.name || productData?.title,
           shortDescription: productData?.shortDescription || (productData?.description ? productData.description.substring(0, 100) + '...' : ''),
-          description: productData?.description || 'No description available.',
+          description: productData?.description || productData?.metadata?.description || 'No description available.',
           images: extractAllProductImages(productData),
           variants: (() => {
             // If product has explicit variants with pricing, use them
@@ -119,16 +133,33 @@ const ProductFullPage = () => {
               }
             ];
           })(),
-          badges: productData?.badges || [],
-          features: productData?.features || [],
-          ingredients: productData?.ingredients || '',
-          benefits: productData?.benefits || [],
-          nutrition: productData?.nutrition || {},
+          badges: productData?.metadata?.badges || productData?.badges || [],
+          features: productData?.metadata?.features || productData?.features || [],
+          ingredients: productData?.metadata?.ingredients || productData?.ingredients || '',
+          benefits: productData?.metadata?.benefits || productData?.benefits || [],
+          // Prefer nutrition stored inside metadata
+          nutrition: productData?.metadata?.nutrition || productData?.nutrition || {},
           metadata: productData?.metadata || {},
           rating: productData?.rating || productData?.ratingValue || 0,
           reviewCount: productData?.reviewCount || 0,
           category: productData?.category || productData?.categoryId,
-          brand: productData?.brand || productData?.manufacturer || 'Brand'
+          // Structured manufacturer info and brand fallback
+          manufacturer: (() => {
+            const m = productData?.manufacturer || productData?.metadata?.manufacturer || productData?.maker || null;
+            if (!m) return null;
+            // If backend provides an object, keep common fields; if string, map to name
+            if (typeof m === 'string') return { name: m };
+            return {
+              id: m?.id || m?.manufacturerId || null,
+              name: m?.name || m?.manufacturerName || m?.title || null,
+              address: m?.address || m?.location || null,
+              website: m?.website || m?.url || null,
+              contact: m?.contact || m?.phone || null,
+              raw: m
+            };
+          })(),
+          // Prefer metadata.brand when present, otherwise derive from manufacturer.name
+          brand: productData?.metadata?.brand || productData?.brand || (typeof (productData?.manufacturer) === 'string' ? productData.manufacturer : productData?.manufacturer?.name) || 'Brand'
         };
 
         setProduct(normalizedProduct);

@@ -12,9 +12,11 @@ const ProductCard = ({ p }) => {
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useCart();
   const [variantIdx, setVariantIdx] = useState(0);
   
-  // Normalize variants to handle both object and string formats
+  // Normalize variants to handle both object and string formats (support metadata.variants)
   const normalizeVariants = () => {
-    if (!p.variants || p.variants.length === 0) {
+    const sourceVariants = (p.variants && p.variants.length > 0) ? p.variants : (p.metadata?.variants || []);
+
+    if (!sourceVariants || sourceVariants.length === 0) {
       return [{ 
         id: 'default', 
         weight: 'Default', 
@@ -24,8 +26,8 @@ const ProductCard = ({ p }) => {
         stock: p.stockQuantity ?? 1 
       }];
     }
-    
-    return p.variants.map((v, idx) => {
+
+    return sourceVariants.map((v, idx) => {
       if (typeof v === 'object') {
         // Build label with units from database (same logic as DogFood)
         let label = '';
@@ -47,8 +49,8 @@ const ProductCard = ({ p }) => {
           id: v.id || `variant-${idx}`,
           weight: v.weight || v.size || label,
           label: label,
-          price: v.price || p.price || 0,
-          originalPrice: v.originalPrice || v.original || p.originalPrice || p.original || v.price || p.price || 0,
+          price: (v.price !== undefined && v.price !== null) ? parseFloat(v.price) : (p.price || 0),
+          originalPrice: (v.originalPrice !== undefined && v.originalPrice !== null) ? parseFloat(v.originalPrice) : (v.mrp || p.originalPrice || p.original || v.price || p.price || 0),
           stock: v.stock ?? v.stockQuantity ?? p.stockQuantity ?? 1,
           weightUnit: v.weightUnit || '',
           sizeUnit: v.sizeUnit || ''

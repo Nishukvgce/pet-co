@@ -15,7 +15,7 @@ const ProductDetails = ({ product }) => {
   } else {
     tabs = [
       { id: 'description', label: 'Product Description', icon: 'FileText' },
-      { id: 'details', label: 'Product Details', icon: 'Info' },
+      // { id: 'details', label: 'Product Details', icon: 'Info' },
       { id: 'manufacturer', label: 'Manufacturer Details', icon: 'Building' }
     ];
     if (hasPharmacyMeta) {
@@ -83,11 +83,13 @@ const ProductDetails = ({ product }) => {
               Product Description
             </h3>
             
-            <div className="prose max-w-none">
-              <p className="text-muted-foreground leading-relaxed">
-                {product?.description || 'Give your doggo the goodness of real, clean preservative free food with Henlo Baked Chicken & Liver, crafted to keep tails wagging and hearts healthy! Unlike regular kibbles that are overextruded and lose nutrition, Henlo is slow-baked to lock in all the goodness, ensuring every bite is packed with taste and nutrition.'}
-              </p>
-            </div>
+            <div
+              className="product-description-html text-sm text-gray-700 leading-relaxed"
+              dangerouslySetInnerHTML={{
+                __html: product?.description ||
+                  '<p>Give your doggo the goodness of real, clean preservative free food.</p>'
+              }}
+            />
 
             {keyFeatures.length > 0 && (
               <div className="space-y-4">
@@ -179,40 +181,52 @@ const ProductDetails = ({ product }) => {
 
         {activeTab === 'manufacturer' && (
           <div className="space-y-6">
-            <div className="bg-card rounded-lg border border-border p-6 space-y-4">
-              <h3 className="font-heading font-semibold text-xl text-foreground flex items-center gap-2">
-                <Icon name="Building" size={20} className="text-primary" />
-                Manufacturer Details
-              </h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Brand</h4>
-                  <p className="text-muted-foreground">{product?.brand || product?.manufacturer || 'Pet & Co'}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Manufacturing Location</h4>
-                  <p className="text-muted-foreground">{productDetails.manufacturingLocation}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Quality Assurance</h4>
-                  <p className="text-muted-foreground">
-                    All products are manufactured following strict quality guidelines and safety standards.
-                  </p>
-                </div>
+            <div className="bg-card rounded-lg border border-border overflow-hidden">
+              <div className="bg-primary/5 px-4 py-3 border-b border-border">
+                <h3 className="font-heading font-semibold text-lg text-foreground flex items-center gap-2">
+                  <Icon name="Building" size={20} className="text-primary" />
+                  Manufacturer Details
+                </h3>
+              </div>
 
-                {product?.certifications && (
-                  <div>
-                    <h4 className="font-medium text-foreground mb-2">Certifications</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {(Array.isArray(product.certifications) ? product.certifications : [product.certifications]).map((cert, index) => (
-                        <span key={index} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                          {cert}
-                        </span>
-                      ))}
-                    </div>
+              <div className="divide-y divide-border">
+                {(product?.metadata?.manufacturer?.sku || product?.sku) && (
+                  <div className="px-4 py-3 flex flex-wrap justify-between items-start gap-2">
+                    <span className="font-medium text-foreground">SKU</span>
+                    <span className="text-muted-foreground font-mono text-sm">{product?.metadata?.manufacturer?.sku || product?.sku}</span>
+                  </div>
+                )}
+
+                {((product?.metadata?.manufacturer?.countryOfOrigin) || product?.countryOfOrigin) && (
+                  <div className="px-4 py-3 flex flex-wrap justify-between items-start gap-2">
+                    <span className="font-medium text-foreground">Country of Origin</span>
+                    <span className="text-muted-foreground">{product?.metadata?.manufacturer?.countryOfOrigin || product?.countryOfOrigin}</span>
+                  </div>
+                )}
+
+                {((product?.metadata?.manufacturer?.manufacturerName) || (product?.metadata?.manufacturer?.name) || product?.manufacturer) && (
+                  <div className="px-4 py-3 flex flex-col gap-1">
+                    <span className="font-medium text-foreground">Name & Address of Manufacturer</span>
+                    <span className="text-muted-foreground text-sm leading-relaxed">
+                      {product.metadata?.manufacturer?.manufacturerName || product.metadata?.manufacturer?.name || product?.manufacturer || 'Not specified'}
+                      {product.metadata?.manufacturer?.address && (<div className="text-xs text-muted-foreground mt-2">{product.metadata.manufacturer.address}</div>)}
+                      {!product.metadata?.manufacturer?.address && product?.manufacturerAddress && (<div className="text-xs text-muted-foreground mt-2">{product.manufacturerAddress}</div>)}
+                    </span>
+                  </div>
+                )}
+
+                {(product?.metadata?.manufacturer?.marketedBy || product?.marketedBy) && (
+                  <div className="px-4 py-3 flex flex-col gap-1">
+                    <span className="font-medium text-foreground">Marketed by</span>
+                    <span className="text-muted-foreground text-sm leading-relaxed">{product.metadata?.manufacturer?.marketedBy || product?.marketedBy}</span>
+                  </div>
+                )}
+
+                {/* Fallback if no specifics are present (consider top-level columns too) */}
+                {!(product?.metadata?.manufacturer?.sku || product?.sku || product?.metadata?.manufacturer?.countryOfOrigin || product?.countryOfOrigin || product?.metadata?.manufacturer?.manufacturerName || product?.metadata?.manufacturer?.name || product?.manufacturer || product?.metadata?.manufacturer?.marketedBy || product?.marketedBy || product?.manufacturerAddress) && (
+                  <div className="px-4 py-6 text-center text-muted-foreground">
+                    <Icon name="Building" size={32} className="mx-auto mb-2 opacity-40" />
+                    <p className="text-sm">No manufacturer details available for this product.</p>
                   </div>
                 )}
               </div>

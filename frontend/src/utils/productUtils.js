@@ -303,6 +303,10 @@ export const normalizeProductFromApi = (product = {}) => {
 
   return {
     ...product,
+    // Images: prefer metadata.images, then product.images, then common single-image fields
+    images: ensureArray(metadata.images || product.images || product.gallery || product.imageUrl || product.image || product.thumbnailUrl),
+    // Primary image convenience field (first available)
+    image: (ensureArray(metadata.images || product.images || product.gallery || product.imageUrl || product.image || product.thumbnailUrl)[0]) || '',
     price: Number.isNaN(price) ? 0 : price,
     originalPrice: Number.isNaN(originalPrice) ? 0 : originalPrice,
     stockQuantity: Number.isNaN(stockQuantity) ? 0 : stockQuantity,

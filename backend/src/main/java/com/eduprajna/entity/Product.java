@@ -131,6 +131,18 @@ public class Product {
     
     @Column(name = "weight_unit", length = 10)
     private String weightUnit; // g, kg, ml, l, etc.
+
+    @Column(length = 150)
+    private String sku;
+
+    @Column(name = "country_of_origin", length = 150)
+    private String countryOfOrigin;
+
+    @Column(name = "manufacturer_address", columnDefinition = "TEXT")
+    private String manufacturerAddress;
+
+    @Column(name = "marketed_by", columnDefinition = "TEXT")
+    private String marketedBy;
     
     @Column(name = "flavors", columnDefinition = "TEXT")
     private String flavors; // Flavors (comma-separated or JSON)
@@ -645,6 +657,38 @@ public class Product {
     
     public void setFlavors(String flavors) {
         this.flavors = flavors;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public String getCountryOfOrigin() {
+        return countryOfOrigin;
+    }
+
+    public void setCountryOfOrigin(String countryOfOrigin) {
+        this.countryOfOrigin = countryOfOrigin;
+    }
+
+    public String getManufacturerAddress() {
+        return manufacturerAddress;
+    }
+
+    public void setManufacturerAddress(String manufacturerAddress) {
+        this.manufacturerAddress = manufacturerAddress;
+    }
+
+    public String getMarketedBy() {
+        return marketedBy;
+    }
+
+    public void setMarketedBy(String marketedBy) {
+        this.marketedBy = marketedBy;
     }
     
     public String getColors() {

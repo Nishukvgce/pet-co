@@ -476,8 +476,12 @@ const ProductForm = ({ product, onSave, onCancel }) => {
                 <option value="">Select Pet Type</option>
                 <option value="Dog">Dog</option>
                 <option value="Cat">Cat</option>
+                <option value="Rabbit">Rabbit</option>
+                <option value="Fish">Fish</option>
+                <option value="Bird">Bird</option>
                 <option value="Pharmacy">Pharmacy</option>
                 <option value="Outlet">Outlet</option>
+                <option value="Pet Parent">Pet Parent</option>
               </select>
 
               <label className="block text-sm font-medium text-foreground mb-1">

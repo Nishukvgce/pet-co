@@ -114,13 +114,27 @@ const productApi = {
     }
   },
 
-  async getById(productId) {
+  async getById(productId, options = {}) {
     try {
       if (!productId) {
         throw new Error('Product ID is required');
       }
-      
       const cacheKey = `product:${productId}`;
+
+      // If caller requests fresh data (bypass stale cache), fetch directly and update cache
+      if (options && options.forceFresh) {
+        const res = await apiClient.get(`/admin/products/${productId}`);
+        // update cache so other parts of app can use it
+        try { cache.setCache(cacheKey, res.data, 30 * 1000, true); } catch (e) {}
+        try {
+          if (typeof window !== 'undefined' && window?.CustomEvent) {
+            const ev = new CustomEvent('cache:updated', { detail: { key: cacheKey, value: res.data } });
+            window.dispatchEvent(ev);
+          }
+        } catch (e) {}
+        return res.data;
+      }
+
       const { cached, fresh } = cache.staleWhileRevalidate(cacheKey, async () => {
         console.log('ProductAPI: Fetching product by ID:', productId);
         const res = await apiClient.get(`/admin/products/${productId}`);

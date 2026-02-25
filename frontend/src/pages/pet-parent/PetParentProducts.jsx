@@ -25,8 +25,7 @@ const categories = [
   { id: 'charms', label: 'Charms', img: '/assets/images/pet-parents/charms.avif' },
   { id: 'stationary', label: 'Stationary', img: '/assets/images/pet-parents/stationary.avif' },
   { id: 'coasters', label: 'Coasters', img: '/assets/images/pet-parents/coasters.avif' },
-  { id: 'furniture', label: 'Furniture', img: '/assets/images/pet-parents/furniture.avif' },
-  { id: 'all', label: 'All Pet Parent Products', img: '/assets/images/pet-parents/accessories.webp' }
+  { id: 'furniture', label: 'Furniture', img: '/assets/images/pet-parents/furniture.avif' }
 ];
 
 const sampleProducts = [
@@ -101,34 +100,52 @@ export default function PetParentProducts({ initialActive = 'All Pet Parent Prod
            console.log('Fallback to all products to find Pet Parent items locally');
            const allResponse = await productApi.getCustomerProducts();
            apiProducts = (allResponse || []).filter(p => {
-               const c = (p?.category || '').toLowerCase();
-               return c.includes('pet parent') || c.includes('petparent') || c === 'parent';
+             const c = (p?.category || '')?.toLowerCase();
+             const t = (p?.type || p?.productType || '')?.toLowerCase();
+             let meta = p?.metadata || {};
+             try { if (meta && typeof meta === 'string') meta = JSON.parse(meta); } catch (e) { meta = p?.metadata || {}; }
+             const metaCat = (meta?.category || meta?.tags || '')?.toString().toLowerCase();
+             const tagMatch = (meta?.tags && JSON.stringify(meta.tags).toLowerCase().includes('pet-parent')) || false;
+             return c.includes('pet parent') || c.includes('petparent') || c === 'parent' || t.includes('pet parent') || t.includes('pet-parent') || metaCat.includes('pet parent') || tagMatch;
            });
         }
 
         const normalize = (p) => {
-          const candidate = p?.imageUrl || p?.image || p?.thumbnailUrl || p?.image_path;
+          // parse metadata if it's string
+          let meta = p?.metadata || {};
+          try {
+            if (meta && typeof meta === 'string') meta = JSON.parse(meta);
+          } catch (err) {
+            try { meta = JSON.parse(decodeURIComponent(meta)); } catch (e) { meta = p?.metadata || {}; }
+          }
+
+          const candidate = (meta?.images && meta.images.length && meta.images[0]) || p?.imageUrl || p?.image || p?.thumbnailUrl || p?.image_path;
           const base = api?.defaults?.baseURL || '';
           const image = candidate ? (/(https?:)?\/\//i.test(candidate) || candidate.startsWith('data:') ? candidate : (candidate.startsWith('/') ? `${base}${candidate}` : `${base}/${candidate}`)) : '/assets/images/no_image.png';
-          
-          const { price, originalPrice } = normalizePrice(p);
-          
+
+          // price normalization: prefer metadata or variants if present
+          const { price, originalPrice } = normalizePrice(p) || {};
+
+          const subFromMeta = meta?.subCategory || meta?.subcategory || meta?.subcategoryLabel || meta?.sub || '';
+
           return {
             id: p?.id,
             name: p?.name || p?.title || 'Unnamed',
             image,
-            badges: p?.badges || [],
-            variants: p?.variants?.map(v => v?.weight || v?.label || v) || ['Default'],
-            price,
-            original: originalPrice,
-            brand: p?.brand || p?.manufacturer || '',
-            category: p?.category || '',
-            subcategory: p?.subcategory || p?.subcategoryLabel || '',
+            badges: meta?.badges || p?.badges || [],
+            variants: (meta?.variants && Array.isArray(meta.variants) && meta.variants.map(v => v?.label || v)) || (p?.variants?.map(v => v?.weight || v?.label || v) || ['Default']),
+            price: price || p?.price || (p?.variants && p.variants[0]?.price) || 0,
+            original: originalPrice || p?.originalPrice || null,
+            brand: p?.brand || p?.manufacturer || meta?.brand || '',
+            category: p?.category || meta?.category || '',
+            subcategory: p?.subcategory || p?.subcategoryLabel || subFromMeta || '',
             // Additional filter properties
-            animal: p?.animal || p?.type || '',
-            productType: p?.productType || p?.product_type || '',
-            size: p?.size || '',
-            subCategory: p?.subCategory || p?.subcategory || p?.subcategoryLabel || ''
+            animal: p?.animal || p?.type || meta?.type || '',
+            productType: p?.productType || p?.product_type || meta?.productType || '',
+            size: p?.size || meta?.size || '',
+            subCategory: p?.subCategory || p?.subcategory || p?.subcategoryLabel || subFromMeta || '',
+            _raw: p,
+            _meta: meta
           };
         };
 
@@ -159,7 +176,7 @@ export default function PetParentProducts({ initialActive = 'All Pet Parent Prod
 
     const urlParams = new URLSearchParams(location.search);
     const urlSub = urlParams.get('sub');
-    const norm = s => String(s||'').toLowerCase().trim();
+    const norm = s => String(s||'').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '').trim();
 
     let working = products;
     
@@ -169,12 +186,11 @@ export default function PetParentProducts({ initialActive = 'All Pet Parent Prod
       const targetSub = norm(activeSubcategory);
       // Sometimes category metadata might be inconsistent, loose matching helps
       working = working.filter(p => {
-        const productSub = norm(p.subcategory || '');
+        const productSub = norm(p.subcategory || p.subCategory || (p._meta && (p._meta.subCategory || p._meta.subcategory || p._meta.subcategoryLabel)) || '');
         const productName = norm(p.name || '');
-        return productSub === targetSub || 
-               productSub.includes(targetSub) ||
-               targetSub.includes(productSub) ||
-               productName.includes(targetSub.substring(0, Math.max(targetSub.length - 1, 4))); // e.g., 'tshirt' in 'cool pet tshirt'
+        const target = targetSub;
+        // exact, contains, or name heuristic
+        return productSub === target || productSub.includes(target) || target.includes(productSub) || productName.includes(target) || productName.includes(target.substring(0, Math.max(target.length - 1, 4)));
       });
     }
     
