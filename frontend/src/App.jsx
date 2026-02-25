@@ -51,6 +51,7 @@ import DogPharmacyPage from './pages/pharmacy/dogs';
 import CatPharmacyPage from './pages/pharmacy/cats';
 import PharmacyCollectionPage from './pages/pharmacy/PharmacyCollectionPage';
 import PetServicesPage from './pages/pet-services';
+import BirthdayClubPage from './pages/birthday-club';
 import AdoptPetPage from './pages/adopt-pet';
 import PetCoFoundation from './pages/petco-foundation';
 import ComingSoon from './pages/ComingSoon';
@@ -161,6 +162,7 @@ function App() {
                 
                 {/* Pet Services */}
                 <Route path="/pet-services" element={<PetServicesPage />} />
+                <Route path="/birthday-club" element={<BirthdayClubPage />} />
                 <Route path="/adopt-pet" element={<AdoptPetPage />} />
                 <Route path="/petco-foundation" element={<PetCoFoundation />} />
                 
