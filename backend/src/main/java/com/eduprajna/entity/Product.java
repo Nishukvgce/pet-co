@@ -123,6 +123,9 @@ public class Product {
     @Column(name = "subcategory_label", length = 255)
     private String subcategoryLabel; // Subcategory display label
     
+    @Column(name = "breed_name", length = 255)
+    private String breedName; // Breed Name entered by admin
+    
     @Column(name = "serving_size", length = 255)
     private String servingSize; // Serving size information
     
@@ -625,6 +628,14 @@ public class Product {
     
     public void setSubcategoryLabel(String subcategoryLabel) {
         this.subcategoryLabel = subcategoryLabel;
+    }
+
+    public String getBreedName() {
+        return breedName;
+    }
+
+    public void setBreedName(String breedName) {
+        this.breedName = breedName;
     }
     
     public String getServingSize() {

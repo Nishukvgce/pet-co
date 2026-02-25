@@ -106,11 +106,12 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
     proteinSource: '',
     petType: 'Dog',
     subcategoryLabel: '',
+    breedName: '',
     colors: '',
     // subcategory-specific fields
     material: '',
     scent: '',
-    suitableFor: '',
+    suitableFor: [],
     treatType: '',
     texture: '',
     // Pharmacy / medicine specific fields
@@ -449,12 +450,39 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
       { id: 'rabbit-grooming', name: 'Grooming & Health' },
       { id: 'rabbit-toys', name: 'Toys & Chews' }
     ],
+    'Hamster & Guinea Pigs': [
+      { id: 'hamster-guinea-food', name: 'Food' },
+      { id: 'hamster-guinea-hay', name: 'Hay & Bedding' },
+      { id: 'hamster-guinea-treats', name: 'Treats' },
+      { id: 'hamster-guinea-habitats', name: 'Habitats & Accessories' },
+      { id: 'hamster-guinea-grooming', name: 'Grooming & Health' },
+      { id: 'hamster-guinea-toys', name: 'Toys & Chews' },
+      { id: 'hamster-guinea-wellness', name: 'Wellness & Supplements' }
+    ],
+    // 'Fish': [
+    //   { id: 'fish-food', name: 'Fish Food' },
+    //   { id: 'aquariums', name: 'Aquariums & Bowls' },
+    //   { id: 'aquarium-filters', name: 'Filters & Pumps' },
+    //   { id: 'aquarium-decor', name: 'Decor & Gravel' },
+    //   { id: 'water-care', name: 'Water Care & Health' }
+    // ],
+    'Turtle': [
+      { id: 'turtle-food', name: 'Food' },
+      { id: 'turtle-habitat', name: 'Habitat & Accessories' },
+      { id: 'turtle-decor', name: 'Aquarium Decor & Pebbles' },
+      { id: 'turtle-filters', name: 'Filters & Pumps' },
+      { id: 'turtle-heater', name: 'Heaters & Thermometers' },
+      { id: 'turtle-supplements', name: 'Supplements & Vitamins' },
+      { id: 'turtle-wellness', name: 'Wellness & Treatments' }
+    ],
+    // Support plural "Fishes" label used in some UI placements
     'Fish': [
       { id: 'fish-food', name: 'Fish Food' },
       { id: 'aquariums', name: 'Aquariums & Bowls' },
       { id: 'aquarium-filters', name: 'Filters & Pumps' },
       { id: 'aquarium-decor', name: 'Decor & Gravel' },
-      { id: 'water-care', name: 'Water Care & Health' }
+      { id: 'water-care', name: 'Water Care & Health' },
+      { id: 'pebbles', name: 'Pebbles & Gravel' }
     ],
     'Bird': [
       { id: 'bird-food', name: 'Bird Food' },
@@ -795,6 +823,7 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
       category: product.category?.id || product.category || '',
       subcategory: product.subcategory?.id || product.subcategory || '',
       subcategoryLabel: metadata.subcategoryLabel || product.subcategoryLabel || product.subcategory || '',
+      breedName: metadata.breedName || product.breedName || '',
 
       price: product.price?.toString() || '',
       originalPrice: product.originalPrice?.toString() || '',
@@ -824,7 +853,9 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
       petType: filters.dogCat?.[0] || filters.petTypes?.[0] || metadata.petType || product.petType || 'Dog',
       material: metadata.material || product.material || '',
       scent: metadata.scent || product.scent || '',
-      suitableFor: metadata.suitableFor || product.suitableFor || '',
+      suitableFor: Array.isArray(metadata.suitableFor)
+        ? metadata.suitableFor
+        : (typeof metadata.suitableFor === 'string' ? metadata.suitableFor.split(',').map(s=>s.trim()).filter(Boolean) : (Array.isArray(product.suitableFor) ? product.suitableFor : (typeof product.suitableFor === 'string' ? product.suitableFor.split(',').map(s=>s.trim()).filter(Boolean) : []))),
       treatType: metadata.treatType || product.treatType || '',
       texture: metadata.texture || product.texture || '',
       servingSize: metadata.servingSize || product.servingSize || '',
@@ -1066,10 +1097,16 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
         setCategorySearch(label);
       }
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
-      }));
+      // Special-case `suitableFor` text inputs: parse comma-separated into array
+      if (name === 'suitableFor') {
+        const arr = (typeof value === 'string' ? value.split(',').map(s => s.trim()).filter(Boolean) : []);
+        setFormData(prev => ({ ...prev, suitableFor: arr }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: type === 'checkbox' ? checked : value
+        }));
+      }
     }
   };
 
@@ -1317,6 +1354,13 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
       // ensure top-level type is set for DB column
       productData.type = formData.type || productData.type || '';
 
+      // Normalize suitableFor to a comma-separated string for the top-level DB column
+      if (Array.isArray(formData.suitableFor)) {
+        productData.suitableFor = formData.suitableFor.join(', ');
+      } else if (typeof formData.suitableFor === 'string') {
+        productData.suitableFor = formData.suitableFor;
+      }
+
       productData.metadata = {
         ...baseMetadata,
         filters: filtersPayload,
@@ -1332,6 +1376,7 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
         treatType: formData.treatType,
         texture: formData.texture,
         subcategoryLabel: formData.subcategoryLabel || normalizedSubcategory || '',
+        breedName: formData.breedName,
         servingSize: formData.servingSize,
         packCount: formData.packCount,
         weightUnit: formData.weightUnit,
@@ -1412,6 +1457,37 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
     { id: 'metadata', label: 'Categories & Tags' },
     { id: 'manufacturer', label: 'Manufacturer Details' }
   ];
+
+  // Whether the currently selected `type` has predefined subcategories in the mapping
+  const typeHasSubcats = !!(
+    formData.type &&
+    Array.isArray(typeSubcategoryMapping[formData.type]) &&
+    typeSubcategoryMapping[formData.type].length > 0
+  );
+
+  // Small pet types that should only show Subcategory + Suitable For + Breed Name
+  const smallPetTypes = new Set(['Fish','Fishes','Bird','Turtle','Hamster & Guinea Pigs','Rabbit']);
+
+  const petTypeOptionsForSuitable = ['Dog','Cat','Bird','Fish','Rabbit','Hamster & Guinea Pigs','Turtle','Reptile','Other'];
+
+  const handleSuitableForChange = (e) => {
+    const values = Array.from(e.target.selectedOptions).map(o => o.value);
+    setFormData(prev => ({ ...prev, suitableFor: values }));
+  };
+
+  const toggleSuitableFor = (opt) => {
+    setFormData(prev => {
+      const arr = Array.isArray(prev.suitableFor) ? prev.suitableFor.slice() : [];
+      const idx = arr.indexOf(opt);
+      if (idx === -1) arr.push(opt);
+      else arr.splice(idx, 1);
+      return { ...prev, suitableFor: arr };
+    });
+  };
+
+  const removeSuitableFor = (val) => {
+    setFormData(prev => ({ ...prev, suitableFor: (prev.suitableFor || []).filter(s => s !== val) }));
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1931,27 +2007,17 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                       <option value="Cat">Cat</option>
                       <option value="Rabbit">Rabbit</option>
                       <option value="Fish">Fish</option>
+                      {/* <option value="Fishes">Fishes</option> */}
+                      <option value="Hamster & Guinea Pigs">Hamster & Guinea Pigs</option>
+                      <option value="Turtle">Turtle</option>
                       <option value="Bird">Bird</option>
                       <option value="Pharmacy">Pharmacy</option>
                       <option value="Outlet">Outlet</option>
                       <option value="Pet Parent">Pet Parent</option>
                     </select>
 
-                    {/* For Rabbit/Bird/Fish show a single Breed Name input instead of Category/Subcategory */}
-                    {['Rabbit','Bird','Fish'].includes(formData.type) ? (
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Breed Name</label>
-                        <Input
-                          name="subcategoryLabel"
-                          value={formData.subcategoryLabel}
-                          onChange={handleChange}
-                          placeholder="Enter breed name"
-                        />
-                        <p className="text-xs text-gray-500 mt-2">For {formData.type} products, provide the breed name here. Category and subcategory selection are hidden.</p>
-                      </div>
-                    ) : formData.type === 'Pet Parent' ? (
-                      null
-                    ) : (
+                    {/* If the selected type has predefined subcategories show Category/Subcategory; otherwise show Breed Name (except Pet Parent) */}
+                    {formData.type !== 'Pet Parent' && typeHasSubcats && !smallPetTypes.has(formData.type) && (
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
                         <div className="bg-gray-50 p-4 rounded-lg border space-y-3">
@@ -2056,12 +2122,54 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
                 )}
                 </div>
 
+                {((!typeHasSubcats && formData.type && formData.type !== 'Pet Parent') || (formData.type && smallPetTypes.has(formData.type))) && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Breed Name</label>
+                    <Input
+                      name="breedName"
+                      value={formData.breedName}
+                      onChange={handleChange}
+                      placeholder="Enter breed name"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">For {formData.type} products, provide the breed name here. Category and subcategory selection are hidden.</p>
+                  </div>
+                )}
+
+                {/* Suitable For multi-select for small pet types */}
+                {(formData.type && smallPetTypes.has(formData.type)) && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">Suitable For</label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-2 border rounded-md">
+                      {petTypeOptionsForSuitable.map(opt => (
+                        <label key={opt} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={Array.isArray(formData.suitableFor) ? formData.suitableFor.includes(opt) : false}
+                            onChange={() => toggleSuitableFor(opt)}
+                            className="w-4 h-4"
+                          />
+                          <span>{opt}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">Select one or more pet types this product is suitable for.</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {Array.isArray(formData.suitableFor) && formData.suitableFor.map(val => (
+                        <span key={val} className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full text-sm">
+                          <span>{val}</span>
+                          <button type="button" onClick={() => removeSuitableFor(val)} className="text-gray-500 hover:text-gray-700">×</button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Subcategory {!formData.type && <span className="text-sm font-normal text-gray-400">(Select Type first)</span>}
                     </label>
-                    {/* When type is Rabbit/Bird/Fish we already show Breed Name above and hide category/subcategory */}
-                    {['Rabbit','Bird','Fish'].includes(formData.type) ? (
+                    {/* Show subcategory selection only when the selected type has mapped subcategories */}
+                    {!typeHasSubcats ? (
                       <></>
                     ) : formData.type && subcategories && subcategories.length > 0 ? (
                       <div className="bg-gray-50 p-4 rounded-lg border space-y-3">
@@ -2166,6 +2274,8 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
 
                 {/* Dynamic filters per category type */}
                 {(() => {
+                  // Do not render the generic dynamic filters for the small pet types
+                  if (formData.type && smallPetTypes.has(formData.type)) return null;
                   // Resolve the selected category object (the select stores an id/slug)
                   const selectedCategory = categories.find(c => {
                     if (!c) return false;
@@ -2380,7 +2490,28 @@ const EnhancedProductForm = ({ product, onSave, onCancel, allowedCategories, def
 
                             <div>
                               <label className="block text-sm font-medium text-foreground mb-1">Suitable For</label>
-                              <Input name="suitableFor" value={formData.suitableFor} onChange={handleChange} placeholder="Puppy, Adult, Chewers" />
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-2 border rounded-md">
+                                {petTypeOptionsForSuitable.map(opt => (
+                                  <label key={opt} className="flex items-center gap-2 text-sm">
+                                    <input
+                                      type="checkbox"
+                                      checked={Array.isArray(formData.suitableFor) ? formData.suitableFor.includes(opt) : false}
+                                      onChange={() => toggleSuitableFor(opt)}
+                                      className="w-4 h-4"
+                                    />
+                                    <span>{opt}</span>
+                                  </label>
+                                ))}
+                              </div>
+                              <p className="text-xs text-gray-500 mt-2">Select one or more pet types this toy is suitable for.</p>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {Array.isArray(formData.suitableFor) && formData.suitableFor.map(val => (
+                                  <span key={val} className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full text-sm">
+                                    <span>{val}</span>
+                                    <button type="button" onClick={() => removeSuitableFor(val)} className="text-gray-500 hover:text-gray-700">×</button>
+                                  </span>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </div>

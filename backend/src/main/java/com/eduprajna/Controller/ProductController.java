@@ -1560,8 +1560,22 @@ public class ProductController {
             }
 
             Object suitableForObj = md.get("suitableFor");
-            if (suitableForObj != null && !suitableForObj.toString().isBlank()) {
-                p.setSuitableFor(suitableForObj.toString());
+            if (suitableForObj != null) {
+                String suitableForStr = null;
+                if (suitableForObj instanceof List) {
+                    try {
+                        List<?> list = (List<?>) suitableForObj;
+                        suitableForStr = list.stream().map(o -> o == null ? "" : o.toString().trim()).filter(s -> !s.isEmpty()).collect(java.util.stream.Collectors.joining(", "));
+                    } catch (Exception e) {
+                        suitableForStr = suitableForObj.toString();
+                    }
+                } else {
+                    suitableForStr = suitableForObj.toString();
+                }
+
+                if (suitableForStr != null && !suitableForStr.isBlank()) {
+                    p.setSuitableFor(suitableForStr);
+                }
             }
 
             Object treatTypeObj = md.get("treatType");
@@ -1577,6 +1591,11 @@ public class ProductController {
             Object subcategoryLabelObj = md.get("subcategoryLabel");
             if (subcategoryLabelObj != null && !subcategoryLabelObj.toString().isBlank()) {
                 p.setSubcategoryLabel(subcategoryLabelObj.toString());
+            }
+
+            Object breedNameObj = md.get("breedName");
+            if (breedNameObj != null && !breedNameObj.toString().isBlank()) {
+                p.setBreedName(breedNameObj.toString());
             }
 
             Object servingSizeObj = md.get("servingSize");
@@ -1912,6 +1931,9 @@ public class ProductController {
             }
             if (p.getSubcategoryLabel() != null && !p.getSubcategoryLabel().isBlank()) {
                 md.remove("subcategoryLabel");
+            }
+            if (p.getBreedName() != null && !p.getBreedName().isBlank()) {
+                md.remove("breedName");
             }
             if (p.getServingSize() != null && !p.getServingSize().isBlank()) {
                 md.remove("servingSize");
