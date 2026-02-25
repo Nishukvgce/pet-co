@@ -37,6 +37,28 @@ const ProductDetails = ({ product }) => {
     noNasties: product?.metadata?.noNasties || product?.noNasties
   };
 
+  // Normalize manufacturer data from multiple possible shapes
+  const manufacturer = (
+    product?.metadata?.manufacturer ||
+    (product?.metadata && product.metadata.pharmacy && product.metadata.pharmacy.manufacturer ? { name: product.metadata.pharmacy.manufacturer } : null) ||
+    (product?.manufacturer ? {
+      name: product.manufacturer,
+      address: product.manufacturerAddress,
+      countryOfOrigin: product.countryOfOrigin,
+      sku: product.sku,
+      marketedBy: product.marketedBy
+    } : null)
+  );
+
+  // Compute display values explicitly to avoid missing keys
+  const skuValue = (manufacturer && (manufacturer.sku || manufacturer.SKU || manufacturer.skuCode)) || product?.sku || product?.metadata?.manufacturer?.sku || '';
+  const countryValue = (manufacturer && (manufacturer.countryOfOrigin || manufacturer.country || manufacturer.country_of_origin)) || product?.countryOfOrigin || product?.metadata?.manufacturer?.countryOfOrigin || '';
+  const nameValue = (manufacturer && (manufacturer.manufacturerName || manufacturer.name || manufacturer.title)) || (product?.manufacturer) || (product?.manufacturer && typeof product.manufacturer === 'string' ? product.manufacturer : (product?.manufacturer?.name || '')) || '';
+  const addressHtml = (manufacturer && (manufacturer.address || manufacturer.manufacturerAddress || manufacturer.location)) || product?.manufacturerAddress || '';
+  const marketedByValue = (manufacturer && (manufacturer.marketedBy || manufacturer.marketed_by)) || product?.marketedBy || '';
+
+  const hasManufacturer = Boolean(skuValue || countryValue || nameValue || addressHtml || marketedByValue);
+
   const keyFeatures = [
     productDetails.weightManagement && {
       title: 'Weight Management Made Easy',
@@ -190,45 +212,49 @@ const ProductDetails = ({ product }) => {
               </div>
 
               <div className="divide-y divide-border">
-                {(product?.metadata?.manufacturer?.sku || product?.sku) && (
-                  <div className="px-4 py-3 flex flex-wrap justify-between items-start gap-2">
-                    <span className="font-medium text-foreground">SKU</span>
-                    <span className="text-muted-foreground font-mono text-sm">{product?.metadata?.manufacturer?.sku || product?.sku}</span>
-                  </div>
-                )}
+                <div className="px-4 py-3 flex flex-wrap justify-between items-start gap-2">
+                  <span className="font-medium text-foreground">SKU</span>
+                  <span className="text-muted-foreground font-mono text-sm">{skuValue || 'Not specified'}</span>
+                </div>
 
-                {((product?.metadata?.manufacturer?.countryOfOrigin) || product?.countryOfOrigin) && (
-                  <div className="px-4 py-3 flex flex-wrap justify-between items-start gap-2">
-                    <span className="font-medium text-foreground">Country of Origin</span>
-                    <span className="text-muted-foreground">{product?.metadata?.manufacturer?.countryOfOrigin || product?.countryOfOrigin}</span>
-                  </div>
-                )}
+                <div className="px-4 py-3 flex flex-wrap justify-between items-start gap-2">
+                  <span className="font-medium text-foreground">Country of Origin</span>
+                  <span className="text-muted-foreground">{countryValue || 'Not specified'}</span>
+                </div>
 
-                {((product?.metadata?.manufacturer?.manufacturerName) || (product?.metadata?.manufacturer?.name) || product?.manufacturer) && (
-                  <div className="px-4 py-3 flex flex-col gap-1">
-                    <span className="font-medium text-foreground">Name & Address of Manufacturer</span>
-                    <span className="text-muted-foreground text-sm leading-relaxed">
-                      {product.metadata?.manufacturer?.manufacturerName || product.metadata?.manufacturer?.name || product?.manufacturer || 'Not specified'}
-                      {product.metadata?.manufacturer?.address && (<div className="text-xs text-muted-foreground mt-2">{product.metadata.manufacturer.address}</div>)}
-                      {!product.metadata?.manufacturer?.address && product?.manufacturerAddress && (<div className="text-xs text-muted-foreground mt-2">{product.manufacturerAddress}</div>)}
-                    </span>
+                <div className="px-4 py-3 flex flex-col gap-1">
+                  <span className="font-medium text-foreground">Name & Address of Manufacturer</span>
+                  <div className="text-muted-foreground text-sm leading-relaxed">
+                    <div className="font-medium text-foreground mb-1">{nameValue || 'Not specified'}</div>
+                    {addressHtml ? (
+                      <div className="text-xs text-muted-foreground mt-2" dangerouslySetInnerHTML={{ __html: addressHtml }} />
+                    ) : (
+                      <div className="text-xs text-muted-foreground mt-2">{product?.manufacturerAddress || 'Not specified'}</div>
+                    )}
                   </div>
-                )}
+                </div>
 
-                {(product?.metadata?.manufacturer?.marketedBy || product?.marketedBy) && (
-                  <div className="px-4 py-3 flex flex-col gap-1">
-                    <span className="font-medium text-foreground">Marketed by</span>
-                    <span className="text-muted-foreground text-sm leading-relaxed">{product.metadata?.manufacturer?.marketedBy || product?.marketedBy}</span>
-                  </div>
-                )}
+                <div className="px-4 py-3 flex flex-col gap-1">
+                  <span className="font-medium text-foreground">Marketed by</span>
+                  <span className="text-muted-foreground text-sm leading-relaxed">{marketedByValue || 'Not specified'}</span>
+                </div>
+
+                {/* Raw manufacturer payload for debugging (shows exactly what's returned from API/DB) */}
+                <div className="px-4 py-3">
+                  <h4 className="font-medium text-foreground">Raw manufacturer payload (from API)</h4>
+                  <pre className="text-xs text-muted-foreground bg-gray-50 p-3 rounded mt-2 overflow-auto" style={{whiteSpace: 'pre-wrap'}}>
+{JSON.stringify(product?.metadata?.manufacturer || {
+                    manufacturer: product?.manufacturer,
+                    manufacturerAddress: product?.manufacturerAddress,
+                    sku: product?.sku,
+                    countryOfOrigin: product?.countryOfOrigin,
+                    marketedBy: product?.marketedBy
+                  }, null, 2)}
+                  </pre>
+                </div>
 
                 {/* Fallback if no specifics are present (consider top-level columns too) */}
-                {!(product?.metadata?.manufacturer?.sku || product?.sku || product?.metadata?.manufacturer?.countryOfOrigin || product?.countryOfOrigin || product?.metadata?.manufacturer?.manufacturerName || product?.metadata?.manufacturer?.name || product?.manufacturer || product?.metadata?.manufacturer?.marketedBy || product?.marketedBy || product?.manufacturerAddress) && (
-                  <div className="px-4 py-6 text-center text-muted-foreground">
-                    <Icon name="Building" size={32} className="mx-auto mb-2 opacity-40" />
-                    <p className="text-sm">No manufacturer details available for this product.</p>
-                  </div>
-                )}
+                {/* Always display fields above; no empty-state block needed */}
               </div>
             </div>
           </div>
