@@ -88,6 +88,18 @@ export const SUBCATEGORY_MAPPINGS = {
 };
 
 const dogFoodSections = [
+  // Age / Life stage first (puppy, adult, senior)
+  buildSection('lifeStages', 'Life Stage', ['Puppy', 'Adult', 'Senior']),
+
+  // Breed size (Small / Medium / Large etc.)
+  buildSection('breedSizes', 'Breed Size', ['Mini', 'Small', 'Medium', 'Large', 'Giant', 'Max']),
+
+  // Specific breeds (helps product filtering by targeted breeds)
+  buildSection('breeds', 'Breed', [
+    'Labrador Retriever', 'German Shepherd', 'Golden Retriever', 'Bulldog', 'Beagle', 'Pug', 'Boxer', 'Dachshund', 'Shih Tzu', 'Chihuahua', 'Rottweiler', 'Doberman', 'Siberian Husky', 'Corgi', 'Maltese', 'All Breeds'
+  ]),
+
+  // Brand list next
   buildSection('brands', 'Brand', [
     'Pet and Co',
     'Hearty',
@@ -99,15 +111,24 @@ const dogFoodSections = [
     'Applaws',
     'Drools'
   ]),
-  buildSection('dogCat', 'Dog/Cat', ['Cat', 'Dog']),
-  buildSection('lifeStages', 'Life Stage', ['Puppy', 'Kitten', 'Adult', 'Senior']),
-  buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Giant', 'Mini', 'Maxi']),
-  buildSection('productTypes', 'Product Type', ['Combo', 'Dry Food', 'Food Toppers', 'Treat', 'Wet Food']),
-  buildSection('specialDiets', 'Special Diet', ['60% Protein', '100% Vegetarian', 'Chicken Free', 'Grain Free', 'High Protein', 'Hypoallergenic']),
+
+  // Veg / Non-Veg
   buildSection('foodType', 'Veg / Non-Veg', ['Vegetarian', 'Non-Vegetarian']),
-  buildSection('proteinSource', 'Protein Source', ['Blueberry', 'Chicken', 'Duck', 'Egg', 'Fish', 'Fruits', 'Lamb', 'Spinach', 'Turkey']),
+
+  // Product / sub-type
+  buildSection('productTypes', 'Product Type', ['Combo', 'Dry Food', 'Baked Dry Food', 'Fresh Food', 'Food Toppers', 'Treat', 'Wet Food']),
+
+  // Special diets and attributes
+  buildSection('specialDiets', 'Special Diet', ['60% Protein', '100% Vegetarian', 'Chicken Free', 'Grain Free', 'High Protein', 'Hypoallergenic']),
+
+  buildSection('proteinSource', 'Protein Source', ['Chicken', 'Fish', 'Turkey', 'Lamb', 'Beef', 'Egg', 'Duck', 'Fruits', 'Vegetables']),
+
+  // Price ranges
   buildSection('priceRanges', 'Price', ['INR 10 - INR 300', 'INR 301 - INR 500', 'INR 501 - INR 1000', 'INR 1000 - INR 2000', 'INR 2000+']),
+
+  // Weights for product filter
   buildSection('weights', 'Weight', ['70 g', '100 g', '150 g', '200 g', '300 g', '340 g', '370 g', '400 g', '500 g', '800 g', '1 kg', '1.5 kg', '2 kg', '3 kg', '5 kg', '10 kg', '20 kg']),
+
   buildSection('sizes', 'Size', ['1.5 kg', '4 kg'])
 ];
 
