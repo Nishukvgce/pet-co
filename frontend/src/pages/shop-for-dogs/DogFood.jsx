@@ -14,15 +14,12 @@ import { normalizeProductFromApi, productMatchesFilterSelections, isDogProduct, 
 
 const categories = [
   { id: 'all', label: 'All Dog Food', img: '/assets/images/essential/all dog food.webp' },
-  { id: 'daily', label: 'Daily Meals', img: '/assets/images/essential/dry food.webp' }, // Using dry food image as fallback
   { id: 'dry', label: 'Dry Food', img: '/assets/images/essential/dry food.webp' },
   { id: 'wet', label: 'Wet Food', img: '/assets/images/essential/wet food.webp' },
-  { id: 'grain-free', label: 'Grain Free', img: '/assets/images/essential/grain free.webp' },
-  { id: 'puppy', label: 'Puppy Food', img: '/assets/images/essential/veterinary food.webp' },
-  { id: 'hypo', label: 'Hypoallergenic', img: '/assets/images/essential/hypoallergenic.webp' },
-  { id: 'vet', label: 'Veterinary Food', img: '/assets/images/essential/veterinary food.webp' },
-  { id: 'toppers', label: 'Food Toppers & Gravy', img: '/assets/images/essential/food toppersgravy.webp' },
-  { id: 'chicken-free', label: 'Chicken Free', img: '/assets/images/essential/chickenfree.webp' }
+  { id: 'baked-dry', label: 'Baked Dry Food', img: '/assets/images/essential/dry food.webp' },
+  { id: 'fresh', label: 'Fresh Food', img: '/assets/images/essential/fresh food.webp' },
+  { id: 'prescription', label: 'Prescription Diet', img: '/assets/images/essential/veterinary food.webp' },
+  { id: 'grain-free', label: 'Grain Free Food', img: '/assets/images/essential/grain free.webp' }
 ];
 
 const sampleProducts = [

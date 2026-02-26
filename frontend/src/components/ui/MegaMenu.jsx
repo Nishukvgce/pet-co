@@ -12,7 +12,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
       label: 'Shop for Dogs',
       icon: '/assets/images/dog/dg1.webp',
       children: [
-        { label: 'Dog Food', type: 'query', category: 'dog-food', subs: ['Daily Meals','Dry Food','Wet Food','Grain Free','Puppy Food','Hypoallergenic','Veterinary Food','Food Toppers & Gravy','All Dog Food'] },
+        { label: 'Dog Food', type: 'query', category: 'dog-food', subs: ['Dry Food','Wet Food','Baked Dry Food','Fresh Food','Prescription Diet','Grain Free Food','All Dog Food'] },
         { label: 'Dog Grooming', type: 'query', category: 'dog-grooming', subs: ['Brushes & Combs','Dry Bath, Wipes & Perfume','Ear, Eye & PawCare','Oral Care','Shampoo & Conditioner','Tick & Flea Control','All Dog Grooming'] },
         { label: 'Dog Treats', type: 'query', category: 'dog-treats', subs: ['Biscuits & Snacks','Soft & Chewy','Natural Treats','Puppy Treats','Vegetarian Treats','Dental Chew','Grain Free Treat','All Dog Treats'] },
         { label: 'Walk Essentials', path: '/shop-for-dogs/walk-essentials', subs: ['Collar','Leash','Harness','Name Tags','Personalised','All Walk Essentials'] },
@@ -432,7 +432,7 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-1">DOG FOOD</h4>
                 <ul className="space-y-0.5">
-                  {['Daily Meals','Dry Food','Wet Food','Grain Free','Puppy Food','Hypoallergenic','Veterinary Food','Food Toppers & Gravy','All Dog Food'].map((t,i)=> (
+                  {['Dry Food','Wet Food','Baked Dry Food','Fresh Food','Prescription Diet','Grain Free Food','All Dog Food'].map((t,i)=> (
                     <li key={i}><Link to={'/shop-for-dogs?category=dog-food&sub=' + encodeURIComponent(t)} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
                   ))}
                 </ul>

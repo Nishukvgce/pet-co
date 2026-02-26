@@ -304,12 +304,11 @@ function App() {
                 <Route path="/shop-for-dogs/dog-training-essentials/stain-odour" element={<DogTrainingEssentials initialActive="Stain & Odour" />} />
                 <Route path="/shop-for-dogs/dogfood/dry-food" element={<DogFood initialActive="Dry Food" />} />
                 <Route path="/shop-for-dogs/dogfood/wet-food" element={<DogFood initialActive="Wet Food" />} />
-                <Route path="/shop-for-dogs/dogfood/grain-free" element={<DogFood initialActive="Grain Free" />} />
-                <Route path="/shop-for-dogs/dogfood/puppy-food" element={<DogFood initialActive="Puppy Food" />} />
-                <Route path="/shop-for-dogs/dogfood/hypoallergenic" element={<DogFood initialActive="Hypoallergenic" />} />
-                <Route path="/shop-for-dogs/dogfood/veterinary-food" element={<DogFood initialActive="Veterinary Food" />} />
-                <Route path="/shop-for-dogs/dogfood/food-toppers-and-gravy" element={<DogFood initialActive="Food Toppers & Gravy" />} />
-                <Route path="/shop-for-dogs/dogfood/daily-meals" element={<DogFood initialActive="Daily Meals" />} />
+                <Route path="/shop-for-dogs/dogfood/baked-dry-food" element={<DogFood initialActive="Baked Dry Food" />} />
+                <Route path="/shop-for-dogs/dogfood/fresh-food" element={<DogFood initialActive="Fresh Food" />} />
+                <Route path="/shop-for-dogs/dogfood/prescription-diet" element={<DogFood initialActive="Prescription Diet" />} />
+                <Route path="/shop-for-dogs/dogfood/grain-free" element={<DogFood initialActive="Grain Free Food" />} />
+                <Route path="/shop-for-dogs/dogfood/all-dog-food" element={<DogFood initialActive="All Dog Food" />} />
                 {/* Cats: route now handled by ShopForCatsIndex */}
                 <Route path="/cats" element={<ShopForCatsIndex />} />
                 <Route path="/cats/:category" element={<ShopForCatsIndex />} />
