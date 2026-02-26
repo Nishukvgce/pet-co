@@ -15,7 +15,9 @@ const categories = [
   { id: 'carriers', label: 'Carriers', img: '/assets/images/dog/dt2.webp' },
   { id: 'travel-bowls', label: 'Travel Bowls', img: '/assets/images/dog/dt3.webp' },
   { id: 'travel-beds', label: 'Travel Beds', img: '/assets/images/dog/dt4.webp' },
-  { id: 'water-bottles', label: 'Water Bottles', img: '/assets/images/dog/dt1.webp' }
+  { id: 'water-bottles', label: 'Water Bottles', img: '/assets/images/dog/dt1.webp' },
+  { id: 'cages-crates', label: 'Cages & Crates', img: '/assets/images/dog/cage.webp' },
+  { id: 'bells-tags', label: 'Bells & Tags', img: '/assets/images/dog/Fil_nametags.webp' }
 ];
 
 const sampleProducts = [
@@ -283,7 +285,7 @@ export default function DogTravelSupplies({ initialActive = 'All Travel Supplies
   const priceRanges = ['INR 10 - INR 300','INR 301 - INR 500','INR 501 - INR 1000','INR 1000 - INR 2000','INR 2000+'];
   const weights = ['320 g','500 g','800 g','1 kg'];
   const sizes = ['Pack of 1','Pack of 2','Pack of 3','Pack of 5'];
-  const subCategories = ['General','Carriers','Travel Bowls','Travel Beds','Water Bottles'];
+  const subCategories = ['General','Carriers','Cages & Crates','Travel Bowls','Travel Beds','Water Bottles','Bells & Tags'];
 
   const [selectedFilters, setSelectedFilters] = useState({});
   const toggleFilter = (key, value) => {

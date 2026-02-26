@@ -201,12 +201,15 @@ function App() {
                 <Route path="/shop-for-dogs/dog-toys/squeaker-toys" element={<DogToys initialActive="Squeaker Toys" />} />
                 {/* Walk Essentials - direct route (no index wrapper) */}
                 <Route path="/shop-for-dogs/walk-essentials" element={<WalkEssentials />} />
-                <Route path="/shop-for-dogs/walk-essentials/all-walk-essentials" element={<WalkEssentials initialActive="All Walk Essentials" />} />
-                <Route path="/shop-for-dogs/walk-essentials/collar" element={<WalkEssentials initialActive="Collar" />} />
-                <Route path="/shop-for-dogs/walk-essentials/leash" element={<WalkEssentials initialActive="Leash" />} />
-                <Route path="/shop-for-dogs/walk-essentials/harness" element={<WalkEssentials initialActive="Harness" />} />
-                <Route path="/shop-for-dogs/walk-essentials/name-tags" element={<WalkEssentials initialActive="Name Tags" />} />
-                <Route path="/shop-for-dogs/walk-essentials/personalised" element={<WalkEssentials initialActive="Personalised" />} />
+                <Route path="/shop-for-dogs/walk-travel-essentials" element={<WalkEssentials />} />
+                <Route path="/shop-for-dogs/walk-essentials/all-walk-essentials" element={<WalkEssentials initialActive="All Walk & Travel Essentials" />} />
+                <Route path="/shop-for-dogs/walk-essentials/collar" element={<WalkEssentials initialActive="Collars" />} />
+                <Route path="/shop-for-dogs/walk-essentials/leash" element={<WalkEssentials initialActive="Leashes" />} />
+                <Route path="/shop-for-dogs/walk-essentials/harness" element={<WalkEssentials initialActive="Harnesses" />} />
+                <Route path="/shop-for-dogs/walk-essentials/gps-tracker" element={<WalkEssentials initialActive="GPS Tracker" />} />
+                <Route path="/shop-for-dogs/walk-essentials/carriers" element={<WalkEssentials initialActive="Carriers & Travel Supplies" />} />
+                <Route path="/shop-for-dogs/walk-essentials/cages-crates" element={<WalkEssentials initialActive="Cages & Crates" />} />
+                <Route path="/shop-for-dogs/walk-essentials/bells-tags" element={<WalkEssentials initialActive="Bells & Tags" />} />
                 <Route path="/shop-for-dogs/dogtreats/all-dog-treats" element={<DogTreats initialActive="All Dog Treats" />} />
                 <Route path="/shop-for-dogs/dogtreats/biscuits-snacks" element={<DogTreats initialActive="Biscuits & Snacks" />} />
                 <Route path="/shop-for-dogs/dogtreats/soft-chewy" element={<DogTreats initialActive="Soft & Chewy" />} />

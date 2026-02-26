@@ -14,9 +14,9 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
       children: [
         { label: 'Dog Food', type: 'query', category: 'dog-food', subs: ['Dry Food','Wet Food','Baked Dry Food','Fresh Food','Prescription Diet','Grain Free Food','All Dog Food'] },
         { label: 'Dog Grooming', type: 'query', category: 'dog-grooming', subs: ['Brushes & Combs','Dry Bath, Wipes & Perfume','Ear, Eye & PawCare','Oral Care','Shampoo & Conditioner','Tick & Flea Control','All Dog Grooming'] },
-        { label: 'Dog Treats', type: 'query', category: 'dog-treats', subs: ['Biscuits & Snacks','Soft & Chewy','Natural Treats','Puppy Treats','Vegetarian Treats','Dental Chew','Grain Free Treat','All Dog Treats'] },
-        { label: 'Walk Essentials', path: '/shop-for-dogs/walk-essentials', subs: ['Collar','Leash','Harness','Name Tags','Personalised','All Walk Essentials'] },
-        { label: 'Dog Toys', path: '/shop-for-dogs/dog-toys', subs: ['Balls','Chew Toys','Crinkle Toys','Fetch Toys','Interactive Toys','Plush Toys','Rope Toys','Squeaker Toys','All Dog Toys'] },
+        { label: 'Dog Treats', type: 'query', category: 'dog-treats', subs: ['Biscuits & Cookies','Bones & Chews','Dental Treats','Jerky Treats','Training Treats','All Dog Treats'] },
+        { label: 'Walk & Travel Essentials', path: '/shop-for-dogs/walk-travel-essentials', subs: ['Collars','Leashes','Harnesses','GPS Tracker','Carriers & Travel Supplies','Cages & Crates','Bells & Tags','All Walk & Travel Essentials'] },
+        { label: 'Dog Toys', path: '/shop-for-dogs/dog-toys', subs: ['Chew Toys','Smart & Interactive Toys','Plush & Soft Toys','Rope & Tug Toys','Ball & Fetch Toys','Squeaky Toys','Treat Dispensing Toys','All Dog Toys'] },
         { label: 'Dog Bedding', path: '/shop-for-dogs/dog-bedding', subs: ['Beds','Blankets & Cushions','Mats','Personalised Bedding','Tents','All Dog Bedding'] },
         { label: 'Dog Clothing & Accessories', path: '/shop-for-dogs/dog-clothing', subs: ['Festive Special','T-Shirts & Dresses','Sweatshirts','Sweaters','Bow Ties & Bandanas','Raincoats','Shoes & Socks','Jackets','Personalised','All Dog Clothing'] },
         { label: 'Dog Bowls & Diners', path: '/shop-for-dogs/dog-bowls-diners', subs: ['All Dog Bowls & Diners','Bowls','Diners','Anti Spill Mats','Travel & Fountain'] },
@@ -446,19 +446,19 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
                   ))}
                 </ul>
                 <hr className="my-1" />
-                <h4 className="text-sm font-semibold text-foreground mb-1">WALK ESSENTIALS</h4>
+                <h4 className="text-sm font-semibold text-foreground mb-1">WALK & TRAVEL ESSENTIALS</h4>
                 <ul className="space-y-0.5">
-                  {['Collar','Leash','Harness','Name Tags','Personalised','All Walk Essentials'].map((t,i)=> (
-                    <li key={i}><Link to={'/shop-for-dogs/walk-essentials/' + slugify(t)} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
+                  {['Collars','Leashes','Harnesses','GPS Tracker','Carriers & Travel Supplies','Cages & Crates','Bells & Tags','All Walk & Travel Essentials'].map((t,i)=> (
+                    <li key={i}><Link to={`/shop-for-dogs?category=walk-travel-essentials&sub=${encodeURIComponent(t)}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
                   ))}
                 </ul>
                 {/* Travel Essentials moved to its own final column for clearer layout */}
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-1">DOG TREATS </h4>
+                <h4 className="text-sm font-semibold text-foreground mb-1">DOG TREATS</h4>
                 <ul className="space-y-0.5">
-                  {['Biscuits & Snacks','Soft & Chewy','Natural Treats','Puppy Treats','Vegetarian Treats','Dental Chew','Grain Free Treat','All Dog Treats'].map((t,i)=> (
+                  {['Biscuits & Cookies','Bones & Chews','Dental Treats','Jerky Treats','Training Treats','All Dog Treats'].map((t,i)=> (
                     <li key={i}><Link to={`/shop-for-dogs?category=dog-treats&sub=${encodeURIComponent(t)}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
                   ))}
                 </ul>
@@ -467,8 +467,8 @@ const MegaMenu = ({ isOpen, onClose, activeCategory, anchorOffset }) => {
               <div>
                 <h4 className="text-sm font-semibold text-foreground mb-1">DOG TOYS</h4>
                 <ul className="space-y-0.5">
-                  {['Balls','Chew Toys','Crinkle Toys','Fetch Toys','Interactive Toys','Plush Toys','Rope Toys','Squeaker Toys','All Dog Toys'].map((t,i)=> (
-                    <li key={i}><Link to={`/shop-for-dogs/dog-toys/${slugify(t)}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
+                  {['Chew Toys','Smart & Interactive Toys','Plush & Soft Toys','Rope & Tug Toys','Ball & Fetch Toys','Squeaky Toys','Treat Dispensing Toys','All Dog Toys'].map((t,i)=> (
+                    <li key={i}><Link to={`/shop-for-dogs?category=dog-toys&sub=${encodeURIComponent(t)}`} onClick={onClose} className="block py-0.5 text-sm leading-tight text-muted-foreground hover:text-primary">{t}</Link></li>
                   ))}
                 </ul>
                 <hr className="my-1" />

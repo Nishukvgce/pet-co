@@ -12,13 +12,11 @@ import { normalizePrice } from '../../utils/priceNormalization';
 
 // Treat categories (left sidebar)
 const categories = [
-  { id: 'biscuits', label: 'Biscuits & Snacks', img: '/assets/images/dog/db2.webp' },
-  { id: 'soft', label: 'Soft & Chewy', img: '/assets/images/dog/db3.webp' },
-  { id: 'natural', label: 'Natural Treats', img: '/assets/images/dog/db4.webp' },
-  { id: 'puppy', label: 'Puppy Treats', img: '/assets/images/dog/db5.webp' },
-  { id: 'vegetarian', label: 'Vegetarian Treats', img: '/assets/images/dog/db6.webp' },
-  { id: 'dental', label: 'Dental Chew', img: '/assets/images/dog/db7.webp' },
-  { id: 'grain-free', label: 'Grain Free Treat', img: '/assets/images/dog/db8.webp' },
+  { id: 'biscuits', label: 'Biscuits & Cookies', img: '/assets/images/dog/db2.webp' },
+  { id: 'bones', label: 'Bones & Chews', img: '/assets/images/dog/db3.webp' },
+  { id: 'dental', label: 'Dental Treats', img: '/assets/images/dog/db7.webp' },
+  { id: 'jerky', label: 'Jerky Treats', img: '/assets/images/dog/db4.webp' },
+  { id: 'training', label: 'Training Treats', img: '/assets/images/dog/db5.webp' },
   { id: 'all', label: 'All Dog Treats', img: '/assets/images/dog/db1.webp' }
 ];
 
@@ -82,25 +80,19 @@ const DogTreats = ({ initialActive = 'All Dog Treats' }) => {
         const subcategoryMap = {
           'all-dog-treats': 'All Dog Treats',
           'all': 'All Dog Treats',
-          'biscuits': 'Biscuits & Snacks',
-          'biscuit': 'Biscuits & Snacks',
-          'snacks': 'Biscuits & Snacks',
-          'soft': 'Soft & Chewy',
-          'soft-chewy': 'Soft & Chewy',
-          'chewy': 'Soft & Chewy',
-          'natural': 'Natural Treats',
-          'natural-treats': 'Natural Treats',
-          'puppy': 'Puppy Treats',
-          'puppy-treats': 'Puppy Treats',
-          'vegetarian': 'Vegetarian Treats',
-          'vegetarian-treats': 'Vegetarian Treats',
-          'veg': 'Vegetarian Treats',
-          'dental': 'Dental Chew',
-          'dental-chew': 'Dental Chew',
-          'chew': 'Dental Chew',
-          'grain-free': 'Grain Free Treat',
-          'grain-free-treat': 'Grain Free Treat',
-          'grainfree': 'Grain Free Treat'
+          'biscuits': 'Biscuits & Cookies',
+          'biscuits-and-cookies': 'Biscuits & Cookies',
+          'biscuit': 'Biscuits & Cookies',
+          'snacks': 'Biscuits & Cookies',
+          'bones': 'Bones & Chews',
+          'bones-and-chews': 'Bones & Chews',
+          'chews': 'Bones & Chews',
+          'dental': 'Dental Treats',
+          'dental-treats': 'Dental Treats',
+          'jerky': 'Jerky Treats',
+          'jerky-treats': 'Jerky Treats',
+          'training': 'Training Treats',
+          'training-treats': 'Training Treats'
         };
 
         // Get URL parameters
@@ -268,17 +260,15 @@ const DogTreats = ({ initialActive = 'All Dog Treats' }) => {
   const priceRanges = ['INR 10 - INR 300','INR 301 - INR 500','INR 501 - INR 1000','INR 1000 - INR 2000','INR 2000+'];
   const weights = ['320 g','500 g','800 g','1kg','300 g','340 g','370 g','400 g','500 g','800 g','1 kg','1.5 kg','2 kg','3 kg','5 kg','10 kg','20 kg'];
   const sizes = ['Pack of 1','Pack of 2','Pack of 3','Pack of 5'];
-  const subCategories = ['Biscuits & Snacks','Natural Treats','Puppy Treats','Vegetarian Treats','Grain Free Treat'];
+  const subCategories = ['Biscuits & Cookies','Bones & Chews','Dental Treats','Jerky Treats','Training Treats','All Dog Treats'];
 
   const routeMap = {
     'All Dog Treats': '/shop-for-dogs?category=dog-treats&sub=All%20Dog%20Treats',
-    'Biscuits & Snacks': '/shop-for-dogs?category=dog-treats&sub=Biscuits%20%26%20Snacks',
-    'Soft & Chewy': '/shop-for-dogs?category=dog-treats&sub=Soft%20%26%20Chewy',
-    'Natural Treats': '/shop-for-dogs?category=dog-treats&sub=Natural%20Treats',
-    'Puppy Treats': '/shop-for-dogs?category=dog-treats&sub=Puppy%20Treats',
-    'Vegetarian Treats': '/shop-for-dogs?category=dog-treats&sub=Vegetarian%20Treats',
-    'Dental Chew': '/shop-for-dogs?category=dog-treats&sub=Dental%20Chew',
-    'Grain Free Treat': '/shop-for-dogs?category=dog-treats&sub=Grain%20Free%20Treat'
+    'Biscuits & Cookies': '/shop-for-dogs?category=dog-treats&sub=Biscuits%20%26%20Cookies',
+    'Bones & Chews': '/shop-for-dogs?category=dog-treats&sub=Bones%20%26%20Chews',
+    'Dental Treats': '/shop-for-dogs?category=dog-treats&sub=Dental%20Treats',
+    'Jerky Treats': '/shop-for-dogs?category=dog-treats&sub=Jerky%20Treats',
+    'Training Treats': '/shop-for-dogs?category=dog-treats&sub=Training%20Treats'
   };
 
   const scrollTopLeft = () => {

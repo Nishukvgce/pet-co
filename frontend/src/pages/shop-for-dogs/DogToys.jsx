@@ -11,14 +11,13 @@ import dataService from '../../services/dataService';
 import { normalizePrice } from '../../utils/priceNormalization';
 
 const categories = [
-  { id: 'balls', label: 'Balls', img: '/assets/images/dog/pt2.webp' },
   { id: 'chew-toys', label: 'Chew Toys', img: '/assets/images/dog/pt3.webp' },
-  { id: 'crinkle-toys', label: 'Crinkle Toys', img: '/assets/images/dog/pt4.webp' },
-  { id: 'fetch-toys', label: 'Fetch Toys', img: '/assets/images/dog/pt5.webp' },
-  { id: 'interactive-toys', label: 'Interactive Toys', img: '/assets/images/dog/pt6.webp' },
-  { id: 'plush-toys', label: 'Plush Toys', img: '/assets/images/dog/pt7.webp' },
-  { id: 'rope-toys', label: 'Rope Toys', img: '/assets/images/dog/pt8.webp' },
-  { id: 'squeaker-toys', label: 'Squeaker Toys', img: '/assets/images/dog/pt9.webp' },
+  { id: 'smart-interactive', label: 'Smart & Interactive Toys', img: '/assets/images/dog/pt6.webp' },
+  { id: 'plush-soft', label: 'Plush & Soft Toys', img: '/assets/images/dog/pt7.webp' },
+  { id: 'rope-tug', label: 'Rope & Tug Toys', img: '/assets/images/dog/pt8.webp' },
+  { id: 'ball-fetch', label: 'Ball & Fetch Toys', img: '/assets/images/dog/pt2.webp' },
+  { id: 'squeaky', label: 'Squeaky Toys', img: '/assets/images/dog/pt9.webp' },
+  { id: 'treat-dispensing', label: 'Treat Dispensing Toys', img: '/assets/images/dog/pt4.webp' },
   { id: 'all', label: 'All Dog Toys', img: '/assets/images/dog/pt1.webp' }
 ];
 
@@ -86,30 +85,26 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
         const subcategoryMap = {
           'all-dog-toys': 'All Dog Toys',
           'all': 'All Dog Toys',
-          'balls': 'Balls',
-          'ball': 'Balls',
           'chew-toys': 'Chew Toys',
-          'chew-toy': 'Chew Toys',
           'chew': 'Chew Toys',
-          'crinkle-toys': 'Crinkle Toys',
-          'crinkle-toy': 'Crinkle Toys',
-          'crinkle': 'Crinkle Toys',
-          'fetch-toys': 'Fetch Toys',
-          'fetch-toy': 'Fetch Toys',
-          'fetch': 'Fetch Toys',
-          'interactive-toys': 'Interactive Toys',
-          'interactive-toy': 'Interactive Toys',
-          'interactive': 'Interactive Toys',
-          'plush-toys': 'Plush Toys',
-          'plush-toy': 'Plush Toys',
-          'plush': 'Plush Toys',
-          'rope-toys': 'Rope Toys',
-          'rope-toy': 'Rope Toys',
-          'rope': 'Rope Toys',
-          'squeaker-toys': 'Squeaker Toys',
-          'squeaker-toy': 'Squeaker Toys',
-          'squeaker': 'Squeaker Toys',
-          'squeaky': 'Squeaker Toys'
+          'chew-toy': 'Chew Toys',
+          'smart-interactive': 'Smart & Interactive Toys',
+          'smart-and-interactive': 'Smart & Interactive Toys',
+          'interactive-toys': 'Smart & Interactive Toys',
+          'interactive': 'Smart & Interactive Toys',
+          'plush-soft': 'Plush & Soft Toys',
+          'plush-and-soft': 'Plush & Soft Toys',
+          'plush': 'Plush & Soft Toys',
+          'rope-tug': 'Rope & Tug Toys',
+          'rope-and-tug': 'Rope & Tug Toys',
+          'rope': 'Rope & Tug Toys',
+          'ball-fetch': 'Ball & Fetch Toys',
+          'ball-and-fetch': 'Ball & Fetch Toys',
+          'ball': 'Ball & Fetch Toys',
+          'squeaky': 'Squeaky Toys',
+          'squeaker-toys': 'Squeaky Toys',
+          'treat-dispensing': 'Treat Dispensing Toys',
+          'treat-dispensing-toys': 'Treat Dispensing Toys'
         };
 
         // Get URL parameters
@@ -241,14 +236,13 @@ export default function DogToys({ initialActive = 'All Dog Toys' }) {
   }, [products, active, location.search]);
 
   const routeMap = {
-    'Balls': '/shop-for-dogs?category=dog-toys&sub=Balls',
     'Chew Toys': '/shop-for-dogs?category=dog-toys&sub=Chew%20Toys',
-    'Crinkle Toys': '/shop-for-dogs?category=dog-toys&sub=Crinkle%20Toys',
-    'Fetch Toys': '/shop-for-dogs?category=dog-toys&sub=Fetch%20Toys',
-    'Interactive Toys': '/shop-for-dogs?category=dog-toys&sub=Interactive%20Toys',
-    'Plush Toys': '/shop-for-dogs?category=dog-toys&sub=Plush%20Toys',
-    'Rope Toys': '/shop-for-dogs?category=dog-toys&sub=Rope%20Toys',
-    'Squeaker Toys': '/shop-for-dogs?category=dog-toys&sub=Squeaker%20Toys',
+    'Smart & Interactive Toys': '/shop-for-dogs?category=dog-toys&sub=Smart%20%26%20Interactive%20Toys',
+    'Plush & Soft Toys': '/shop-for-dogs?category=dog-toys&sub=Plush%20%26%20Soft%20Toys',
+    'Rope & Tug Toys': '/shop-for-dogs?category=dog-toys&sub=Rope%20%26%20Tug%20Toys',
+    'Ball & Fetch Toys': '/shop-for-dogs?category=dog-toys&sub=Ball%20%26%20Fetch%20Toys',
+    'Squeaky Toys': '/shop-for-dogs?category=dog-toys&sub=Squeaky%20Toys',
+    'Treat Dispensing Toys': '/shop-for-dogs?category=dog-toys&sub=Treat%20Dispensing%20Toys',
     'All Dog Toys': '/shop-for-dogs?category=dog-toys&sub=All%20Dog%20Toys'
   };
 

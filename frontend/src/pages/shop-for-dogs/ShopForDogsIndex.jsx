@@ -24,7 +24,7 @@ export default function ShopForDogsIndex() {
 
   let Page = DogTreats; // Default fallback
 
-  if (cat === 'walk-essentials' || cat === 'walkessentials' || cat === 'walk') {
+  if (cat === 'walk-essentials' || cat === 'walkessentials' || cat === 'walk' || cat.includes('travel') || cat === 'dog-travel-supplies' || cat === 'walk-travel-essentials') {
     Page = WalkEssentials;
   } else if (cat.includes('groom')) {
     Page = () => <DogGrooming initialActive={sub ? decodeURIComponent(sub) : undefined} />;

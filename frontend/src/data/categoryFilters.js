@@ -206,11 +206,14 @@ const catTreatsSections = [
 ];
 
 const dogWalkSections = [
-  buildSection('brands', 'Brand', ['Pet and Co', 'Trixie', 'Farmina']),
-  buildSection('productTypes', 'Product Type', ['Collars', 'Leashes', 'Harness', 'Name Tags', 'Personalised']),
+  buildSection('lifeStages', 'Life Stage', ['Puppy', 'Adult', 'Senior']),
+  buildSection('breedSizes', 'Breed Size', ['Mini', 'Small', 'Medium', 'Large', 'Giant']),
+  buildSection('breeds', 'Breed', ['Labrador Retriever','German Shepherd','Golden Retriever','Bulldog','Beagle','Pug','Boxer','Dachshund','Shih Tzu','Chihuahua','All Breeds']),
+  buildSection('brands', 'Brand', ['Pet and Co', 'Trixie', 'Farmina', 'Hearty', 'Royal Canin']),
+  buildSection('productTypes', 'Product Type', ['Collars', 'Leashes', 'Harnesses', 'GPS Tracker', 'Carriers & Travel Supplies', 'Cages & Crates', 'Bells & Tags']),
   buildSection('materials', 'Material', ['Nylon', 'Leather', 'Rope', 'Canvas']),
-  buildSection('sizes', 'Size', ['XS', 'S', 'M', 'L', 'XL']),
-  buildSection('color', 'Color', ['Red', 'Blue', 'Green', 'Yellow', 'Pink', 'Purple', 'Orange', 'Brown', 'Black', 'White', 'Gray'])
+  buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+']),
+  buildSection('sizes', 'Size', ['XS', 'S', 'M', 'L', 'XL'])
 ];
 
 const catLitterSuppliesSections = [
@@ -291,14 +294,8 @@ const dogHealthHygieneSections = [
   buildSection('specialDiets', 'Special Diet', ['Grain Free'])
 ];
 
-const dogTravelSections = [
-  buildSection('brands', 'Brand', ['Trixie', 'M-petrs', 'savic']),
-  buildSection('lifeStages', 'Life Stage', ['Kitten', 'Adult']),
-  buildSection('breedSizes', 'Breed Size', ['Small', 'Medium', 'Large', 'Persian', 'Maine Coon', 'Siamese']),
-  buildSection('productTypes', 'Product Type', ['travel']),
-  buildSection('priceRanges', 'Price', ['INR 100 - INR 500', 'INR 501 - INR 1000', 'INR 1000+']),
-  buildSection('sizes', 'Size', ['Small', 'Medium', 'Large', 'Extra Large'])
-];
+// Travel-related options are now merged into walk sections (Walk & Travel Essentials)
+const dogTravelSections = dogWalkSections;
 
 const dogTrainingSections = [
   buildSection('brands', 'Brand', ['Pet and Co']),
@@ -422,13 +419,13 @@ export const CATEGORY_FILTERS = {
       food: buildSubcategoryConfig('Dog Food', dogFoodSections),
       grooming: buildSubcategoryConfig('Dog Grooming', dogGroomingSections),
       treats: buildSubcategoryConfig('Dog Treats', dogTreatsSections),
-      walkEssentials: buildSubcategoryConfig('Walk Essentials', dogWalkSections),
+      walkEssentials: buildSubcategoryConfig('Walk & Travel Essentials', dogWalkSections),
       toys: buildSubcategoryConfig('Dog Toys', dogToysSections),
       bedding: buildSubcategoryConfig('Dog Bedding', dogBedsSections),
       clothing: buildSubcategoryConfig('Dog Clothing & Accessories', dogClothingSections),
       bowls: buildSubcategoryConfig('Dog Bowls & Diners', dogBowlsSections),
       healthHygiene: buildSubcategoryConfig('Dog Health & Hygiene', dogHealthHygieneSections),
-      travel: buildSubcategoryConfig('Dog Travel Supplies', dogTravelSections),
+      travel: buildSubcategoryConfig('Walk & Travel Essentials', dogTravelSections),
       training: buildSubcategoryConfig('Dog Training Essentials', dogTrainingSections)
     }
   },
